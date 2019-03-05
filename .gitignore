@@ -1,0 +1,39 @@
+### Maven ###
+target/
+
+### MAC ###
+*.DS_Store
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+### Eclipse ###
+.metadata
+
+### DB4O ###
+**/*.db4o
+
+### SoupUI ###
+**/soapui*.log
+
+### Ignore int test log file ###
+**/rest*.log
