@@ -1,6 +1,6 @@
 ## What is this repository for? ##
 
-To run spring boot and spring cloud enabled services on the BIP Platform, it must adhere to various service patterns. This repository contains suite of framework libraries, auto configurations, test libraries and parent POM that can be included as dependencies to enable the patterns
+To run spring boot and spring cloud enabled services on the BIP Platform, it must adhere to various service patterns. This repository contains suite of framework libraries, auto configurations, test libraries and parent POM that must be included as dependencies to enable the patterns
 
 ## Project Breakdown ##
 
