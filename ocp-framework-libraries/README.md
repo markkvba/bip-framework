@@ -1,8 +1,14 @@
-This page documents the purpose and capabilities of **OpenShift Reference Framework** library.
+This page documents the purpose and capabilities of **OpenShift Container Platform Framework Libraries** for the services.
 
-## What is this repository for? ##
+## What is this library project for? ##
 
-This is a repository for the framework library that would be referenced by the application services for JSR-303 Validation, exception handling etc.
+This project contains interfaces, classes necessary and referenced by the application services for aspect, audit, exception, WS client config, JSR-303 Validation, exception handling etc.
 
+## How to add dependency in your project? ##
 
-See [Reference Quick Start Guide](https://github.com/department-of-veterans-affairs/os-svc-reference-spring-boot/wiki/DEV-:-Platform-Quick-Start-Guide) for the software prerequisites.
+    <dependency>
+        <groupId>gov.va.ocp.reference</groupId>
+        <artifactId>ocp-framework-libraries</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
