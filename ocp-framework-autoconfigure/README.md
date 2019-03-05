@@ -24,5 +24,12 @@ OCP Framework Autoconfigure Project is a suite of POM files that provides applic
 **gov.va.ocp.framework.vault.bootstrap.autoconfigure**: vault starter and bootstrap auto-configuration to bootstrap the Vault PropertySource as the first source loaded. 
                                                         This is important so that we can use the Vault generated Consul ACL token to authenticate with Consul for both 
                                                         Service Discovery and a K/V configuration source
+     
+## How to add dependencies in your maven pom.xml? ##
+    <dependency>
+        <groupId>gov.va.ocp.reference</groupId>
+        <artifactId>ocp-framework-autoconfigure</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 
 
