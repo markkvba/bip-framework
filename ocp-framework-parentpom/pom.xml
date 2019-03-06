@@ -101,6 +101,10 @@
 		<logback-classic.version>1.2.3</logback-classic.version>
 		<embedded-redis.version>0.6</embedded-redis.version>
 		<jfiglet.version>0.0.8</jfiglet.version>
+		
+		<!-- GitHub server corresponds to entry in ~/.m2/settings.xml -->
+		<!-- TEMPORARY TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
+    	<github.global.server>github</github.global.server>
 
 	</properties>
 
@@ -244,6 +248,38 @@
             </resource>
 		</resources>
 		<plugins>
+			<!-- TEMPORARY GITHUB PLUGIN TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
+		    <plugin>
+		        <artifactId>maven-deploy-plugin</artifactId>
+		        <configuration>
+		               <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+		        </configuration>
+		    </plugin>
+		    <!-- TEMPORARY GITHUB PLUGIN TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
+		    <plugin>
+	            <groupId>com.github.github</groupId>
+	            <artifactId>site-maven-plugin</artifactId>
+	            <version>0.12</version>
+	            <configuration>
+	                <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+	                <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+	                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+	                <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+	                <includes><include>**/*</include></includes>
+	                <repositoryName>ocp-framework</repositoryName>      <!-- github repo name -->
+	                <repositoryOwner>department-of-veterans-affairs</repositoryOwner>    <!-- github username  -->
+	                <merge>true</merge>
+	            </configuration>
+	            <executions>
+	              <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+	              <execution>
+	                <goals>
+	                  <goal>site</goal>
+	                </goals>
+	                <phase>deploy</phase>
+	              </execution>
+	            </executions>
+        	</plugin>
 			<!-- repackages jar and war plugins so they can be executed with command
 				line -->
 			<plugin>
