@@ -16,7 +16,7 @@ To run spring boot and spring cloud enabled services on the BIP Platform, it mus
 
 There are 2 options to ensure that these libraries are downloaded on your local workstation for your service project to build.
 
-** OPTION 1 **
+**OPTION 1**
 1. Clone this repository
    
     git clone https://github.com/department-of-veterans-affairs/ocp-framework.git
@@ -25,7 +25,7 @@ There are 2 options to ensure that these libraries are downloaded on your local 
    
     mvn clean install
 
-** OPTION 2 **
+**OPTION 2**
 Add the below section in the reactor (root) pom.xml of your service project. See example: https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml
 
 pom.xml
