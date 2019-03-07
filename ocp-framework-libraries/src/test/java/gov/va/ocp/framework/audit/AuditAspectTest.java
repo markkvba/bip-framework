@@ -74,7 +74,7 @@ class AuditServiceRequest extends DomainRequest {
 
 @Configuration
 @ComponentScan({ "gov.va.ocp.framework.audit",
-		"gov.va.ocp.reference.starter.audit.autoconfigure" })
+		"gov.va.ocp.framework.audit.autoconfigure" })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 class Config {
 

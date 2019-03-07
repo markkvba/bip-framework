@@ -27,7 +27,7 @@ OCP Framework Autoconfigure Project is a suite of POM files that provides applic
      
 ## How to add dependencies in your maven pom.xml? ##
     <dependency>
-        <groupId>gov.va.ocp.reference</groupId>
+        <groupId>gov.va.ocp.framework</groupId>
         <artifactId>ocp-framework-autoconfigure</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </dependency>

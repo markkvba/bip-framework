@@ -1,4 +1,4 @@
-package gov.va.ocp.reference.security.jwt.correlation;
+package gov.va.ocp.framework.security.jwt.correlation;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

@@ -10,7 +10,7 @@ import gov.va.ocp.framework.security.jwt.JwtAuthenticationProvider;
 import gov.va.ocp.framework.security.jwt.JwtParser;
 
 @Configuration
-@ComponentScan(basePackages = { "gov.va.ocp.reference.security", "gov.va.ocp.framework.security.jwt" })
+@ComponentScan(basePackages = { "gov.va.ocp.framework.security", "gov.va.ocp.framework.security.jwt" })
 public class OcpSecurityTestConfig {
 	@Bean
 	JwtAuthenticationProperties jwtAuthenticationProperties() {

@@ -7,7 +7,7 @@ This project contains interfaces, classes necessary and referenced by the applic
 ## How to add dependency in your project? ##
 
     <dependency>
-        <groupId>gov.va.ocp.reference</groupId>
+        <groupId>gov.va.ocp.framework</groupId>
         <artifactId>ocp-framework-libraries</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </dependency>

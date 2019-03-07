@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="gov.va.ocp.reference.test" level="DEBUG"/>
+    <logger name="gov.va.ocp.framework.test" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
