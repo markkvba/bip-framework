@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.log;
 
+import static org.junit.Assert.assertNotNull;
 import static gov.va.ocp.framework.log.HttpLoggingUtils.UNABLE_TO_LOG_HTTP_MESSAGE_TEXT;
 import static gov.va.ocp.framework.log.HttpLoggingUtils.logMessage;
 import static org.junit.Assert.assertTrue;
@@ -45,8 +46,7 @@ public class HttpLoggingUtilsTest {
 
 		try {
 			doAnswer((Answer<?>) invocation -> {
-				ByteArrayTransportOutputStream arg0 =
-						invocation.getArgument(0);
+				ByteArrayTransportOutputStream arg0 = invocation.getArgument(0);
 				arg0.write(TEST_SAMPLE_SOAP_MESSAGE.getBytes("UTF-8"));
 				return null;
 			}).when(request).writeTo(any(HttpLoggingUtils.ByteArrayTransportOutputStream.class));
@@ -80,5 +80,18 @@ public class HttpLoggingUtilsTest {
 
 		assertTrue(outString.contains(UNABLE_TO_LOG_HTTP_MESSAGE_TEXT));
 
+	}
+
+	@Test
+	public void byteArrayTransportOutputStreamTest() {
+		ByteArrayTransportOutputStream stream = new ByteArrayTransportOutputStream();
+		try {
+			stream.addHeader("test name", "test value");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("Should not have thrown  exception while adding header");
+		}
+
+		assertNotNull(stream.toByteArray());
 	}
 }

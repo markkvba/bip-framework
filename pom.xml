@@ -21,6 +21,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 		<plugins>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
 				<inherited>false</inherited>
 				<configuration>
 					<skip>true</skip>
@@ -28,7 +29,8 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 			</plugin>
 			<plugin>
 				<groupId>com.github.github</groupId>
-		           <artifactId>site-maven-plugin</artifactId>
+		        <artifactId>site-maven-plugin</artifactId>
+		        <version>0.12</version>
 				<inherited>false</inherited>
 				<configuration>
 					<skip>true</skip>
