@@ -25,9 +25,7 @@ import feign.Feign;
 import feign.Target;
 import feign.hystrix.SetterFactory;
 import gov.va.ocp.framework.audit.autoconfigure.OcpAuditAutoConfiguration;
-import gov.va.ocp.framework.feign.autoconfigure.OcpFeignAutoConfiguration;
-import gov.va.ocp.framework.feign.autoconfigure.TokenFeignRequestInterceptor;
-import gov.va.ocp.framework.rest.provider.aspect.RestProviderHttpResponseAspect;
+import gov.va.ocp.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.ocp.framework.security.autoconfigure.OcpSecurityAutoConfiguration;
 
 /**
@@ -47,10 +45,11 @@ public class OcpFeignAutoConfigurationTest {
 		context = new AnnotationConfigWebApplicationContext();
 		TestPropertyValues.of("feign.hystrix.enabled=true").applyTo(context);
 		TestPropertyValues.of("ocp.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
-		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class, EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
+		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class,
+				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				OcpSecurityAutoConfiguration.class,
 				OcpAuditAutoConfiguration.class, OcpFeignAutoConfiguration.class,
-				RestProviderHttpResponseAspect.class);
+				ProviderHttpAspect.class);
 
 		context.refresh();
 		assertNotNull(context);

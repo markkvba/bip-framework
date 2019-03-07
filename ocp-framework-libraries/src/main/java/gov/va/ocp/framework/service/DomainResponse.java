@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import gov.va.ocp.framework.messages.Message;
+import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.transfer.AbstractTransferObject;
 import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
@@ -21,8 +21,8 @@ public class DomainResponse extends AbstractTransferObject implements DomainTran
 
 	private static final long serialVersionUID = -3937937807439785385L;
 
-	/** The messages. */
-	private List<Message> messages;
+	/** The serviceMessages. */
+	private List<ServiceMessage> serviceMessages;
 
 	/*
 	 * cacheResponse
@@ -40,7 +40,7 @@ public class DomainResponse extends AbstractTransferObject implements DomainTran
 	}
 
 	/**
-	 * Adds a {@link Message} to the messages list on the response.
+	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
 	 * Messages made with this constructor CANNOT be used in a JSR303 context.
 	 *
@@ -51,19 +51,19 @@ public class DomainResponse extends AbstractTransferObject implements DomainTran
 	 */
 	public final void addMessage(final MessageSeverity severity, final String key, final String text,
 			final HttpStatus httpStatus) {
-		if (messages == null) {
-			messages = new LinkedList<>();
+		if (serviceMessages == null) {
+			serviceMessages = new LinkedList<>();
 		}
-		final Message message = new Message();
-		message.setSeverity(severity);
-		message.setKey(key);
-		message.setText(text);
-		message.setHttpStatus(httpStatus);
-		messages.add(message);
+		final ServiceMessage serviceMessage = new ServiceMessage();
+		serviceMessage.setSeverity(severity);
+		serviceMessage.setKey(key);
+		serviceMessage.setText(text);
+		serviceMessage.setHttpStatus(httpStatus);
+		serviceMessages.add(serviceMessage);
 	}
 
 	/**
-	 * Adds a {@link Message} to the messages list on the response.
+	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
 	 * Messages made with this constructor CAN be used in a JSR303 context.
 	 *
@@ -78,62 +78,62 @@ public class DomainResponse extends AbstractTransferObject implements DomainTran
 	public final void addMessage(final MessageSeverity severity, final String key, final String text,
 			final HttpStatus httpStatus,
 			Integer paramCount, String[] paramNames, String[] paramValues) {
-		if (messages == null) {
-			messages = new LinkedList<>();
+		if (serviceMessages == null) {
+			serviceMessages = new LinkedList<>();
 		}
-		final Message message = new Message();
-		message.setSeverity(severity);
-		message.setKey(key);
-		message.setText(text);
-		message.setHttpStatus(httpStatus);
-		message.setParamCount(paramCount);
-		message.setParamNames(paramNames);
-		message.setParamValues(paramValues);
-		messages.add(message);
+		final ServiceMessage serviceMessage = new ServiceMessage();
+		serviceMessage.setSeverity(severity);
+		serviceMessage.setKey(key);
+		serviceMessage.setText(text);
+		serviceMessage.setHttpStatus(httpStatus);
+		serviceMessage.setParamCount(paramCount);
+		serviceMessage.setParamNames(paramNames);
+		serviceMessage.setParamValues(paramValues);
+		serviceMessages.add(serviceMessage);
 	}
 
 	/**
-	 * Adds all messages.
+	 * Adds all serviceMessages.
 	 *
 	 * @param newMessages the newMessages
 	 */
-	public final void addMessages(final List<Message> newMessages) {
-		if (messages == null) {
-			messages = new LinkedList<>();
+	public final void addMessages(final List<ServiceMessage> newMessages) {
+		if (serviceMessages == null) {
+			serviceMessages = new LinkedList<>();
 		}
-		messages.addAll(newMessages);
+		serviceMessages.addAll(newMessages);
 	}
 
 	/**
-	 * Gets the messages.
+	 * Gets the serviceMessages.
 	 *
-	 * @return the messages
+	 * @return the serviceMessages
 	 */
-	public final List<Message> getMessages() {
-		if (messages == null) {
-			messages = new LinkedList<>();
+	public final List<ServiceMessage> getMessages() {
+		if (serviceMessages == null) {
+			serviceMessages = new LinkedList<>();
 		}
-		return this.messages;
+		return this.serviceMessages;
 	}
 
 	/**
-	 * Sets the messages.
+	 * Sets the serviceMessages.
 	 *
-	 * @param messages the new messages
+	 * @param serviceMessages the new serviceMessages
 	 */
-	public final void setMessages(final List<Message> messages) {
-		this.messages = messages;
+	public final void setMessages(final List<ServiceMessage> serviceMessages) {
+		this.serviceMessages = serviceMessages;
 	}
 
 	/**
-	 * Checks for messages of type.
+	 * Checks for serviceMessages of type.
 	 *
 	 * @param severity the severity
 	 * @return true, if successful
 	 */
 	private boolean hasMessagesOfType(final MessageSeverity severity) {
-		for (final Message message : getMessages()) {
-			if (severity.equals(message.getSeverity())) {
+		for (final ServiceMessage serviceMessage : getMessages()) {
+			if (severity.equals(serviceMessage.getSeverity())) {
 				return true;
 			}
 		}

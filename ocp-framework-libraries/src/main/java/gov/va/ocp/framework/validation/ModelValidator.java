@@ -31,7 +31,6 @@ import gov.va.ocp.framework.util.Defense;
  * @author jimmyray
  * @version 2.0
  */
-
 public class ModelValidator implements Serializable {
 	private static final long serialVersionUID = -6019704406389010935L;
 

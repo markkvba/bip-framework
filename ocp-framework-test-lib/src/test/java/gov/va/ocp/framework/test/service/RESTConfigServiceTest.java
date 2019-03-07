@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.util;
+package gov.va.ocp.framework.test.service;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;

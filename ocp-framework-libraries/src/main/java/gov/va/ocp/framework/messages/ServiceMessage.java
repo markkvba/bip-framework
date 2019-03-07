@@ -12,13 +12,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Message is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate status or
+ * ServiceMessage is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate status or
  * other sorts of information during method calls between components/layers. This is serializable and can be used in SOAP or REST
  * calls.
  *
  * @author jshrader
  */
-public class Message extends AbstractMessage {
+public class ServiceMessage extends AbstractMessage {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -1711431368372127555L;
@@ -51,7 +51,7 @@ public class Message extends AbstractMessage {
 	/**
 	 * Instantiates a new message.
 	 */
-	public Message() { // NOSONAR @NotNull is a validation annotation, not a usage annotation
+	public ServiceMessage() { // NOSONAR @NotNull is a validation annotation, not a usage annotation
 		super(); // NOSONAR @NotNull is a validation annotation, not a usage annotation
 	} // NOSONAR @NotNull is a validation annotation, not a usage annotation
 
@@ -63,7 +63,7 @@ public class Message extends AbstractMessage {
 	 * @param text the text of the message
 	 * @param httpStatus the http status associated with the cause of the message
 	 */
-	public Message(final MessageSeverity severity, final String key, final String text, final HttpStatus httpStatus) {
+	public ServiceMessage(final MessageSeverity severity, final String key, final String text, final HttpStatus httpStatus) {
 		super();
 		this.severity = severity;
 		this.key = key;
@@ -78,7 +78,7 @@ public class Message extends AbstractMessage {
 	 * @param paramNames the names, in same order as thier respective getParamValues
 	 * @param paramValues the values, in same order as their respective getParamNames
 	 */
-	public Message(Integer paramCount, String[] paramNames, String[] paramValues) {
+	public ServiceMessage(Integer paramCount, String[] paramNames, String[] paramValues) {
 		super(paramCount, paramNames, paramValues);
 	}
 
@@ -93,7 +93,7 @@ public class Message extends AbstractMessage {
 	 * @param paramNames the names, in same order as thier respective getParamValues
 	 * @param paramValues the values, in same order as their respective getParamNames
 	 */
-	public Message(final MessageSeverity severity, final String key, final String text, HttpStatus httpStatus,
+	public ServiceMessage(final MessageSeverity severity, final String key, final String text, HttpStatus httpStatus,
 			Integer paramCount, String[] paramNames, String[] paramValues) {
 		super(paramCount, paramNames, paramValues);
 		this.severity = severity;

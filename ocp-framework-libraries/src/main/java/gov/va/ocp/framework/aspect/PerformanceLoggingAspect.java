@@ -62,7 +62,8 @@ public class PerformanceLoggingAspect {
 
 			returnObject = joinPoint.proceed();
 		} catch (Throwable throwable) {
-			LOGGER.error("PerformanceLoggingAspect encountered uncaught exception. Throwable Cause.");
+			LOGGER.error("PerformanceLoggingAspect encountered uncaught exception: " + throwable.getClass().getSimpleName() + ": "
+					+ throwable.getMessage(), throwable);
 			throw throwable;
 		} finally {
 			LOGGER.debug("PerformanceLoggingAspect after method was called.");

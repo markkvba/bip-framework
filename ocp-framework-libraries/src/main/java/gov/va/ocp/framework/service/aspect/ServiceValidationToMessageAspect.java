@@ -19,16 +19,19 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.messages.Message;
 import gov.va.ocp.framework.messages.MessageSeverity;
-import gov.va.ocp.framework.rest.provider.aspect.BaseRestProviderAspect;
+import gov.va.ocp.framework.messages.ServiceMessage;
+import gov.va.ocp.framework.rest.provider.aspect.BaseHttpProviderAspect;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.validation.Validatable;
 import gov.va.ocp.framework.validation.ViolationMessageParts;
 
 /**
+ * TODO This aspect needs pointcut on the controller, not the service api.
+ * TODO So ServiceMessage and DomainResponse need to change to Message and ProviderResponse.
+ *
  * The Class ServiceValidationToMessageAspect is an aspect that performs validation (i.e. JSR 303) on the
- * standard service methods which are validatable, converting validation errors into Message objects in a consistent way.
+ * standard service methods which are validatable, converting validation errors into ServiceMessage objects in a consistent way.
  *
  * Standard service operations which are validatable are those which are...
  * (1) public
@@ -112,7 +115,7 @@ public class ServiceValidationToMessageAspect extends BaseServiceAspect {
 				domainResponse.addMessage(MessageSeverity.ERROR, fieldError.getNewKey(), fieldError.getText(), HttpStatus.BAD_REQUEST);
 			}
 		}
-		Collections.sort(domainResponse.getMessages(), Comparator.comparing(Message::getKey));
+		Collections.sort(domainResponse.getMessages(), Comparator.comparing(ServiceMessage::getKey));
 	}
 
 	/**
@@ -137,8 +140,8 @@ public class ServiceValidationToMessageAspect extends BaseServiceAspect {
 		if (!messages.isEmpty()) {
 			domainResponse = (DomainResponse) methodSignature.getMethod().getReturnType().newInstance();
 			convertMapToMessages(domainResponse, messages);
-			AuditLogger.error(BaseRestProviderAspect.getDefaultAuditableInstance(methodSignature.getMethod()),
-					domainResponse.getMessages().stream().map(Message::toString).reduce("", String::concat), null);
+			AuditLogger.error(BaseHttpProviderAspect.getDefaultAuditableInstance(methodSignature.getMethod()),
+					domainResponse.getMessages().stream().map(ServiceMessage::toString).reduce("", String::concat), null);
 		}
 		return domainResponse;
 	}

@@ -16,7 +16,7 @@ public class BearerTokenService {
 
 	private static BearerTokenService instance = null;
 	private String bearerToken = "";
-
+	
 	private BearerTokenService() {
 
 	}
@@ -46,7 +46,7 @@ public class BearerTokenService {
 		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
 		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
 		final RESTUtil restUtil = new RESTUtil();
-		restUtil.setUpRequest(headerFile, headerMap);
+        restUtil.setUpRequest(headerFile, headerMap);
 		return restUtil.postResponse(baseUrl + tokenUrl);
 	}
 

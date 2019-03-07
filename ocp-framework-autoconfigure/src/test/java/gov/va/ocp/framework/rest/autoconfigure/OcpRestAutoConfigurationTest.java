@@ -17,8 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import gov.va.ocp.framework.audit.autoconfigure.OcpAuditAutoConfiguration;
-import gov.va.ocp.framework.rest.autoconfigure.OcpRestAutoConfiguration;
-import gov.va.ocp.framework.rest.provider.aspect.RestProviderHttpResponseAspect;
+import gov.va.ocp.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.ocp.framework.security.autoconfigure.OcpSecurityAutoConfiguration;
 
 /**
@@ -36,12 +35,13 @@ public class OcpRestAutoConfigurationTest {
 	@Before
 	public void setup() {
 		context = new AnnotationConfigWebApplicationContext();
-		TestPropertyValues.of("feign.hystrix.enabled=true").applyTo(context);;
-		TestPropertyValues.of("ocp.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);;
-		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class, EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
+		TestPropertyValues.of("feign.hystrix.enabled=true").applyTo(context);
+		TestPropertyValues.of("ocp.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
+		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class,
+				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				OcpSecurityAutoConfiguration.class,
 				OcpAuditAutoConfiguration.class, OcpRestAutoConfiguration.class,
-				RestProviderHttpResponseAspect.class);
+				ProviderHttpAspect.class);
 
 		context.refresh();
 		assertNotNull(context);
@@ -69,7 +69,7 @@ public class OcpRestAutoConfigurationTest {
 		} catch (Exception e) {
 			assertTrue(BeansException.class.isAssignableFrom(e.getClass()));
 		} finally {
-			TestPropertyValues.of("ocp.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);;
+			TestPropertyValues.of("ocp.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
 			context.refresh();
 			ocpRestAutoConfiguration = context.getBean(OcpRestAutoConfiguration.class);
 			assertNotNull(ocpRestAutoConfiguration);
@@ -78,7 +78,7 @@ public class OcpRestAutoConfigurationTest {
 
 	@Test
 	public void testWebConfiguration() throws Exception {
-		assertNotNull(ocpRestAutoConfiguration.restProviderHttpResponseAspect());
+		assertNotNull(ocpRestAutoConfiguration.providerHttpAspect());
 		assertNotNull(ocpRestAutoConfiguration.restProviderTimerAspect());
 		assertNotNull(ocpRestAutoConfiguration.restClientTemplate());
 		assertNotNull(ocpRestAutoConfiguration.tokenClientHttpRequestInterceptor());

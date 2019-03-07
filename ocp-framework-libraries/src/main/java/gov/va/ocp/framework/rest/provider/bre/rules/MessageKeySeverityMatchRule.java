@@ -5,11 +5,11 @@ import java.util.Set;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.http.HttpStatus;
 
-import gov.va.ocp.framework.messages.Message;
+import gov.va.ocp.framework.rest.provider.Message;
 import gov.va.ocp.framework.util.Defense;
 
 /**
- * The Class MessageKeySeverityMatchRule is a rule to match a Message based on key and severity.
+ * The Class MessageKeySeverityMatchRule is a rule to match a ServiceMessage based on key and severity.
  *
  * @author jshrader
  */
@@ -36,7 +36,7 @@ public final class MessageKeySeverityMatchRule implements MessagesToHttpStatusRu
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.rest.provider.MessagesToHttpStatusRule#eval(java.util.Set)
 	 */
 	@Override
@@ -46,11 +46,10 @@ public final class MessageKeySeverityMatchRule implements MessagesToHttpStatusRu
 		}
 		if (messagesToEval != null) {
 			for (final Message message : messagesToEval) {
-				if (messageToMatch.getSeverity()!=null && 
-					messageToMatch.getSeverity().equals(message.getSeverity()) && 
-					messageToMatch.getKey()!= null &&
-					messageToMatch.getKey().equals(message.getKey())) 
-				{
+				if (messageToMatch.getSeverity() != null &&
+						messageToMatch.getSeverity().equals(message.getSeverity()) &&
+						messageToMatch.getKey() != null &&
+						messageToMatch.getKey().equals(message.getKey())) {
 					return httpStatus;
 				}
 			}
@@ -60,7 +59,7 @@ public final class MessageKeySeverityMatchRule implements MessagesToHttpStatusRu
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

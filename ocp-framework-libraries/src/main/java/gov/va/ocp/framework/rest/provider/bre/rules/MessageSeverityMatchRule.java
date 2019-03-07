@@ -1,16 +1,16 @@
 package gov.va.ocp.framework.rest.provider.bre.rules;
 
-import gov.va.ocp.framework.messages.Message;
-import gov.va.ocp.framework.messages.MessageSeverity;
-import gov.va.ocp.framework.util.Defense;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.http.HttpStatus;
 
-import java.util.Set;
+import gov.va.ocp.framework.messages.MessageSeverity;
+import gov.va.ocp.framework.rest.provider.Message;
+import gov.va.ocp.framework.util.Defense;
 
 /**
- * The Class MessageSeverityMatchRule is a rule used to match a Message solely based on Severity.
+ * The Class MessageSeverityMatchRule is a rule used to match a ServiceMessage solely based on Severity.
  *
  * @author jshrader
  */
@@ -38,14 +38,14 @@ public final class MessageSeverityMatchRule implements MessagesToHttpStatusRule 
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.rest.provider.MessagesToHttpStatusRule#eval(java.util.Set)
 	 */
 	@Override
 	public HttpStatus eval(final Set<Message> messagesToEval) {
 		if (messagesToEval != null) {
-			for (final Message message : messagesToEval) {
-				if (severityToMatch.equals(message.getSeverity())) {
+			for (final Message serviceMessage : messagesToEval) {
+				if (severityToMatch.equals(serviceMessage.getSeverity())) {
 					return httpStatus;
 				}
 			}
@@ -55,7 +55,7 @@ public final class MessageSeverityMatchRule implements MessagesToHttpStatusRule 
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

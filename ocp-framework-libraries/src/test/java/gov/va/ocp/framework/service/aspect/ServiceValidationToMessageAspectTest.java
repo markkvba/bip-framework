@@ -63,10 +63,10 @@ public class ServiceValidationToMessageAspectTest {
 		testMessageList = new ArrayList<ViolationMessageParts>();
 		ViolationMessageParts errorMessage1 = new ViolationMessageParts();
 		errorMessage1.setNewKey("ErrMsg1");
-		errorMessage1.setText("Error Message 1");
+		errorMessage1.setText("Error ServiceMessage 1");
 		ViolationMessageParts errorMessage2 = new ViolationMessageParts();
 		errorMessage2.setNewKey("ErrMsg2");
-		errorMessage2.setText("Error Message 2");
+		errorMessage2.setText("Error ServiceMessage 2");
 		testMessageList.add(errorMessage1);
 		testMessageList.add(errorMessage2);
 

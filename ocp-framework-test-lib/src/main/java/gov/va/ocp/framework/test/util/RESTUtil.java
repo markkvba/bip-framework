@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -42,21 +41,16 @@ import io.restassured.specification.RequestSpecification;
  * @author sravi
  */
 
-public class RESTUtil {
+public class RESTUtil { 
 
 	private static final String DOCUMENTS_FOLDER_NAME = "documents";
 	private static final String PAYLOAD_FOLDER_NAME = "payload";
 	private static final String SUBMIT_PAYLOAD = "submitPayload";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTUtil.class);
 
-	private Map<String, String> mapReqHeader = new HashMap<>(); // stores
-																 // request
-																 // headers
-	String contentType = new String();
+	// stores request headers
+	private Map<String, String> mapReqHeader = new HashMap<>(); 
 	String jsonText = new String();
-	File requestFile = null;
-	File responseFile = null;
-	PrintStream requestStream = null;
 	Response response = null; // stores response from rest
 
 	/**
@@ -75,10 +69,9 @@ public class RESTUtil {
 				if (urlFilePath == null) {
 					LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
 				} else {
-					requestFile = new File(urlFilePath.toURI());
 					// Note - Enhance the code so if Header.Accept is xml, then it
 					// should use something like convertToXML function
-					jsonText = readFile(requestFile);
+					jsonText = readFile(new File(urlFilePath.toURI()));
 				}
 			}
 		} catch (final URISyntaxException ex) {
@@ -96,6 +89,15 @@ public class RESTUtil {
 		mapReqHeader = mapHeader;
 	}
 
+	/**
+	 * Gets  header object.
+	 *
+	 * @return mapHeader
+	 */
+	public Map<String, String> getRequest() {
+		return mapReqHeader;
+	}
+	
 	/**
 	 * Invokes REST end point for a GET method using REST assured API and return
 	 * response JSON object.
@@ -336,6 +338,7 @@ public class RESTUtil {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					LOGGER.info("While thread was waiting to retry REST call ... " + e.getMessage(), e);
+					Thread.currentThread().interrupt();
 				}
 			}
 			retries++;

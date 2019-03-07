@@ -4,16 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>gov.va.ocp.framework</groupId>
-		<artifactId>ocp-framework-parentpom</artifactId>
+		<groupId>gov.va.ocp.reference</groupId>
+		<artifactId>ocp-reference-parentpom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../ocp-framework-parentpom</relativePath>
+		<relativePath>../ocp-reference-parentpom</relativePath>
 	</parent>
 
-	<artifactId>ocp-framework-test-lib</artifactId>
+	<artifactId>ocp-reference-test-lib</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
-	<description>Test Framework for integration test on OpenShift Container Platform (OCP) Application Framework</description>
+	<description>Test Framework for integration test</description>
 
 	<properties>
 		<!-- 3rd party versions -->
@@ -136,7 +136,14 @@
 		    <artifactId>commons-text</artifactId>
 		    <version>1.6</version>
 		</dependency>
-		
+		<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -31,14 +31,21 @@ public class RemoteServiceCallInterceptor implements MethodInterceptor {
 	@Autowired
 	RequestResponseLogSerializer asyncLogging;
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Spring-managed interceptor that executes equivalent of an {@code @Around} aspect.
+	 * <p>
+	 * This interceptor executes, in order, the following tasks:
+	 * <ol>
+	 * <li>Collect audit data and log to async audit logger
+	 * <li>
+	 * </ol>
 	 *
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
 	@Override
 	public final Object invoke(final MethodInvocation methodInvocation) throws Throwable {
 
+		/* Create audit log for request to partner client */
 		String paramtypesToLog = "";
 		for (Class<?> c : methodInvocation.getMethod().getParameterTypes()) {
 			paramtypesToLog += c.getName() + ", ";
@@ -60,13 +67,12 @@ public class RemoteServiceCallInterceptor implements MethodInterceptor {
 		asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
 				MessageSeverity.INFO, null);
 
+		/* Call the partner client */
 		Object retVal = "";
 		try {
 			retVal = methodInvocation.proceed();
 		} catch (Exception e) {
-			/**
-			 * Catch; Audit Log and Rethrow exception
-			 */
+			/* Catch; Audit Log and Rethrow exception */
 			String errMsg = e.getMessage() != null ? e.getMessage() : " null.";
 			LOGGER.error("Partner error: methodName {} " + methodInvocation.getMethod() + "; method args {} "
 					+ ReflectionToStringBuilder.toString(methodInvocation.getArguments()) + ".\n Message: " + errMsg, e);
@@ -74,6 +80,7 @@ public class RemoteServiceCallInterceptor implements MethodInterceptor {
 			throw e;
 		}
 
+		/* Create audit log for response from partner client */
 		final ResponseAuditData resonseAuditData = new ResponseAuditData();
 		resonseAuditData.setResponse(retVal);
 

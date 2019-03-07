@@ -21,7 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.event.Level;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
-import gov.va.ocp.framework.aspect.PerformanceLoggingAspect;
 import gov.va.ocp.framework.log.OcpLogger;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -111,8 +110,7 @@ public class PerformanceLoggingAspectTest extends AbstractBaseLogTester {
 			PerformanceLoggingAspect.aroundAdvice(proceedingJoinPoint);
 			fail("Should have thrown exception.");
 		} catch (Throwable e) {
-			assertEquals("PerformanceLoggingAspect encountered uncaught exception. Throwable Cause.",
-					super.getAppender().get(0).getMessage());
+			assertTrue(super.getAppender().get(0).getMessage().startsWith("PerformanceLoggingAspect encountered uncaught exception"));
 			assertEquals(ch.qos.logback.classic.Level.ERROR, super.getAppender().get(0).getLevel());
 		}
 

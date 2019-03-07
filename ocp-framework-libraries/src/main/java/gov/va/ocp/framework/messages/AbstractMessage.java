@@ -10,7 +10,7 @@ import gov.va.ocp.framework.transfer.AbstractTransferObject;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Message is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate status or
+ * ServiceMessage is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate status or
  * other sorts of information during method calls between components/layers. This is serializable and can be used in SOAP or REST
  * calls. This class has param names and valsues as lists.
  * <p>

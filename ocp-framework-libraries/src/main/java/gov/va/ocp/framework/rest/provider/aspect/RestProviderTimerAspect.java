@@ -9,9 +9,9 @@ import gov.va.ocp.framework.aspect.PerformanceLoggingAspect;
 
 @Aspect
 @Order(-9999)
-public class RestProviderTimerAspect extends BaseRestProviderAspect {
+public class RestProviderTimerAspect extends BaseHttpProviderAspect {
 
-	@Around("restController() && publicServiceResponseRestMethod()")
+	@Around("publicServiceResponseRestMethod()")
 	public Object aroundAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
 		// thrown exceptions are handled in the PerformanceLoggingAspect
 		return PerformanceLoggingAspect.aroundAdvice(joinPoint);

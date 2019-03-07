@@ -8,6 +8,5 @@ package gov.va.ocp.framework.transfer;
  *
  * @author aburkholder
  */
-public interface ProviderTransferObjectMarker {
-
+public interface ProviderTransferObjectMarker extends OcpBaseTransferMarker {
 }

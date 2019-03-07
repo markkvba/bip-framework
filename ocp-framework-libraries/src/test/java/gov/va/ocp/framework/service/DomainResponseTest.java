@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import gov.va.ocp.framework.messages.Message;
+import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.validation.ViolationMessageParts;
@@ -22,19 +22,19 @@ import gov.va.ocp.framework.validation.ViolationMessageParts;
 public class DomainResponseTest {
 
 	private DomainResponse mockServiceResponse;
-	private List<Message> testMessages = new ArrayList<Message>();
-	Message infoMessage;
-	Message warnMessage;
-	Message errorMessage;
-	Message fatalMessage;
+	private List<ServiceMessage> testMessages = new ArrayList<ServiceMessage>();
+	ServiceMessage infoMessage;
+	ServiceMessage warnMessage;
+	ServiceMessage errorMessage;
+	ServiceMessage fatalMessage;
 
 	@Before
 	public void setUp() throws Exception {
 		mockServiceResponse = new DomainResponse();
-		infoMessage = new Message(MessageSeverity.INFO, "InfoKey", "Dummy info text", null);
-		warnMessage = new Message(MessageSeverity.WARN, "WarnKey", "Dummy warning text", null);
-		errorMessage = new Message(MessageSeverity.ERROR, "ErrorKey", "Dummy error text", null);
-		fatalMessage = new Message(MessageSeverity.FATAL, "FatalKey", "Dummy fatal text", null);
+		infoMessage = new ServiceMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null);
+		warnMessage = new ServiceMessage(MessageSeverity.WARN, "WarnKey", "Dummy warning text", null);
+		errorMessage = new ServiceMessage(MessageSeverity.ERROR, "ErrorKey", "Dummy error text", null);
+		fatalMessage = new ServiceMessage(MessageSeverity.FATAL, "FatalKey", "Dummy fatal text", null);
 		addTestMessages();
 	}
 

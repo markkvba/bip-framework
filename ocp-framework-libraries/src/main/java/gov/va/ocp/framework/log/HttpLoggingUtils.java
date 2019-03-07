@@ -27,6 +27,15 @@ public class HttpLoggingUtils {
 	private HttpLoggingUtils() {
 	}
 
+	/**
+	 * Log an INFO SOAP message asynchronously.
+	 * 
+	 * @param title brief title for the message
+	 * @param webServiceMessage the message
+	 * @param auditActivity the activity to which the message is logged
+	 * @param auditClassName the class from with the message is logged
+	 * @param auditEvent the event being logged
+	 */
 	public static void logMessage(final String title, final WebServiceMessage webServiceMessage, final String auditActivity,
 			final String auditClassName, AuditEvents auditEvent) {
 		try {

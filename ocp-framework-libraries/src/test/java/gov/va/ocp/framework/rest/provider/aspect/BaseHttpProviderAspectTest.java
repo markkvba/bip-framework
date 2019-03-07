@@ -16,19 +16,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
-import gov.va.ocp.framework.rest.provider.aspect.BaseRestProviderAspect;
+import gov.va.ocp.framework.rest.provider.aspect.BaseHttpProviderAspect;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BaseRestProviderAspectTest {
+public class BaseHttpProviderAspectTest {
 
 	@Test
 	public void testRestController() {
-		BaseRestProviderAspect.restController();
+		BaseHttpProviderAspect.restController();
 	}
 
 	@Test
 	public void testPublicServiceResponseRestMethod() {
-		BaseRestProviderAspect.publicServiceResponseRestMethod();
+		BaseHttpProviderAspect.publicServiceResponseRestMethod();
 	}
 
 	@Mock
@@ -51,64 +51,64 @@ public class BaseRestProviderAspectTest {
 	}
 
 	/**
-	 * Test of auditableAnnotation method, of class BaseRestProviderAspect.
+	 * Test of auditableAnnotation method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testAuditableAnnotation() {
-		BaseRestProviderAspect.auditableAnnotation();
+		BaseHttpProviderAspect.auditableAnnotation();
 	}
 
 	/**
-	 * Test of auditableExecution method, of class BaseRestProviderAspect.
+	 * Test of auditableExecution method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testAuditableExecution() {
-		BaseRestProviderAspect.auditableExecution();
+		BaseHttpProviderAspect.auditableExecution();
 	}
 
 	/**
-	 * Test of auditRestController method, of class BaseRestProviderAspect.
+	 * Test of auditRestController method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testAuditRestController() {
-		BaseRestProviderAspect.restController();
+		BaseHttpProviderAspect.restController();
 	}
 
 	/**
-	 * Test of getDefaultAuditableInstance method, of class BaseRestProviderAspect.
+	 * Test of getDefaultAuditableInstance method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testGetDefaultAuditableInstance() throws Exception {
 		Method method = myMethod();
 		AuditEvents expResult = AuditEvents.REQUEST_RESPONSE;
-		AuditEventData result = BaseRestProviderAspect.getDefaultAuditableInstance(method);
+		AuditEventData result = BaseHttpProviderAspect.getDefaultAuditableInstance(method);
 		assertEquals(expResult, result.getEvent());
 		assertEquals("someMethod", result.getActivity());
-		assertEquals("gov.va.ocp.framework.rest.provider.aspect.BaseRestProviderAspectTest", result.getAuditClass());
+		assertEquals("gov.va.ocp.framework.rest.provider.aspect.BaseHttpProviderAspectTest", result.getAuditClass());
 
 	}
 
 	/**
-	 * Test of getDefaultAuditableInstance method, of class BaseRestProviderAspect.
+	 * Test of getDefaultAuditableInstance method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testGetDefaultAuditableInstanceMethodNotNull() throws Exception {
 		Method method = myMethod();
 		AuditEvents expResult = AuditEvents.REQUEST_RESPONSE;
-		AuditEventData result = BaseRestProviderAspect.getDefaultAuditableInstance(method);
+		AuditEventData result = BaseHttpProviderAspect.getDefaultAuditableInstance(method);
 		assertEquals(expResult, result.getEvent());
 		assertEquals(method.getName(), result.getActivity());
 		assertEquals(method.getDeclaringClass().getName(), result.getAuditClass());
 	}
 
 	/**
-	 * Test of getDefaultAuditableInstance method, of class BaseRestProviderAspect.
+	 * Test of getDefaultAuditableInstance method, of class BaseHttpProviderAspect.
 	 */
 	@Test
 	public void testGetDefaultAuditableInstanceMethodNull() throws Exception {
 		Method method = null;
 		AuditEvents expResult = AuditEvents.REQUEST_RESPONSE;
-		AuditEventData result = BaseRestProviderAspect.getDefaultAuditableInstance(method);
+		AuditEventData result = BaseHttpProviderAspect.getDefaultAuditableInstance(method);
 		assertEquals(expResult, result.getEvent());
 		assertEquals("Unknown", result.getActivity());
 		assertEquals("Unknown", result.getAuditClass());

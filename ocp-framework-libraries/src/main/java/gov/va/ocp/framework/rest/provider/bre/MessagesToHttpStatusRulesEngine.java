@@ -5,11 +5,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.messages.Message;
+import gov.va.ocp.framework.rest.provider.Message;
 import gov.va.ocp.framework.rest.provider.bre.rules.MessagesToHttpStatusRule;
 
 /**
@@ -78,12 +79,14 @@ public final class MessagesToHttpStatusRulesEngine {
 		boolean has4xxErrors = false;
 		for (final Message message : messagesInResponse) {
 			// check if any message has a 500 error status
-			has5xxErrors = has5xxErrors || message.getHttpStatus() == null ? false : message.getHttpStatus().is5xxServerError();
-			has4xxErrors = has4xxErrors || message.getHttpStatus() == null ? false : message.getHttpStatus().is4xxClientError();
+			HttpStatus httpStatus = message.getHttpStatus(
+					StringUtils.isBlank(message.getStatus()) ? 0 : Integer.valueOf(message.getStatus()));
+			has5xxErrors = has5xxErrors || httpStatus.is5xxServerError();
+			has4xxErrors = has4xxErrors || httpStatus.is4xxClientError();
 			// convert current messages into Set of Message objects for quicker matching
-			messagesToEval.add(new Message(message.getSeverity(), message.getKey(), message.getText(), message.getHttpStatus()));
+			messagesToEval.add(new Message(message.getSeverity(), message.getKey(), message.getText(), httpStatus.value()));
 		}
-		// if the resopnse messages have 4xx and 5xx, send 400 error
+		// if the response messages have 4xx and 5xx, send 400 error
 		if (has5xxErrors && has4xxErrors) {
 			return HttpStatus.BAD_REQUEST;
 		} else if (has5xxErrors) {
