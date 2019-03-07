@@ -4,16 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>gov.va.ocp.reference</groupId>
-		<artifactId>ocp-reference-parentpom</artifactId>
+		<groupId>gov.va.ocp.framework</groupId>
+		<artifactId>ocp-framework-parentpom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../ocp-reference-parentpom</relativePath>
+		<relativePath>../ocp-framework-parentpom</relativePath>
 	</parent>
 
-	<artifactId>ocp-reference-test-lib</artifactId>
+	<artifactId>ocp-framework-test-lib</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
-	<description>Test Framework for integration test</description>
+	<description>Test Framework for integration test on OpenShift Container Platform (OCP) Application Framework</description>
 
 	<properties>
 		<!-- 3rd party versions -->
