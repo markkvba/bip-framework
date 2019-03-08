@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.classmate.TypeResolver;
 
-import gov.va.ocp.framework.service.DomainResponse;
+import gov.va.ocp.framework.rest.provider.ProviderResponse;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -49,7 +49,7 @@ public class SwaggerAutoConfiguration {
 	private static final String MESSAGE_400 = "There was an error encountered processing the Request.  Response will contain a  \"messages\" element that will provide further information on the error.  This request shouldn\'t be retried until corrected.";
 	private static final String MESSAGE_500 = "There was an error encountered processing the Request.  Response will contain a  \"messages\" element that will provide further information on the error.  Please retry.  If problem persists, please contact support with a copy of the Response.";
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String SERVICE_RESPONSE = "DomainResponse";
+	private static final String PROVIDER_RESPONSE = "ProviderResponse";
 
 	@Autowired
 	private SwaggerProperties swaggerProperties;
@@ -66,7 +66,7 @@ public class SwaggerAutoConfiguration {
 				.apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
 				.build()
 				.ignoredParameterTypes(ApiIgnore.class)
-				.additionalModels(typeResolver.resolve(DomainResponse.class))
+				.additionalModels(typeResolver.resolve(ProviderResponse.class))
 				.globalResponseMessage(RequestMethod.GET, globalResponseMessages())
 				.globalResponseMessage(RequestMethod.POST, globalResponseMessages())
 				.globalResponseMessage(RequestMethod.DELETE, globalResponseMessages())
@@ -107,13 +107,13 @@ public class SwaggerAutoConfiguration {
 	private List<ResponseMessage> globalResponseMessages() {
 		List<ResponseMessage> responseMessages = new ArrayList<>();
         responseMessages.add(new ResponseMessageBuilder().code(200).message(MESSAGE_200).
-                responseModel(new ModelRef(SERVICE_RESPONSE)).build());
+                responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
         responseMessages.add(new ResponseMessageBuilder().code(400).message(MESSAGE_400).
-                responseModel(new ModelRef(SERVICE_RESPONSE)).build());
+                responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
         responseMessages.add(new ResponseMessageBuilder().code(500).message(MESSAGE_500).
-                responseModel(new ModelRef(SERVICE_RESPONSE)).build());
+                responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
         responseMessages.add(new ResponseMessageBuilder().code(403).message(MESSAGE_403).
-                responseModel(new ModelRef(SERVICE_RESPONSE)).build());
+                responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
 		return responseMessages;
 	}
 }

@@ -12,9 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -99,12 +101,26 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		AuditLogger.error(auditData, data, t);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#successfulAuthentication(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain, org.springframework.security.core.Authentication)
+	 */
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		super.successfulAuthentication(request, response, chain, authResult);
 
 		chain.doFilter(request, response);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.springframework.security.core.AuthenticationException)
+	 */
+	@Override
+	public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException exception) throws IOException, ServletException {
+	  
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getLocalizedMessage()); 
 	}
 }
 
