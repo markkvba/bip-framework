@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.exception;
+package gov.va.ocp.framework.exception.interceptor;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

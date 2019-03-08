@@ -1,8 +1,11 @@
 package gov.va.ocp.framework.security.jwt.correlation;
 
+import org.springframework.http.HttpStatus;
+
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * Vaules for user status codes.
@@ -55,7 +58,7 @@ public enum UserStatus {
 		}
 		String msg = "UserStatus {} does not exist: " + stringValue;
 		LOGGER.error(msg);
-		throw new OcpRuntimeException(msg);
+		throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 	}
 
 }

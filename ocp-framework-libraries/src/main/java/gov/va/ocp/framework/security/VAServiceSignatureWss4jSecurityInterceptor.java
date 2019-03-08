@@ -14,6 +14,7 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.w3c.dom.Document;
@@ -22,6 +23,7 @@ import org.w3c.dom.Element;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * A Wss4j2 Security Interceptor to digitally sign a soap message.
@@ -112,8 +114,9 @@ public abstract class VAServiceSignatureWss4jSecurityInterceptor extends Abstrac
 					+ ReflectionToStringBuilder.reflectionToString(soapMessage));
 
 		} catch (final WSSecurityException e) {
-			LOGGER.error("failed encryption ", e);
-			throw new OcpRuntimeException(e);
+			String msg = "Could not sign SOAPMessage Document.";
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 

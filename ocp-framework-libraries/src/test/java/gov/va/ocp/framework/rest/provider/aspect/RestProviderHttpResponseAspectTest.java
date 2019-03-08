@@ -33,7 +33,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import gov.va.ocp.framework.AbstractBaseLogTester;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.Auditable;
-import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
@@ -231,7 +230,7 @@ public class RestProviderHttpResponseAspectTest extends AbstractBaseLogTester {
 
 	}
 
-	// TODO
+	// TODO this test is no longer meaningful, as the exception carries messages now, not transfer objects
 	@Ignore
 	@Test
 	public void testAroundAdviceCatchReferenceExceptionLogging() {
@@ -241,7 +240,7 @@ public class RestProviderHttpResponseAspectTest extends AbstractBaseLogTester {
 		restProviderHttpResponseAspect = new RestProviderHttpResponseAspect();
 		Object returnObject = null;
 		try {
-			Mockito.lenient().when(proceedingJoinPoint.proceed()).thenThrow(new OcpRuntimeException());
+//			Mockito.lenient().when(proceedingJoinPoint.proceed()).thenThrow(new OcpRuntimeException());
 			Mockito.lenient().when(proceedingJoinPoint.getSignature()).thenReturn(mockSignature);
 			Mockito.lenient().when(mockSignature.getMethod()).thenReturn(myMethod());
 			Mockito.lenient().when(proceedingJoinPoint.getTarget()).thenReturn(new TestClass());

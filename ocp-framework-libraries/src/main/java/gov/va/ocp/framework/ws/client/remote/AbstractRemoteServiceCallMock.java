@@ -10,6 +10,7 @@ import javax.xml.transform.Source;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.test.client.MockWebServiceServer;
@@ -20,6 +21,7 @@ import org.springframework.xml.transform.StringSource;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.transfer.PartnerTransferObjectMarker;
 import gov.va.ocp.framework.util.Defense;
 
@@ -179,8 +181,9 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 		try {
 			resource = new ResourceSource(new ClassPathResource(MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)));
 		} catch (final IOException e) {
-			throw new OcpRuntimeException("Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
-					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.", e);
+			throw new OcpRuntimeException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
+					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.",
+					MessageSeverity.FATAL, HttpStatus.SERVICE_UNAVAILABLE, e);
 		}
 		return resource;
 	}

@@ -29,7 +29,7 @@ import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 
-import gov.va.ocp.framework.exception.InterceptingExceptionTranslator;
+import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 import gov.va.ocp.framework.ws.client.BaseWsClientConfig;

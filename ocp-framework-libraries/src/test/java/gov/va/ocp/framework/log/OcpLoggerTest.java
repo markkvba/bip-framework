@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -32,9 +33,7 @@ import com.github.lalyos.jfiglet.FigletFont;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.log.OcpBanner;
-import gov.va.ocp.framework.log.OcpLogMarkers;
-import gov.va.ocp.framework.log.OcpLogger;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 @RunWith(SpringRunner.class)
 public class OcpLoggerTest extends AbstractBaseLogTester {
@@ -44,7 +43,8 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 	private final OcpBanner banner = OcpBanner.newBanner("TEST BANNER", Level.INFO);
 	private static final String MESSAGE = "Test message";
 	private static final Marker MARKER = OcpLogMarkers.TEST.getMarker();
-	private static final OcpRuntimeException EXCEPTION = new OcpRuntimeException("TestException");
+	private static final OcpRuntimeException EXCEPTION =
+			new OcpRuntimeException("some.message.key", "TestException", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 	/** The output capture. */
 	@Rule
@@ -166,7 +166,7 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 
 		int captureCount = 0;
 
-		if ((mdcReserveLength + messageLength + stackTraceLength) > MAX_TOTAL_LOG_LEN) {
+		if (mdcReserveLength + messageLength + stackTraceLength > MAX_TOTAL_LOG_LEN) {
 			if (messageLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_MSG_LENGTH) {
 				String[] splitMessages = ReflectionTestUtils.invokeMethod(logger, "splitMessages", message);
 				captureCount = splitMessages.length;
@@ -174,7 +174,7 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 				captureCount = 1;
 			}
 
-			if ((stackTraceLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_STACK_TRACE_TEXT_LENGTH)) {
+			if (stackTraceLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_STACK_TRACE_TEXT_LENGTH) {
 				String[] splitstackTrace = ReflectionTestUtils.invokeMethod(logger, "splitStackTraceText", stackTrace);
 				captureCount = captureCount + splitstackTrace.length;
 			} else if (stackTraceLength != 0) {
@@ -197,7 +197,8 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 	@Test
 	public final void testLargeMessageWithLargeStackTrace() {
 
-		Exception e = new OcpRuntimeException("TestException");
+		Exception e = new OcpRuntimeException("some.message.key", "TestException",
+				MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ArrayList<StackTraceElement> stackTraces = new ArrayList<>();
 		for (int i = 0; i < 6; i++) {
 			stackTraces.addAll(Arrays.asList(e.getStackTrace()));
@@ -216,7 +217,7 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 
 		int captureCount = 0;
 
-		if ((mdcReserveLength + messageLength + stackTraceLength) > MAX_TOTAL_LOG_LEN) {
+		if (mdcReserveLength + messageLength + stackTraceLength > MAX_TOTAL_LOG_LEN) {
 			if (messageLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_MSG_LENGTH) {
 				String[] splitMessages = ReflectionTestUtils.invokeMethod(logger, "splitMessages", message);
 				captureCount = splitMessages.length;
@@ -224,7 +225,7 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 				captureCount = 1;
 			}
 
-			if ((stackTraceLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_STACK_TRACE_TEXT_LENGTH)) {
+			if (stackTraceLength >= gov.va.ocp.framework.log.OcpBaseLogger.MAX_STACK_TRACE_TEXT_LENGTH) {
 				String[] splitstackTrace = ReflectionTestUtils.invokeMethod(logger, "splitStackTraceText", stackTrace);
 				captureCount = captureCount + splitstackTrace.length;
 			} else if (stackTraceLength != 0) {
