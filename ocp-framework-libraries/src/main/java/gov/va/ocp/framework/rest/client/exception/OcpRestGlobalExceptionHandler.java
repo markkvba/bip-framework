@@ -1,8 +1,6 @@
 package gov.va.ocp.framework.rest.client.exception;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -75,19 +73,17 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleMethodArgumentNotValidException(HttpServletRequest req, MethodArgumentNotValidException ex) {
 		logger.info(ex.getClass().getName());
-		final List<String> errors = new ArrayList<String>();
+		final ProviderResponse apiError = new ProviderResponse();
 		for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-			errors.add(error.getField() + ": " + error.getDefaultMessage());
+			apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
+					error.getDefaultMessage(),
+					HttpStatus.BAD_REQUEST);
 		}
 		for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-			errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
+			apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
+					error.getDefaultMessage(),
+					HttpStatus.BAD_REQUEST);
 		}
-
-		final String finalError = String.join(",", errors);
-		final ProviderResponse apiError = new ProviderResponse();
-		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
-				finalError,
-				HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
 	}
 
@@ -131,6 +127,7 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
 	public ResponseEntity<Object> handleMethodArgumentTypeMismatch(HttpServletRequest req, final MethodArgumentTypeMismatchException ex) {
 		logger.info(ex.getClass().getName());
+		logger.error("error", ex);
 		//
 		final String error = ex.getName() + " should be of type " + ex.getRequiredType().getName();
 
@@ -153,16 +150,12 @@ public class OcpRestGlobalExceptionHandler {
 	public ResponseEntity<Object> handleConstraintViolation(HttpServletRequest req, final ConstraintViolationException ex) {
 		logger.info(ex.getClass().getName());
 		//
-		final List<String> errors = new ArrayList<String>();
-		for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-			errors.add(violation.getRootBeanClass().getName() + " " + violation.getPropertyPath() + ": " + violation.getMessage());
-		}
-
-		final String finalError = String.join(",", errors);
 		final ProviderResponse apiError = new ProviderResponse();
-		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
-				finalError,
-				HttpStatus.BAD_REQUEST);
+		for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+			apiError.addMessage(MessageSeverity.ERROR, violation.getRootBeanClass().getName() + " " + violation.getPropertyPath(),
+					violation.getMessage(),
+					HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 

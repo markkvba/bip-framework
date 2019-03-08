@@ -330,7 +330,7 @@ public class RestProviderHttpResponseAspectTest extends AbstractBaseLogTester {
 		try {
 			method = aspect.getClass().getDeclaredMethod("getReturnResponse", boolean.class, Object.class);
 			method.setAccessible(true);
-			retval = method.invoke(aspect, Boolean.TRUE, new ResponseEntity<DomainResponse>(HttpStatus.valueOf(200)));
+			retval = method.invoke(aspect, Boolean.TRUE, new ResponseEntity<DomainResponse>(HttpStatus.resolve(200)));
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			e.printStackTrace();
