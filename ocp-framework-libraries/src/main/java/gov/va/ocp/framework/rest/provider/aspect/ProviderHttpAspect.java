@@ -21,6 +21,7 @@ import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
@@ -138,13 +139,15 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 		try {
 			if (throwable == null) {
 				// null throwable almost certain not to happen, but check nonetheless
-				throwable = new Throwable("Unknown exception.");
+				throwable = new Throwable("Unknown (null) exception.");
 			}
 
 			OcpRuntimeException ocpException = null;
-			if (!OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
-				ocpException = new OcpRuntimeException("Converting " + throwable.getClass().getSimpleName()
-						+ " to OcpRuntimeException.  Original message: " + throwable.getMessage(), throwable.getCause());
+			if (!OcpExceptionExtender.class.isAssignableFrom(throwable.getClass())) {
+				ocpException = new OcpRuntimeException("", "Converting " + throwable.getClass().getSimpleName()
+						+ " to OcpRuntimeException.  Original message: " + throwable.getMessage(),
+						MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
+						throwable.getCause());
 			} else {
 				ocpException = (OcpRuntimeException) throwable;
 			}
@@ -173,7 +176,8 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 		ResponseEntity<ProviderResponse> entity = null;
 		try {
 			final OcpRuntimeException ocpRuntimeException =
-					new OcpRuntimeException(adviceName + " - Exception occured while attempting to " + attemptingTo + ".",
+					new OcpRuntimeException("", adviceName + " - Exception occured while attempting to " + attemptingTo + ".",
+							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
 							throwable);
 			entity = writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 

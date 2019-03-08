@@ -1,21 +1,22 @@
 package gov.va.ocp.framework.exception;
 
-import java.util.HashMap;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.event.Level;
+import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
-import gov.va.ocp.framework.exception.InterceptingExceptionTranslator;
-import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.OcpLogger;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 
@@ -30,31 +31,38 @@ public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 		InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
 		interceptingExceptionTranslator.setDefaultExceptionType(OcpRuntimeException.class);
 
-		Throwable throwable = new Throwable("Cause Unit Test");
+		OcpRuntimeException throwable =
+				new OcpRuntimeException("", "Cause Unit Test",
+						MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 		exceptions.expect(OcpRuntimeException.class);
-//		exceptions.expectMessage((String) null);
-		exceptions.expectCause(Matchers.<Throwable> equalTo(throwable));
+		exceptions.expectMessage("Cause Unit Test");
 
-		interceptingExceptionTranslator.afterThrowing(this.getClass().getMethod("testReferenceRunTimeExceptionDefault"), null, null,
-				throwable);
+		interceptingExceptionTranslator.afterThrowing(
+				this.getClass().getMethod("testReferenceRunTimeExceptionDefault"),
+				null, null, throwable);
 	}
 
 	@Test
-	public void testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull() throws Exception {
+	public void testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull() {
 		super.getAppender().clear();
 
 		InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
 
 		Throwable throwable = new Throwable("Cause Unit Test");
 
-		interceptingExceptionTranslator.afterThrowing(
-				this.getClass().getMethod("testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull"), null, null, throwable);
+		try {
+			interceptingExceptionTranslator.afterThrowing(
+					this.getClass().getMethod("testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull"), null, null,
+					throwable);
+		} catch (Throwable e) {
+			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
+		}
 
 		Assert.assertTrue(super.getAppender().get(0).getMessage().startsWith(
-				"InterceptingExceptionTranslator caught exception, handling it as configured."
-						+ "  Here are details [java.lang.Throwable thrown by gov.va.ocp.framework.exception."
-						+ "InterceptingExceptionTranslatorTest.testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull]"
+				"InterceptingExceptionTranslator caught exception, handling it as configured.  "
+						+ "Here are details [java.lang.Throwable thrown by "
+						+ "gov.va.ocp.framework.exception.InterceptingExceptionTranslatorTest.testReferenceRunTimeExceptionMapNullAndDefaultExceptionTypeNull]"
 						+ " args [null]."));
 	}
 
@@ -63,11 +71,7 @@ public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 		super.getAppender().clear();
 
 		InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
-		interceptingExceptionTranslator.setDefaultExceptionType(RuntimeException.class);
-
-		Map<String, Class<? extends RuntimeException>> exceptionMap = new HashMap<>();
-		exceptionMap.put("OcpRuntimeException", RuntimeException.class);
-		interceptingExceptionTranslator.setExceptionMap(exceptionMap);
+		interceptingExceptionTranslator.setDefaultExceptionType(OcpRuntimeException.class);
 
 		Set<String> exclusion = new HashSet<>();
 		exclusion.add("java.lang.Throwable");
@@ -90,7 +94,7 @@ public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 		// Setup
 		LOG.setLevel(Level.ERROR);
 		InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
-		interceptingExceptionTranslator.setDefaultExceptionType(RuntimeException.class);
+		interceptingExceptionTranslator.setDefaultExceptionType(OcpRuntimeException.class);
 
 		Set<String> exclusion = new HashSet<>();
 		// Test OR statement by matching on package name
@@ -110,18 +114,20 @@ public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 	@Test
 	public void testResolvableException() throws Exception {
 		InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
-		interceptingExceptionTranslator.setDefaultExceptionType(RuntimeException.class);
-		Map<String, Class<? extends RuntimeException>> exceptionMap = new HashMap<>();
-		exceptionMap.put("java.lang.RuntimeException", OcpRuntimeException.class);
+		interceptingExceptionTranslator.setDefaultExceptionType(OcpRuntimeException.class);
 
-		interceptingExceptionTranslator.setExceptionMap(exceptionMap);
+		OcpRuntimeException throwable = new OcpRuntimeException("", "Cause Unit Test",
+				null, null, new Throwable("Test cause"));
 
-		Throwable throwable = new RuntimeException("Cause Unit Test");
-
-		exceptions.expect(OcpRuntimeException.class);
-		exceptions.expectCause(Matchers.<Throwable> equalTo(throwable));
-
-		interceptingExceptionTranslator.afterThrowing(this.getClass().getMethod("testResolvableException"), null, null, throwable);
+		try {
+			interceptingExceptionTranslator.afterThrowing(
+					this.getClass().getMethod("testResolvableException"),
+					null, null, throwable);
+			fail("Should have thrown exception");
+		} catch (Exception e) {
+			assertTrue(OcpRuntimeException.class.isAssignableFrom(throwable.getClass()));
+			assertTrue(e.getCause().getClass().getName().equals(Throwable.class.getName()));
+		}
 
 	}
 }

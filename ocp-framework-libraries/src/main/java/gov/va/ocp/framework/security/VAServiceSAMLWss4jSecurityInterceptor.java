@@ -17,6 +17,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.WSSecHeader;
 import org.slf4j.event.Level;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
@@ -31,6 +32,7 @@ import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * A Wss4j2 Security Interceptor to add a SAML assertion to the secure message header.
@@ -87,8 +89,9 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 							true, true, null));
 
 		} catch (final WSSecurityException e) {
-			LOGGER.error("Error while attempting to insert SAML Assertion into message.", e);
-			throw new OcpRuntimeException(e);
+			String msg = "Error while attempting to insert SAML Assertion into message.";
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
@@ -105,7 +108,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 				: new ByteArrayInputStream(getSamlFile().getBytes())) {
 			clientAssertion = IOUtils.toString(input, "UTF-8");
 		} catch (final Exception e) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
+			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 					"Unable to read SAML assertion from file." + getSamlFile(), e);
 			return retVal;
 		}
@@ -126,7 +129,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 			retVal = doc.getDocumentElement();
 
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
+			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 					ERROR_SAML_ASSERTION, e);
 		}
 

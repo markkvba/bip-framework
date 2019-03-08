@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.slf4j.event.Level;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import gov.va.ocp.framework.exception.ExceptionHandlingUtils;
+import gov.va.ocp.framework.exception.interceptor.ExceptionHandlingUtils;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 

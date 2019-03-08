@@ -5,17 +5,17 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
- * The root OCP class for managing runtime exceptions.
+ * The root OCP class for managing checked exceptions.
  * <p>
- * To support the requirements of consumer responses, OCP Exception classes that need
- * to bubble back to the provider controller should extend this class.
+ * To support the requirements of consumer responses, all OCP checked Exception classes
+ * that will be handled internally by the service should extend this class.
  *
  * @see OcpExceptionExtender
- * @see RuntimeException
+ * @see Exception
  *
  * @author aburkholder
  */
-public class OcpRuntimeException extends RuntimeException implements OcpExceptionExtender {
+public class OcpException extends Exception implements OcpExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
 	/** The consumer facing identity key */
@@ -26,11 +26,11 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	private HttpStatus status;
 
 	/**
-	 * Constructs a new RuntimeException with the specified detail key, message, severity, and status.
+	 * Constructs a new checked Exception with the specified detail key, message, severity, and status.
 	 * The cause is not initialized, and may subsequently be initialized by
 	 * a call to {@link #initCause}.
 	 *
-	 * @see RuntimeException#RuntimeException(String)
+	 * @see Exception#Exception(String)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
 	 * @param message - the detail message
@@ -38,7 +38,7 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
 	 */
-	public OcpRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status) {
+	public OcpException(String key, String message, MessageSeverity severity, HttpStatus status) {
 		super(message);
 		this.key = key;
 		this.severity = severity;
@@ -46,9 +46,9 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	}
 
 	/**
-	 * Constructs a new RuntimeException with the specified detail key, message, severity, status, and cause.
+	 * Constructs a new checked Exception with the specified detail key, message, severity, status, and cause.
 	 *
-	 * @see RuntimeException#RuntimeException(String, Throwable)
+	 * @see Exception#Exception(String, Throwable)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
 	 * @param message - the detail message
@@ -57,7 +57,7 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
 	 * @param cause - the throwable that caused this throwable
 	 */
-	public OcpRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status, Throwable cause) {
+	public OcpException(String key, String message, MessageSeverity severity, HttpStatus status, Throwable cause) {
 		super(message, cause);
 		this.key = key;
 		this.severity = severity;

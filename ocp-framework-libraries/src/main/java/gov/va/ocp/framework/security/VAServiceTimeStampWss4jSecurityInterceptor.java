@@ -3,6 +3,7 @@ package gov.va.ocp.framework.security;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.w3c.dom.Document;
@@ -10,6 +11,7 @@ import org.w3c.dom.Document;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * A Wss4j2 Security Interceptor to add a timestamp and time-to-live to a soap message.
@@ -55,10 +57,10 @@ public abstract class VAServiceTimeStampWss4jSecurityInterceptor extends Abstrac
 			soapMessage.setDocument(doc);
 
 		} catch (final WSSecurityException e) {
-			LOGGER.error("failed encryption ", e);
-			throw new OcpRuntimeException(e);
+			String msg = "Could not add header TTL timestamp to SOAPMessage.";
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
-
 	}
 
 	/**
