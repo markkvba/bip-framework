@@ -106,9 +106,7 @@ public class RESTUtil {
 	 * @return
 	 */
 	public String getResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().get(serviceURL),
-				5);
-		LOGGER.info(response.getBody().asString());
+		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().get(serviceURL),5);
 		return response.asString();
 	}
 
@@ -120,9 +118,7 @@ public class RESTUtil {
 	 * @return
 	 */
 	public String deleteResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().delete(serviceURL),
-				5);
-		LOGGER.info(response.getBody().asString());
+		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().delete(serviceURL),5);
 		return response.asString();
 	}
 
@@ -134,9 +130,7 @@ public class RESTUtil {
 	 * @return
 	 */
 	public String postResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).body(jsonText).when()
-				.post(serviceURL), 5);
-		LOGGER.info(response.getBody().asString());
+		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).body(jsonText).when().post(serviceURL), 5);
 		return response.asString();
 	}
 
@@ -239,36 +233,12 @@ public class RESTUtil {
 	 * @return
 	 */
 	public String putResponse(final String serviceURL) {
-		RestAssured.useRelaxedHTTPSValidation();
 		doWithRetry(() -> given().log().all().headers(mapReqHeader).urlEncodingEnabled(false).body(jsonText).when()
 				.put(serviceURL), 5);
-		LOGGER.info(response.getBody().asString());
+
 		return response.asString();
 	}
 
-
-	/**
-	 * Formats the XML in pretty format.
-	 *
-	 * @param strXml
-	 * @return
-	 */
-	public String prettyFormatXML(final String strXml) {
-		final String xml = strXml;
-		String result = null;
-		try {
-			final Document doc = DocumentHelper.parseText(xml);
-			final StringWriter sw = new StringWriter();
-			final OutputFormat format = OutputFormat.createPrettyPrint();
-			final XMLWriter xw = new XMLWriter(sw, format);
-			xw.write(doc);
-			result = sw.toString();
-		} catch (DocumentException | IOException ex) {
-			LOGGER.error(ex.getMessage(), ex);
-		}
-
-		return result;
-	}
 
 	/**
 	 * Loads the expected results from source folder and returns as string.
@@ -326,7 +296,7 @@ public class RESTUtil {
 	 * @param supplier
 	 * @param attempts
 	 */
-	private void doWithRetry(Supplier<Response> supplier, int attempts) {
+	public void doWithRetry(Supplier<Response> supplier, int attempts) {
 		boolean failed = false;
 		int retries = 0;
 		do {
@@ -343,5 +313,6 @@ public class RESTUtil {
 			}
 			retries++;
 		} while (failed && retries < attempts);
+		LOGGER.info(response.getBody().asString());
 	}
 }
