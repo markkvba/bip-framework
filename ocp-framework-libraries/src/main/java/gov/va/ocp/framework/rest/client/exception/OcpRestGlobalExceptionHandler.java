@@ -262,7 +262,7 @@ public class OcpRestGlobalExceptionHandler {
 		apiError.addMessage(ex.getSeverity(), ex.getKey(),
 				ex.getMessage(),
 				ex.getStatus());
-		return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiError, ex.getStatus());
 	}
 
 	/**
