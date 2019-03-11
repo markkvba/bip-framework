@@ -98,6 +98,7 @@
 		<jackson-databind.version>2.9.8</jackson-databind.version>
 		<commons-logging.version>1.2</commons-logging.version>
 		<logstash-logback-encoder.version>5.3</logstash-logback-encoder.version>
+		<janino-version>3.0.12</janino-version>
 		<logback-classic.version>1.2.3</logback-classic.version>
 		<embedded-redis.version>0.6</embedded-redis.version>
 		<jfiglet.version>0.0.8</jfiglet.version>
@@ -158,6 +159,11 @@
 				<artifactId>logback-core</artifactId>
 				<version>${logback.version}</version>
 			</dependency>
+			<dependency>
+		        <groupId>org.codehaus.janino</groupId>
+		        <artifactId>janino</artifactId>
+		        <version>${janino-version}</version>
+		    </dependency>
 			<!-- Embedded REDIS -->
 			<dependency>
 				<groupId>com.github.kstyrc</groupId>
