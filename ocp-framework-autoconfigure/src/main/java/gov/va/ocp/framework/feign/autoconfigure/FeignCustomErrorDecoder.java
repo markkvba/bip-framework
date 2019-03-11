@@ -49,7 +49,7 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 				JSONObject messageObject = jsonarray.getJSONObject(0);
 				return new OcpFeignRuntimeException(messageObject.getString("key"), messageObject.getString("text"),
 						MessageSeverity.fromValue(messageObject.getString("severity")),
-						HttpStatus.valueOf(messageObject.getString("status")));
+						HttpStatus.resolve(Integer.valueOf(messageObject.getString("status"))));
 
 			} catch (JSONException e) {
 				return defaultErrorDecoder.decode(methodKey, response);

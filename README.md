@@ -12,9 +12,30 @@ To run spring boot and spring cloud enabled services on the BIP Platform, it mus
 
 1. ocp-framework-test-lib: Test library framework to support functional testing for the services
 
-## How to include these dependency libraries in your project ##
+## How to include and download these dependency libraries in your project ##
 
-There are 2 options to ensure that these libraries are downloaded on your local workstation for your service project to build.
+     <dependency>
+         <groupId>gov.va.ocp.framework</groupId>
+         <artifactId>ocp-framework-autoconfigure</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+         <groupId>gov.va.ocp.framework</groupId>
+         <artifactId>ocp-framework-libraries</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+         <groupId>gov.va.ocp.framework</groupId>
+         <artifactId>ocp-framework-parentpom</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+         <groupId>gov.va.ocp.framework</groupId>
+         <artifactId>ocp-framework-test-lib</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+     </dependency>
+
+There are 2 options to download these libraries on local workstation for the service project to build.
 
 **OPTION 1**
 1. Clone this repository

@@ -175,7 +175,7 @@ public class Message {
 		if (status == null) {
 			return HttpStatus.CREATED;
 		}
-		return HttpStatus.valueOf(status);
+		return HttpStatus.resolve(status);
 	}
 	
 	/*
