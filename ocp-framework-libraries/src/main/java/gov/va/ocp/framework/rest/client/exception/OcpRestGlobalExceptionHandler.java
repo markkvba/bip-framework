@@ -52,10 +52,10 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = IllegalArgumentException.class)
-	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleIllegalArgumentException(HttpServletRequest req, IllegalArgumentException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		final ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
 				ex.getMessage(),
@@ -71,10 +71,11 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = MethodArgumentNotValidException.class)
-	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleMethodArgumentNotValidException(HttpServletRequest req, MethodArgumentNotValidException ex) {
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public final ResponseEntity<Object> handleMethodArgumentNotValidException(HttpServletRequest req,
+			MethodArgumentNotValidException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		final ProviderResponse apiError = new ProviderResponse();
 		for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 			apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
@@ -97,8 +98,9 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = HttpClientErrorException.class)
-	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
-	public ResponseEntity<Object> handleHttpClientErrorException(HttpServletRequest req, final HttpClientErrorException httpClientErrorException) {
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public ResponseEntity<Object> handleHttpClientErrorException(HttpServletRequest req,
+			final HttpClientErrorException httpClientErrorException) {
 		logger.info(httpClientErrorException.getClass().getName());
 		logger.error("error", httpClientErrorException);
 		//
@@ -117,7 +119,6 @@ public class OcpRestGlobalExceptionHandler {
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
-
 	/**
 	 * Handle method argument type mismatch.
 	 *
@@ -126,8 +127,9 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
-	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
-	public ResponseEntity<Object> handleMethodArgumentTypeMismatch(HttpServletRequest req, final MethodArgumentTypeMismatchException ex) {
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public ResponseEntity<Object> handleMethodArgumentTypeMismatch(HttpServletRequest req,
+			final MethodArgumentTypeMismatchException ex) {
 		logger.info(ex.getClass().getName());
 		logger.error("error", ex);
 		//
@@ -148,10 +150,10 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = ConstraintViolationException.class)
-	@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public ResponseEntity<Object> handleConstraintViolation(HttpServletRequest req, final ConstraintViolationException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		//
 		final ProviderResponse apiError = new ProviderResponse();
 		for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
@@ -172,10 +174,10 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = NoHandlerFoundException.class)
-	@ResponseStatus(value= HttpStatus.NOT_FOUND)
+	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	protected ResponseEntity<Object> handleNoHandlerFoundException(HttpServletRequest req, final NoHandlerFoundException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		//
 		final String error = "No handler found for " + ex.getHttpMethod() + " " + ex.getRequestURL();
 
@@ -196,10 +198,11 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-	@ResponseStatus(value= HttpStatus.METHOD_NOT_ALLOWED)
-	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpServletRequest req, final HttpRequestMethodNotSupportedException ex) {
+	@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED)
+	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpServletRequest req,
+			final HttpRequestMethodNotSupportedException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		//
 		final StringBuilder builder = new StringBuilder();
 		builder.append(ex.getMethod());
@@ -223,10 +226,11 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = MediaTypeNotSupportedStatusException.class)
-	@ResponseStatus(value= HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpServletRequest req, final HttpMediaTypeNotSupportedException ex) {
+	@ResponseStatus(value = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpServletRequest req,
+			final HttpMediaTypeNotSupportedException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		//
 		final StringBuilder builder = new StringBuilder();
 		builder.append(ex.getContentType());
@@ -250,14 +254,14 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = OcpRuntimeException.class)
-	@ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public final ResponseEntity<Object> handleOcpRuntimeException(HttpServletRequest req, OcpRuntimeException ex) {
 		logger.info(ex.getClass().getName());
-		logger.error("error",ex);
+		logger.error("error", ex);
 		final ProviderResponse apiError = new ProviderResponse();
-		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.INTERNAL_SERVER_ERROR.name(),
+		apiError.addMessage(ex.getSeverity(), ex.getKey(),
 				ex.getMessage(),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+				ex.getStatus());
 		return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -269,7 +273,7 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = Exception.class)
-	@ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<Object> handleAll(HttpServletRequest req, final Exception ex) {
 		logger.info(ex.getClass().getName());
 		logger.error("error", ex);

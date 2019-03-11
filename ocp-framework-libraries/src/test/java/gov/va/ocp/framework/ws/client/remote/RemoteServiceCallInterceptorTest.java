@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.ws.client.remote.RemoteServiceCallInterceptor;
 
 
@@ -27,7 +27,7 @@ public class RemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
 	MethodInvocation methodInvocation;
 	
 	@Mock
-	RequestResponseLogSerializer asyncLogging;
+	AuditLogSerializer asyncLogging;
 	
 	@InjectMocks
 	RemoteServiceCallInterceptor remoteServiceCallInterceptor;

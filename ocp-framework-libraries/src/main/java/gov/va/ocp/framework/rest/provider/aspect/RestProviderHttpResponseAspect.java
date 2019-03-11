@@ -23,7 +23,7 @@ public class RestProviderHttpResponseAspect extends BaseHttpProviderAspect {
 //	private final MessagesToHttpStatusRulesEngine rulesEngine;
 //
 //	@Autowired
-//	RequestResponseLogSerializer asyncLogging;
+//	AuditLogSerializer asyncLogging;
 //
 //	/**
 //	 * Instantiates a new RestProviderHttpResponseAspect using a default MessagesToHttpStatusRulesEngine.
@@ -306,7 +306,7 @@ public class RestProviderHttpResponseAspect extends BaseHttpProviderAspect {
 //		}
 //
 //		if (asyncLogging != null) {
-//			LOGGER.debug("Invoking RequestResponseLogSerializer.asyncLogRequestResponseAspectAuditData()");
+//			LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
 //			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
 //					messageSeverity, t);
 //		}

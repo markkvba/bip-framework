@@ -66,7 +66,7 @@ public class BaseWsClientConfig {
 	protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
 	/** base package for framework exceptions */
-	public static final String PACKAGE_REFERENCE_FRAMEWORK_EXCEPTION = "gov.va.ocp.framework.exception";
+	public static final String PACKAGE_FRAMEWORK_EXCEPTION = "gov.va.ocp.framework.exception";
 
 	/**
 	 * Creates the default web service template using the default audit request/response interceptors and no web service interceptors.
@@ -521,7 +521,7 @@ public class BaseWsClientConfig {
 		// define packages that contain "our exceptions" that we want to propagate through
 		// without again logging and/or wrapping
 		final Set<String> exclusionSet = new HashSet<>();
-		exclusionSet.add(PACKAGE_REFERENCE_FRAMEWORK_EXCEPTION);
+		exclusionSet.add(PACKAGE_FRAMEWORK_EXCEPTION);
 		interceptingExceptionTranslator.setExclusionSet(exclusionSet);
 
 		return interceptingExceptionTranslator;

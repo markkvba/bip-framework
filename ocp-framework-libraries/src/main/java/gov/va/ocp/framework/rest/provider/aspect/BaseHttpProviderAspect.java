@@ -25,7 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.RequestAuditData;
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.ResponseAuditData;
 import gov.va.ocp.framework.constants.AnnotationConstants;
 import gov.va.ocp.framework.log.OcpBanner;
@@ -49,7 +49,7 @@ public class BaseHttpProviderAspect {
 	private static final int NUMBER_OF_BYTES = 1024;
 
 	@Autowired
-	RequestResponseLogSerializer asyncLogging;
+	AuditLogSerializer asyncLogging;
 
 	/**
 	 * Protected constructor.
@@ -277,7 +277,7 @@ public class BaseHttpProviderAspect {
 		}
 
 		if (asyncLogging != null) {
-			LOGGER.debug("Invoking RequestResponseLogSerializer.asyncLogRequestResponseAspectAuditData()");
+			LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
 			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
 					messageSeverity, t);
 		}

@@ -183,7 +183,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 		} catch (final IOException e) {
 			throw new OcpRuntimeException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
 					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.",
-					MessageSeverity.FATAL, HttpStatus.SERVICE_UNAVAILABLE, e);
+					MessageSeverity.ERROR, HttpStatus.OK, e);
 		}
 		return resource;
 	}

@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.autoconfigure.OcpAuditAutoConfiguration;
 
 import static org.junit.Assert.*;
@@ -30,6 +30,6 @@ public class OcpAuditAutoConfigurationTest {
         context.register(JacksonAutoConfiguration.class, OcpAuditAutoConfiguration.class);
         context.refresh();
         assertNotNull(context);
-        assertNotNull(this.context.getBean(RequestResponseLogSerializer.class));
+        assertNotNull(this.context.getBean(AuditLogSerializer.class));
     }
 }
