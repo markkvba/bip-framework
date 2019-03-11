@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 
 
 /**
@@ -20,8 +20,8 @@ public class OcpAuditAutoConfiguration {
 	
     @Bean
     @ConditionalOnMissingBean
-    public RequestResponseLogSerializer requestResponseAsyncLogging() {
-        return new RequestResponseLogSerializer();
+    public AuditLogSerializer requestResponseAsyncLogging() {
+        return new AuditLogSerializer();
     }
 }
 

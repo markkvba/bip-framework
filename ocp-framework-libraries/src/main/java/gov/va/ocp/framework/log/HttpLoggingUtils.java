@@ -9,7 +9,7 @@ import org.springframework.ws.transport.TransportOutputStream;
 
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -22,7 +22,7 @@ public class HttpLoggingUtils {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
 
-	static RequestResponseLogSerializer asyncLogging = new RequestResponseLogSerializer();
+	static AuditLogSerializer asyncLogging = new AuditLogSerializer();
 
 	private HttpLoggingUtils() {
 	}
