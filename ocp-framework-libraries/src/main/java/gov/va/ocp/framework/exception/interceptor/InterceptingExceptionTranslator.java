@@ -1,6 +1,5 @@
 package gov.va.ocp.framework.exception.interceptor;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -9,7 +8,6 @@ import org.springframework.aop.ThrowsAdvice;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.constants.AnnotationConstants;
-import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
@@ -44,13 +42,13 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 	private Class<? extends OcpRuntimeException> defaultExceptionType;
 
 	/**
-	 * Log the exception, and rethrow a some sort of application exception.
-	 *
+	 * Log the thrown exception, and rethrow an exception as defined by {@link #setDefaultExceptionType(Class)}.
+	 * <p>
 	 * DO NOT REMOVE "target" ARGUMENT IN THE METHOD, AS REMOVING IT BREAKS END POINT CALLS
 	 *
-	 * @param method the method
-	 * @param args the args
-	 * @param target the args
+	 * @param method the method that threw the exception
+	 * @param args the parameters to the method
+	 * @param target the target of the method
 	 * @param throwable the throwable
 	 */
 	public final void afterThrowing(final Method method, final Object[] args, final Object target, final Throwable throwable) {
@@ -58,6 +56,9 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 		if (defaultExceptionType == null) {
 			defaultExceptionType = OcpRuntimeException.class;
 		}
+
+		// figure out what exception type should replace throwable
+		OcpRuntimeException resolvedRuntimeException = null;
 
 		// skip conversion if the throwable is in the exclusion set
 		try {
@@ -76,77 +77,25 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 			}
 
 			// figure out what exception type should replace throwable
-			final RuntimeException resolvedRuntimeException = resolveRuntimeException(throwable);
-			if (resolvedRuntimeException != null) {
-				// override the throwable, and send resolvedRuntimeException instead
-				throw resolvedRuntimeException;
-			}
+			resolvedRuntimeException = ExceptionHandlingUtils.resolveRuntimeException(throwable);
 
-		} catch (final InstantiationException e) {
-			InterceptingExceptionTranslator.LOGGER.error(
-					"InstantiationException likely configuration error, review log/configuration to troubleshoot", e);
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					"InstantiationException likely configuration error, review log/configuration to troubleshoot", e);
-
-		} catch (final IllegalAccessException e) {
-			InterceptingExceptionTranslator.LOGGER.error(
-					"IllegalAccessException likely configuration error, review log/configuration to troubleshoot", e);
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					"InstantiationException likely configuration error, review log/configuration to troubleshoot", e);
-
+		} catch (final Exception e) {
+			String msg = "Exception likely due to configuration error, review log/configuration to troubleshoot";
+			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), msg, e);
+			resolvedRuntimeException = new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
+		if (resolvedRuntimeException != null) {
+			// override the throwable, and send resolvedRuntimeException instead
+			throw resolvedRuntimeException;
+		}
+		// otherwise allow the original throwable to continue bubbling up
 	}
 
 	/**
-	 * Resolve the runtime exception for the throwable
-	 *
-	 * @param throwable the throwable
-	 * @return the runtime exception
-	 * @throws InstantiationException the instantiation exception
-	 * @throws IllegalAccessException the illegal access exception
-	 */
-	private OcpRuntimeException resolveRuntimeException(final Throwable throwable) throws InstantiationException,
-			IllegalAccessException {
-		// custom exception type to represent the error
-		OcpRuntimeException resolvedRuntimeException = null;
-
-		if (OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
-			// have to cast so the "Throwable throwable" variable can be returned as-is
-			try {
-				resolvedRuntimeException = (OcpRuntimeException) throwable;
-			} catch (ClassCastException e) {
-				String msg = "Could not cast " + throwable.getClass().getName() + " to OcpRuntimeException";
-				LOGGER.error(msg, e);
-				throw new InstantiationException(msg);
-			}
-
-		} else if (OcpExceptionExtender.class.isAssignableFrom(throwable.getClass())) {
-			try {
-				// cast "Throwable throwable" variable to the OCP exception interface
-				OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
-				// instantiate the Runtime version of the interface
-				resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
-						.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
-						.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
-			} catch (ClassCastException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-					| SecurityException e) {
-				String msg = "Could not instantiate OcpRuntimeException using values from throwable "
-						+ throwable.getClass().getName();
-				LOGGER.error(msg, e);
-				throw new InstantiationException(msg);
-			}
-
-		} else {
-			// make a new OcpRuntimeException from the non-OCP throwable
-			resolvedRuntimeException =
-					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, throwable);
-		}
-
-		return resolvedRuntimeException;
-	}
-
-	/**
-	 * Sets the default exception type.
+	 * Sets the default exception type. The exception type must extend {@link OcpRuntimeException}.
+	 * <p>
+	 * The default exception type is OcpRuntimeException.
 	 *
 	 * @param defaultExceptionType the defaultExceptionType to set
 	 */
@@ -155,7 +104,11 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 	}
 
 	/**
-	 * Sets the exclusion set.
+	 * Sets the exclusion set. Each element of the set can be a package name
+	 * (or some part of a package name),
+	 * or the fully qualified name of a class that extends Throwable.
+	 * <p>
+	 * Otherwise, the exclusion will be ignored.
 	 *
 	 * @param exclusionSet the exclusionSet to set
 	 */
