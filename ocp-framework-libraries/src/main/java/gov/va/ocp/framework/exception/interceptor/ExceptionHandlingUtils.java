@@ -1,10 +1,18 @@
 package gov.va.ocp.framework.exception.interceptor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import org.slf4j.event.Level;
+import org.springframework.http.HttpStatus;
+
+import gov.va.ocp.framework.exception.OcpExceptionExtender;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * Contains utility ops for logging and handling exceptions consistently. Primarily for usage in interceptors which
@@ -13,6 +21,7 @@ import gov.va.ocp.framework.log.OcpLoggerFactory;
  * @author jshrader
  */
 public final class ExceptionHandlingUtils {
+	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(ExceptionHandlingUtils.class);
 
 	/** The Constant LOC_EXCEPTION_PREFIX. */
 	private static final String LOC_EXCEPTION_PREFIX =
@@ -34,6 +43,53 @@ public final class ExceptionHandlingUtils {
 	 * private constructor for utility class
 	 */
 	private ExceptionHandlingUtils() {
+	}
+
+	/**
+	 * Resolve the runtime exception for the throwable
+	 *
+	 * @param throwable the throwable
+	 * @return the runtime exception
+	 * @throws InstantiationException the instantiation exception
+	 * @throws IllegalAccessException the illegal access exception
+	 */
+	public static OcpRuntimeException resolveRuntimeException(final Throwable throwable) {
+		// custom exception type to represent the error
+		OcpRuntimeException resolvedRuntimeException = null;
+
+		if (OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
+			// have to cast so the "Throwable throwable" variable can be returned as-is
+			try {
+				resolvedRuntimeException = (OcpRuntimeException) throwable;
+			} catch (ClassCastException e) {
+				String msg = "Could not cast " + throwable.getClass().getName() + " to OcpRuntimeException";
+				LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
+				throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+		} else if (OcpExceptionExtender.class.isAssignableFrom(throwable.getClass())) {
+			try {
+				// cast "Throwable throwable" variable to the OCP exception interface
+				OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
+				// instantiate the Runtime version of the interface
+				resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
+						.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
+						.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
+			} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				String msg = "Could not instantiate OcpRuntimeException using values from throwable "
+						+ throwable.getClass().getName();
+				LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
+				throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+		} else {
+			// make a new OcpRuntimeException from the non-OCP throwable
+			resolvedRuntimeException =
+					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, throwable);
+		}
+
+		return resolvedRuntimeException;
 	}
 
 	/**
