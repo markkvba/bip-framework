@@ -1,8 +1,11 @@
 package gov.va.ocp.framework.security.jwt.correlation;
 
+import org.springframework.http.HttpStatus;
+
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 public enum Sources {
 	/** The ICN assigning facility (VHA) */
@@ -53,6 +56,6 @@ public enum Sources {
 		}
 		String msg = "Source {} does not exist: " + stringValue;
 		LOGGER.error(msg);
-		throw new OcpRuntimeException(msg);
+		throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 	}
 }

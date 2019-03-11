@@ -3,10 +3,12 @@ package gov.va.ocp.framework.security.jwt.correlation;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.PersonTraits;
 
 /**
@@ -47,7 +49,7 @@ public class CorrelationIdsParser {
 	 * @throws OcpRuntimeException if some problem with the correlation ids
 	 */
 	public static void parseCorrelationIds(final List<String> list, final PersonTraits personTraits) {
-		if ((list != null) && !list.isEmpty()) {
+		if (list != null && !list.isEmpty()) {
 			for (final String token : list) {
 				processToken(token, personTraits);
 			}
@@ -65,7 +67,7 @@ public class CorrelationIdsParser {
 		if (StringUtils.isBlank(token)) {
 			String msg = "Cannot process blank correlation id";
 			LOGGER.error(msg);
-			throw new OcpRuntimeException(msg);
+			throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 		final String[] tokens = token.split("\\^");
 
@@ -89,7 +91,7 @@ public class CorrelationIdsParser {
 			String msg = "Invalid number of elements {} in correlation id {}, should be " + ELEMENT_MAX_COUNT
 					+ " or " + ELEMENT_SS_COUNT + tokens.length + ", " + token;
 			LOGGER.error(msg);
-			throw new OcpRuntimeException(msg);
+			throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 	}
 

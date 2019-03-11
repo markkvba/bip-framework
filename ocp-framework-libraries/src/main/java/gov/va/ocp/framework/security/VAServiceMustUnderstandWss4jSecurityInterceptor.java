@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.WSSecHeader;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
@@ -14,6 +15,7 @@ import org.w3c.dom.Element;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * A Wss4j2 Security Interceptor to remove "mustUnderstand" attributes from the envelope namespaces in the message header.
@@ -57,8 +59,9 @@ public class VAServiceMustUnderstandWss4jSecurityInterceptor extends Wss4jSecuri
 				removeAttributeWithSOAPNS(header, MUST_UNDERSTAND_ATTR);
 			}
 		} catch (final WSSecurityException e) { // NOSONAR no action to take
-			LOGGER.error(e.getMessage()); // NOSONAR no action to take
-			throw new OcpRuntimeException(e);
+			String msg = "Could not remove '" + MUST_UNDERSTAND_ATTR + "' attribute.";
+			LOGGER.error(msg, e); // NOSONAR no action to take
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 
 		soapMessage.setDocument(doc);

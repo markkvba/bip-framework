@@ -5,6 +5,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.w3c.dom.Document;
@@ -12,6 +13,7 @@ import org.w3c.dom.Document;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * A Wss4j2 Security Interceptor to encrypt secure message header and body.
@@ -32,7 +34,7 @@ import gov.va.ocp.framework.log.OcpLoggerFactory;
  * new VAServiceEncryptionWss4jSecurityInterceptor() {
  * &#64;Override
  * public CryptoProperties retrieveCryptoProps() {
- * 	return new VAServiceEncryptionWss4jSecurityInterceptor interceptor = cryptoProps.retrieveCryptoProperties();
+ * return new VAServiceEncryptionWss4jSecurityInterceptor interceptor = cryptoProps.retrieveCryptoProperties();
  * }
  * };
  */
@@ -71,8 +73,9 @@ public abstract class VAServiceEncryptionWss4jSecurityInterceptor extends Abstra
 
 			soapMessage.setDocument(doc);
 		} catch (final WSSecurityException e) {
-			LOGGER.error("failed to encrypt ", e);
-			throw new OcpRuntimeException(e);
+			String msg = "Failed to encrypt SOAPMessage";
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 

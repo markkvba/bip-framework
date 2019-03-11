@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -40,11 +41,12 @@ import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 import gov.va.ocp.framework.constants.AnnotationConstants;
-import gov.va.ocp.framework.exception.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 import gov.va.ocp.framework.util.Defense;
 import gov.va.ocp.framework.ws.client.remote.RemoteServiceCallInterceptor;
@@ -450,7 +452,7 @@ public class BaseWsClientConfig {
 					| UnrecoverableKeyException e) {
 				String msg = "Could not establish SSL context due to " + e.getClass().getSimpleName() + ": " + e.getMessage();
 				LOGGER.error(msg, e);
-				throw new OcpRuntimeException(msg, e);
+				throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.INTERNAL_SERVER_ERROR, e);
 			}
 		}
 	}
@@ -514,7 +516,7 @@ public class BaseWsClientConfig {
 
 		// set the default type of exception that should be returned when this interceptor runs
 		interceptingExceptionTranslator
-				.setDefaultExceptionType((Class<? extends RuntimeException>) Class.forName(defaultExceptionClass));
+				.setDefaultExceptionType((Class<? extends OcpRuntimeException>) Class.forName(defaultExceptionClass));
 
 		// define packages that contain "our exceptions" that we want to propagate through
 		// without again logging and/or wrapping

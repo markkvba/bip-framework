@@ -1,13 +1,20 @@
 package gov.va.ocp.framework.rest.provider;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.http.HttpStatus;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import gov.va.ocp.framework.messages.MessageSeverity;
 
+/**
+ * The Class Message.
+ */
 public class Message {
 
 	/** The Constant serialVersionUID. */
@@ -17,26 +24,29 @@ public class Message {
 	 * information.
 	 */
 	private static final String[] EQUALS_HASH_EXCLUDE_FIELDS = new String[] { "text" };
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+	private Date timestamp; // NOSONAR cannot be final
 
 	/** The key. */
 	@NotNull
 	private String key;
-
-	/** The message. */
-	private String text;
+	
+	/** The message severity. */
+	@NotNull
+	private String severity;
 
 	/** The Http status. */
 	private Integer status;
 
-	/** The message severity. */
-	@NotNull
-	private String severity;
+	/** The message. */
+	private String text;
 
 	/**
 	 * Instantiates a new message.
 	 */
 	public Message() { // NOSONAR @NotNull is a validation annotation, not a usage annotation
-		super(); // NOSONAR @NotNull is a validation annotation, not a usage annotation
+		this.timestamp = new Date();
 	} // NOSONAR @NotNull is a validation annotation, not a usage annotation
 
 	/**
@@ -54,11 +64,29 @@ public class Message {
 	 * @param httpStatus the http status associated with the cause of the message
 	 */
 	public Message(final String severity, final String key, final String text, final Integer httpStatus) {
-		super();
+		this();
 		this.severity = severity;
 		this.key = key;
 		this.text = text;
 		this.status = httpStatus;
+	}
+	
+	/**
+	 * Gets the timestamp to be part of message payload.
+	 *
+	 * @return the timestamp
+	 */
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * Sets the timestamp for the message payload.
+	 *
+	 * @param timestamp the new timestamp
+	 */
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -147,9 +175,9 @@ public class Message {
 		if (status == null) {
 			return HttpStatus.CREATED;
 		}
-		return HttpStatus.valueOf(status);
+		return HttpStatus.resolve(status);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 *

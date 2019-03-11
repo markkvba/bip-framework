@@ -2,12 +2,16 @@ package gov.va.ocp.framework.feign.autoconfigure;
 
 import java.io.IOException;
 import java.io.Reader;
+
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpStatus;
+
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import gov.va.ocp.framework.exception.OcpFeignRuntimeException;
+import gov.va.ocp.framework.exception.impl.OcpFeignRuntimeException;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * The Class FeignCustomErrorDecoder.
@@ -16,7 +20,9 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 
 	private final ErrorDecoder defaultErrorDecoder = new Default();
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see feign.codec.ErrorDecoder#decode(java.lang.String, feign.Response)
 	 */
 	@Override
@@ -28,8 +34,8 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 
 				Reader inputReader = response.body().asReader();
 				int data = inputReader.read();
-				while(data != -1) {
-					strBuffer.append((char)data);
+				while (data != -1) {
+					strBuffer.append((char) data);
 					data = inputReader.read();
 				}
 
@@ -42,7 +48,8 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 				JSONArray jsonarray = messageObjects.getJSONArray("messages");
 				JSONObject messageObject = jsonarray.getJSONObject(0);
 				return new OcpFeignRuntimeException(messageObject.getString("key"), messageObject.getString("text"),
-						messageObject.getString("status"), messageObject.getString("severity"));
+						MessageSeverity.fromValue(messageObject.getString("severity")),
+						HttpStatus.resolve(Integer.valueOf(messageObject.getString("status"))));
 
 			} catch (JSONException e) {
 				return defaultErrorDecoder.decode(methodKey, response);
