@@ -17,24 +17,21 @@
 
 	<properties>
 		<!-- 3rd party versions -->
-		<dom4j.version>2.1.0</dom4j.version>
-		<commons.version>1.6</commons.version>
+		<dom4j.version>2.1.1</dom4j.version>
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>${dom4j.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 			<version>${fest-assert.version}</version>
 		</dependency>
-
+		
 		<!-- Testng Dependencies -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -42,8 +39,7 @@
 			<version>${testng.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-
+		
 		<!-- Cucumber Dependencies -->
 		<dependency>
 			<groupId>info.cukes</groupId>
@@ -96,7 +92,6 @@
 			<artifactId>json-schema-validator</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.apache.maven.surefire</groupId>
 			<artifactId>surefire-junit47</artifactId>
@@ -136,7 +131,6 @@
 		    <artifactId>commons-text</artifactId>
 		    <version>1.6</version>
 		</dependency>
-		
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-test</artifactId>
