@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,8 +42,7 @@ public class VaultForConsulBootstrapConfiguration implements ApplicationContextA
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(final ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
@@ -73,7 +71,7 @@ public class VaultForConsulBootstrapConfiguration implements ApplicationContextA
 						consulProperties.getBackend(), consulProperties.getRole()));
 		
 		//Store the generator Consul ACL token in properties for both service discovery and consul configuration.
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map<String, Object> props = new HashMap<>();
 		props.put("spring.cloud.consul.token", vaultPropertySource.getProperty("token")); //Consul Config
 		props.put("spring.cloud.consul.discovery.acl-token", vaultPropertySource.getProperty("token")); //Service Discovery
 		MapPropertySource mps = new MapPropertySource("consul-token", props);
