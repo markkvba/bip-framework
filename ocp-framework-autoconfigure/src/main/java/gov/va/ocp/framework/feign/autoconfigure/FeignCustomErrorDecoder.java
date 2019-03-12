@@ -26,8 +26,8 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 	 * @see feign.codec.ErrorDecoder#decode(java.lang.String, feign.Response)
 	 */
 	@Override
-	public Exception decode(String methodKey, Response response) {
-		if (response.status() >= 400 && response.status() <= 499) {
+	public Exception decode(final String methodKey, final Response response) {
+		if ((response.status() >= 400) && (response.status() <= 499)) {
 
 			StringBuffer strBuffer = new StringBuffer();
 			try {
