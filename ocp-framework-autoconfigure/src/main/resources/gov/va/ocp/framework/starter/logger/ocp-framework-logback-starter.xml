@@ -9,7 +9,7 @@
 	<springProperty scope="context" name="app_profile" source="spring.profiles.active" />
 	<springProperty scope="context" name="app_version" source="info.build.version" />
 
-	<appender name="OCP_REFERENCE_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="OCP_FRAMEWORK_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
 
@@ -53,10 +53,10 @@
 	  
 	  Always be sure to test different configurations for yourself. Every application has different requirements.
 	-->
-	<appender name="OCP_REFERENCE_ASYNC_CONSOLE_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
+	<appender name="OCP_FRAMEWORK_ASYNC_CONSOLE_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
 		<queueSize>262144</queueSize> <!--default is 256 -->
 		<discardingThreshold>0</discardingThreshold> <!--events are not discarded -->
-		<appender-ref ref="OCP_REFERENCE_CONSOLE_LOG_ENCODER" />
+		<appender-ref ref="OCP_FRAMEWORK_CONSOLE_LOG_ENCODER" />
 	</appender>
 
 </included>
