@@ -46,7 +46,7 @@ public final class ExceptionHandlingUtils {
 	}
 
 	/**
-	 * Resolve the runtime exception for the throwable
+	 * Resolve the throwable to an {@link OcpRuntimeException} (or subclass of OcpRuntimeException).
 	 *
 	 * @param throwable the throwable
 	 * @return the runtime exception

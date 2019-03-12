@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.RequestAuditData;
-import gov.va.ocp.framework.audit.RequestResponseLogSerializer;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.ResponseAuditData;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
@@ -29,7 +29,7 @@ public class RemoteServiceCallInterceptor implements MethodInterceptor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteServiceCallInterceptor.class);
 
 	@Autowired
-	RequestResponseLogSerializer asyncLogging;
+	AuditLogSerializer asyncLogging;
 
 	/**
 	 * Spring-managed interceptor that executes equivalent of an {@code @Around} aspect.

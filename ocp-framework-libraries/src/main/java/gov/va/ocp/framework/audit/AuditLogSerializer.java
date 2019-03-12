@@ -24,9 +24,9 @@ import gov.va.ocp.framework.messages.MessageSeverity;
  *         The purpose of this class is to asynchronuously serialize an object to JSON and then write it to the audit logs.
  */
 @Component
-public class RequestResponseLogSerializer {
+public class AuditLogSerializer {
 
-	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(RequestResponseLogSerializer.class);
+	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(AuditLogSerializer.class);
 
 	ObjectMapper mapper = new ObjectMapper();
 
