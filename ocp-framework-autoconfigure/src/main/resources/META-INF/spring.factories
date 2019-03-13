@@ -12,4 +12,6 @@ gov.va.ocp.framework.security.autoconfigure.OcpSecurityAutoConfiguration,\
 gov.va.ocp.framework.cache.autoconfigure.OcpCacheAutoConfiguration,\
 gov.va.ocp.framework.cache.autoconfigure.server.OcpEmbeddedRedisServer,\
 gov.va.ocp.framework.swagger.autoconfigure.SwaggerAutoConfiguration,\
-gov.va.ocp.framework.hystrix.autoconfigure.HystrixContextAutoConfiguration
+gov.va.ocp.framework.hystrix.autoconfigure.HystrixContextAutoConfiguration,\
+gov.va.ocp.framework.validator.autoconfigure.OcpValidatorAutoConfiguration
+
