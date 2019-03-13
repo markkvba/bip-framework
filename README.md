@@ -47,9 +47,11 @@ There are 2 options to download these libraries on local workstation for the ser
     mvn clean install
 
 **OPTION 2**
-Add the below section in the reactor (root) pom.xml of your service project. See example: https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml
+This is a temporary solution until Nexus repository is made available by DevOps.
 
-pom.xml
+A `repositories` section has been added in the reactor pom.xml of this repository. To verify library versions, see the [mvn-repo](https://github.com/department-of-veterans-affairs/ocp-framework/branches) feature branch of ocp-framework.pom.xml
+
+Add the below section in the reactor (root) pom.xml of your service project. See example: https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml
 
 	<distributionManagement>
 	    <repository>
@@ -71,8 +73,18 @@ Update your local ~/.m2/settings.xml with the text below. Replace values between
         	<httpHeaders>
 	          	<property>
 	            	<name>Authorization</name>
-	            	<!-- Base64-encoded username:access_token -->
-	            	<!-- Example site to generate https://codebeautify.org/base64-encode -->
+			<!--
+			For value tag below:
+				Step 1: Base64-encode your username and Github access token together
+					in the form: {{username}}:{{access_token}}
+					Example: encode the string "myGithubUsername:ab123983245sldfkjsw398r7"
+				Step 2: Add the encoded string to the value tag in the form of
+					"Basic {{encoded-string}}"
+					Example: <value>Basic YXJtaXvB4F5ghTE2OGYwNmExMWM2NDdhYjWExZjQ1N2FhNGJiMjE=</value>
+			Base64 encoders:
+				https://codebeautify.org/base64-encode
+				https://www.base64encode.org/
+			-->
 	            	<value>Basic {{base64 encoded content}}</value>
 	          	</property>
         	</httpHeaders>
