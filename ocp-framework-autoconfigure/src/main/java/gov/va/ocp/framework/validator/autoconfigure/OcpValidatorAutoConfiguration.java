@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.modelvalidator.autoconfigure;
+package gov.va.ocp.framework.validator.autoconfigure;
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -8,29 +8,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import gov.va.ocp.framework.validation.ModelValidator;
-
 
 /**
- * Created by rthota on 8/24/17.
+ * The Class OcpValidatorAutoConfiguration.
  */
-
 @Configuration
 @AutoConfigureBefore(MessageSourceAutoConfiguration.class)
-public class OcpModelValidatorAutoConfiguration {
+public class OcpValidatorAutoConfiguration {
 
-    /**
-     * Model validator.
-     *
-     * @return the model validator
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public ModelValidator modelValidator(){
-        return new ModelValidator();
-    }
-    
-    /**
+	/**
      * Validator.
      *
      * @param messageSource the message source
@@ -44,5 +30,3 @@ public class OcpModelValidatorAutoConfiguration {
         return validatorFactoryBean;
     }
 }
-
-

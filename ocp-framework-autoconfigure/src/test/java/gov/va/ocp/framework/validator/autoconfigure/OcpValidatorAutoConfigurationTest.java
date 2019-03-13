@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.va.ocp.framework.modelvalidator.autoconfigure;
+package gov.va.ocp.framework.validator.autoconfigure;
 
 import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import gov.va.ocp.framework.modelvalidator.autoconfigure.OcpModelValidatorAutoConfiguration;
+import gov.va.ocp.framework.validator.autoconfigure.OcpValidatorAutoConfiguration;
 
 /**
  *
- * @author rthota
+ * @author akulkarni
  */
-public class OcpModelValidatorAutoConfigurationTest {
+public class OcpValidatorAutoConfigurationTest {
     
     private AnnotationConfigWebApplicationContext context;
 
@@ -30,10 +30,10 @@ public class OcpModelValidatorAutoConfigurationTest {
    @Test
     public void testWebConfiguration() throws Exception {
         context = new AnnotationConfigWebApplicationContext();
-        context.register(OcpModelValidatorAutoConfiguration.class);
+        context.register(OcpValidatorAutoConfiguration.class);
         context.refresh();
         assertNotNull(context);
-        assertNotNull(this.context.getBean(OcpModelValidatorAutoConfiguration.class));
+        assertNotNull(this.context.getBean(OcpValidatorAutoConfiguration.class));
 
     }
     

@@ -59,7 +59,7 @@ pom.xml
 	    </repository>
 	</distributionManagement>
 
-Update your local ~/.m2/settings.xml 
+Update your local ~/.m2/settings.xml with the text below. Replace values between {{Text}} with your information
 
 	<settings>
 	  <servers>

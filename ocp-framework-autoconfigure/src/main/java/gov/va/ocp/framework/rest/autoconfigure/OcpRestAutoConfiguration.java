@@ -23,8 +23,8 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import gov.va.ocp.framework.rest.client.exception.OcpRestGlobalExceptionHandler;
 import gov.va.ocp.framework.rest.client.resttemplate.RestClientTemplate;
+import gov.va.ocp.framework.rest.exception.OcpRestGlobalExceptionHandler;
 import gov.va.ocp.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.ocp.framework.rest.provider.aspect.RestProviderTimerAspect;
 import gov.va.ocp.framework.util.Defense;
