@@ -24,9 +24,10 @@ public interface RemoteServiceCall {
 	 * @param request the request (a subclass of AbstractTransferObject)
 	 * @param requestClass the actual Class of the request object
 	 * @return PartnerTransferObjectMarker the response from the remote web service (cast it to the desired response type)
+	 * @throws Exception 
 	 */
 	PartnerTransferObjectMarker callRemoteService(final WebServiceTemplate webserviceTemplate,
 			final PartnerTransferObjectMarker request,
-			final Class<? extends PartnerTransferObjectMarker> requestClass);
+			final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception;
 
 }

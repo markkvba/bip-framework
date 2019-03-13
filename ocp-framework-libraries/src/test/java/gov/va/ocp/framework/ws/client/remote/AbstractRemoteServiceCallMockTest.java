@@ -144,7 +144,7 @@ public class AbstractRemoteServiceCallMockTest {
 		@Override
 		public PartnerTransferObjectMarker callRemoteService(final WebServiceTemplate webserviceTemplate,
 				final PartnerTransferObjectMarker request,
-				final Class<? extends PartnerTransferObjectMarker> requestClass) {
+				final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception {
 			return super.callMockService(webserviceTemplate, request, requestClass);
 		}
 	}

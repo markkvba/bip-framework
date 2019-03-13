@@ -18,7 +18,7 @@ import org.springframework.xml.transform.ResourceSource;
 import org.springframework.xml.transform.StringResult;
 import org.springframework.xml.transform.StringSource;
 
-import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.exception.OcpException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -106,10 +106,11 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 *            the actual Class of the request object
 	 * @return PartnerTransferObjectMarker the response from the remote web service (cast
 	 *         it to the desired response type)
+	 * @throws Exception 
 	 */
 	protected PartnerTransferObjectMarker callMockService(final WebServiceTemplate webserviceTemplate,
 			final PartnerTransferObjectMarker request,
-			final Class<? extends PartnerTransferObjectMarker> requestClass) {
+			final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception {
 
 		Defense.notNull(webserviceTemplate, "To callMockService, the WebServiceTemplate cannot be null.");
 		Defense.notNull(request, "To callMockService, the transfer object 'request' cannot be null.");
@@ -168,9 +169,10 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 * @param request
 	 * @param requestClass
 	 * @return
+	 * @throws OcpException 
 	 * @throws IOException
 	 */
-	private ResourceSource readMockResponseByKey(final PartnerTransferObjectMarker request) {
+	private ResourceSource readMockResponseByKey(final PartnerTransferObjectMarker request) throws OcpException {
 		// get the key from the calling class
 		final String key = getKeyForMockResponse(request);
 
@@ -181,7 +183,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 		try {
 			resource = new ResourceSource(new ClassPathResource(MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)));
 		} catch (final IOException e) {
-			throw new OcpRuntimeException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
+			throw new OcpException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
 					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.",
 					MessageSeverity.ERROR, HttpStatus.OK, e);
 		}
