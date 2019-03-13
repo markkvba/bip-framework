@@ -6,11 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -27,8 +30,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.log.OcpLogger;
-import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
 
@@ -40,7 +41,7 @@ import gov.va.ocp.framework.rest.provider.ProviderResponse;
 public class OcpRestGlobalExceptionHandler {
 
 	/** The Constant LOGGER. */
-	private static final OcpLogger logger = OcpLoggerFactory.getLogger(OcpRestGlobalExceptionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(OcpRestGlobalExceptionHandler.class);
 
 	// 400
 
@@ -161,6 +162,29 @@ public class OcpRestGlobalExceptionHandler {
 					violation.getMessage(),
 					HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+	}
+	
+	/**
+	 * Handle http message not readable exception.
+	 *
+	 * @param req the req
+	 * @param httpMessageNotReadableException the http message not readable exception
+	 * @return the response entity
+	 */
+	@ExceptionHandler(value = HttpMessageNotReadableException.class)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpServletRequest req,
+			final HttpMessageNotReadableException httpMessageNotReadableException) {
+		logger.info(httpMessageNotReadableException.getClass().getName());
+		logger.error("error", httpMessageNotReadableException);
+		//
+		ProviderResponse apiError = new ProviderResponse();
+
+		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
+				httpMessageNotReadableException.getMessage(),
+				HttpStatus.BAD_REQUEST);
+	
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
