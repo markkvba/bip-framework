@@ -117,10 +117,17 @@ public class OcpRestAutoConfiguration {
 				.setBufferSize(Integer.valueOf(connectionBufferSize))
 				.build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
-		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
-		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
-		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
-		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
+		PoolingHttpClientConnectionManager poolingConnectionManager;
+		poolingConnectionManager = new PoolingHttpClientConnectionManager();
+		try {
+			poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
+			poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
+			poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
+		} catch (Exception e) {
+			LOGGER.debug("Error setting properties in pooling manager", e);
+		} finally {
+			poolingConnectionManager.close();
+		}
 
 		clientBuilder.setConnectionManager(poolingConnectionManager);
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
@@ -163,7 +170,7 @@ public class OcpRestAutoConfiguration {
 	@ConditionalOnMissingBean
 	public RestClientTemplate restClientTemplate() {
 		RestTemplate restTemplate = new RestTemplate(httpComponentsClientHttpRequestFactory());
-		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 		interceptors.add(tokenClientHttpRequestInterceptor());
 		restTemplate.setInterceptors(interceptors);
 		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));

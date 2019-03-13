@@ -21,7 +21,7 @@ import redis.clients.jedis.JedisPool;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ReferenceEmbeddedRedisServerAutoConfiguration.class)
-public class ReferenceEmbeddedRedisServerTest {
+public class OcpEmbeddedRedisServerTest {
 
 	@Autowired
 	OcpEmbeddedRedisServer referenceEmbeddedServer;
@@ -38,6 +38,7 @@ public class ReferenceEmbeddedRedisServerTest {
 		referenceEmbeddedServer.startRedis();
 		referenceEmbeddedServer.stopRedis();
 	}
+
 
 	@Test
 	public void shouldAllowSubsequentRuns() throws Exception {
