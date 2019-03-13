@@ -1,10 +1,11 @@
 package gov.va.ocp.framework.service;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-import gov.va.ocp.framework.transfer.AbstractTransferObject;
 import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 
 /**
@@ -15,9 +16,7 @@ import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "serviceRequest")
-public class DomainRequest extends AbstractTransferObject implements DomainTransferObjectMarker {
-
-	/** The Constant serialVersionUID. */
+public class DomainRequest implements DomainTransferObjectMarker, Serializable {
 	private static final long serialVersionUID = -8521125059263688741L;
 
 	/**

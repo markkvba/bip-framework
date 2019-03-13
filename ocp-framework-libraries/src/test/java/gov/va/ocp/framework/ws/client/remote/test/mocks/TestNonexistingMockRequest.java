@@ -6,16 +6,16 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import gov.va.ocp.framework.transfer.AbstractTransferObject;
-
-
 /**
- * <p>NOTE: THERE IS INTENTIONALLY NO ObjectFactory METHOD FOR THIS CLASS. Necessary for testing.
+ * <p>
+ * NOTE: THERE IS INTENTIONALLY NO ObjectFactory METHOD FOR THIS CLASS. Necessary for testing.
  *
  *
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType&gt;
@@ -36,22 +36,15 @@ import gov.va.ocp.framework.transfer.AbstractTransferObject;
 		"somePrivateMember"
 })
 @XmlRootElement(name = "TestNonexistingMockRequest")
-public class TestNonexistingMockRequest
-extends AbstractTransferObject
-{
-
-	/**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = 2396390075291310912L;
+public class TestNonexistingMockRequest {
 	private String somePrivateMember;
 
 	/**
 	 * Gets the value of the somePrivateMember property.
 	 *
 	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * 		possible object is
+	 *         {@link String }
 	 *
 	 */
 	public String getSomePrivateMember() {
@@ -62,8 +55,8 @@ extends AbstractTransferObject
 	 * Sets the value of the setSomePrivateMember property.
 	 *
 	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 *            allowed object is
+	 *            {@link String }
 	 *
 	 */
 	public void setSomePrivateMember(String somePrivateMember) {

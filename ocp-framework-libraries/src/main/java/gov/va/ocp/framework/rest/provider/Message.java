@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.rest.provider;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -15,23 +16,22 @@ import gov.va.ocp.framework.messages.MessageSeverity;
 /**
  * The Class Message.
  */
-public class Message {
-
-	/** The Constant serialVersionUID. */
+public class Message implements Serializable {
+	private static final long serialVersionUID = -8835969328009728923L;
 
 	/**
 	 * The text is excluded from equals and hash as the key+severity are to jointly indicate a unique message. The text is supplemental
 	 * information.
 	 */
 	private static final String[] EQUALS_HASH_EXCLUDE_FIELDS = new String[] { "text" };
-	
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 	private Date timestamp; // NOSONAR cannot be final
 
 	/** The key. */
 	@NotNull
 	private String key;
-	
+
 	/** The message severity. */
 	@NotNull
 	private String severity;
@@ -70,7 +70,7 @@ public class Message {
 		this.text = text;
 		this.status = httpStatus;
 	}
-	
+
 	/**
 	 * Gets the timestamp to be part of message payload.
 	 *
@@ -177,7 +177,7 @@ public class Message {
 		}
 		return HttpStatus.resolve(status);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 *
