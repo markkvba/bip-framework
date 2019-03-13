@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.rest.client.exception;
+package gov.va.ocp.framework.rest.exception;
 
 import java.io.IOException;
 

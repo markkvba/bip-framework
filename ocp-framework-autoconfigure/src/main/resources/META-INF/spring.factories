@@ -7,7 +7,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 gov.va.ocp.framework.service.autoconfigure.OcpServiceAutoConfiguration,\
 gov.va.ocp.framework.rest.autoconfigure.OcpRestAutoConfiguration,\
 gov.va.ocp.framework.audit.autoconfigure.OcpAuditAutoConfiguration,\
-gov.va.ocp.framework.modelvalidator.autoconfigure.OcpModelValidatorAutoConfiguration,\
 gov.va.ocp.framework.feign.autoconfigure.OcpFeignAutoConfiguration,\
 gov.va.ocp.framework.security.autoconfigure.OcpSecurityAutoConfiguration,\
 gov.va.ocp.framework.cache.autoconfigure.OcpCacheAutoConfiguration,\
