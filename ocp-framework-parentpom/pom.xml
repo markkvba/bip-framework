@@ -706,7 +706,7 @@
 							</execution>
 						</executions>
 						<configuration>
-							<repository>bip/${project.artifactId}</repository>
+							<repository>ocpdev/${project.artifactId}</repository>
 						</configuration>
 					</plugin>
 				</plugins>
