@@ -44,4 +44,17 @@ public class HystrixContextAutoConfigurationTest {
 		}
 	}
 
+	@Test
+	public void testConfigureHystrixConcurencyStrategyWithEmptyWrappers() {
+		List<HystrixCallableWrapper> wrappers = new LinkedList<HystrixCallableWrapper>();
+		HystrixContextAutoConfiguration hystrixContextAutoConfiguration = new HystrixContextAutoConfiguration();
+		ReflectionTestUtils.setField(hystrixContextAutoConfiguration, "wrappers", wrappers);
+		// no exceptions to be thrown
+		try {
+			hystrixContextAutoConfiguration.configureHystrixConcurencyStrategy();
+		} catch (Exception e) {
+			fail("No exception expected when calling method configureHystrixConcurencyStrategy() on hystrixContextAutoConfiguration object");
+		}
+	}
+
 }

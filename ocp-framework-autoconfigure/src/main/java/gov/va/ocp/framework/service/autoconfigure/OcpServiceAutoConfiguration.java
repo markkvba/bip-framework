@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import gov.va.ocp.framework.service.aspect.ServiceTimerAspect;
-import gov.va.ocp.framework.service.aspect.ServiceValidationToMessageAspect;
+import gov.va.ocp.framework.service.aspect.ServiceValidationAspect;
 
 /**
  * Created by rthota on 8/24/17.
@@ -22,8 +22,8 @@ public class OcpServiceAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ServiceValidationToMessageAspect serviceValidationToMessageAspect() {
-		return new ServiceValidationToMessageAspect();
+	public ServiceValidationAspect serviceValidationAspect() {
+		return new ServiceValidationAspect();
 	}
 
 }

@@ -75,8 +75,7 @@ public class OcpCacheAutoConfiguration extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
-		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs =
-				new HashMap<String, org.springframework.data.redis.cache.RedisCacheConfiguration>();
+		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
 		if (!CollectionUtils.isEmpty(ocpCacheProperties.getExpires())) {
 			// key = name, value - TTL
@@ -142,20 +141,17 @@ public class OcpCacheAutoConfiguration extends CachingConfigurerSupport {
 
 		@Override
 		public void handleCacheGetError(final RuntimeException exception, final Cache cache, final Object key) {
-			LOGGER.error(OcpBanner.newBanner("Unable to get from cache " + cache.getName(), Level.ERROR),
-					exception.getMessage());
+			LOGGER.error(OcpBanner.newBanner("Unable to get from cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
 		@Override
 		public void handleCachePutError(final RuntimeException exception, final Cache cache, final Object key, final Object value) {
-			LOGGER.error(OcpBanner.newBanner("Unable to put into cache " + cache.getName(), Level.ERROR),
-					exception.getMessage());
+			LOGGER.error(OcpBanner.newBanner("Unable to put into cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
 		@Override
 		public void handleCacheEvictError(final RuntimeException exception, final Cache cache, final Object key) {
-			LOGGER.error(OcpBanner.newBanner("Unable to evict from cache " + cache.getName(), Level.ERROR),
-					exception.getMessage());
+			LOGGER.error(OcpBanner.newBanner("Unable to evict from cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
 		@Override

@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.service;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,9 +8,8 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.messages.MessageSeverity;
-import gov.va.ocp.framework.transfer.AbstractTransferObject;
+import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 
 /**
@@ -17,8 +17,7 @@ import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
  *
  * @see gov.va.ocp.framework.transfer.AbstractTransferObject
  */
-public class DomainResponse extends AbstractTransferObject implements DomainTransferObjectMarker {
-
+public class DomainResponse implements DomainTransferObjectMarker, Serializable {
 	private static final long serialVersionUID = -3937937807439785385L;
 
 	/** The serviceMessages. */

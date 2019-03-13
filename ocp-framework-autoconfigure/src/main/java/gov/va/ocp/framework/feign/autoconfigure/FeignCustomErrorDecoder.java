@@ -11,12 +11,16 @@ import org.springframework.http.HttpStatus;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import gov.va.ocp.framework.exception.impl.OcpFeignRuntimeException;
+import gov.va.ocp.framework.log.OcpLogger;
+import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * The Class FeignCustomErrorDecoder.
  */
 public class FeignCustomErrorDecoder implements ErrorDecoder {
+
+	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(FeignCustomErrorDecoder.class);
 
 	private final ErrorDecoder defaultErrorDecoder = new Default();
 
@@ -29,7 +33,7 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 	public Exception decode(final String methodKey, final Response response) {
 		if ((response.status() >= 400) && (response.status() <= 499)) {
 
-			StringBuffer strBuffer = new StringBuffer();
+			StringBuilder strBuffer = new StringBuilder();
 			try {
 
 				Reader inputReader = response.body().asReader();
@@ -40,6 +44,9 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 				}
 
 			} catch (IOException e) {
+				LOGGER.debug(
+						"Could not read response body, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
+						e);
 				return defaultErrorDecoder.decode(methodKey, response);
 			}
 
@@ -52,6 +59,9 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 						HttpStatus.resolve(Integer.valueOf(messageObject.getString("status"))));
 
 			} catch (JSONException e) {
+				LOGGER.debug(
+						"Could not, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
+						e);
 				return defaultErrorDecoder.decode(methodKey, response);
 			}
 
