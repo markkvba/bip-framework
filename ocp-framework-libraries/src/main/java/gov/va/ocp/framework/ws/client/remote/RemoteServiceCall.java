@@ -21,7 +21,7 @@ public interface RemoteServiceCall {
 	 * Execution of a real or mocked remote call to the web service identified by the WebServiceTemplate.
 	 *
 	 * @param webserviceTemplate the template for the web service being called
-	 * @param request the request (a subclass of AbstractTransferObject)
+	 * @param request the request (a class that implements PartnerTransferObjectMarker)
 	 * @param requestClass the actual Class of the request object
 	 * @return PartnerTransferObjectMarker the response from the remote web service (cast it to the desired response type)
 	 * @throws Exception 

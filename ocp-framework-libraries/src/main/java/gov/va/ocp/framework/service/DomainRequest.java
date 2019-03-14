@@ -11,7 +11,6 @@ import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 /**
  * A base Request object capable of representing the payload of a service request.
  *
- * @see gov.va.ocp.framework.transfer.AbstractTransferObject
  * @author jshrader
  */
 @XmlAccessorType(XmlAccessType.FIELD)
