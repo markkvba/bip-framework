@@ -1,13 +1,13 @@
 ## What is this test library project for? ##
 
-Test -lib test Automation Framework is customized to support testing the REST Services used by BIP applications. It supports testing of both REST and SOAP protocols with the help of REST Assured jars. Testing the APIs via Jayway REST- Assured tool is fast and lightweight.
+Test -lib test Automation Framework is customized to support testing the REST Services deployed on BIP platform. It supports testing of both REST and SOAP protocols with the help of REST Assured jars. Testing the APIs via Jayway REST- Assured tool is fast and lightweight.
 
 ## Dependencies:
 
 Rest assured - This is the Rest-Assured library itself.
 
        <groupId>io.rest-assured</groupId>
-	   <artifactId>rest-assured</artifactId>
+       <artifactId>rest-assured</artifactId>
 
 cucumber-java - a library that makes it easier for us to write and execute parameterized test.
 
@@ -17,11 +17,11 @@ cucumber-java - a library that makes it easier for us to write and execute param
 
 ## How to add dependencies in your maven pom.xml? ##
         
-        <dependency>
-		<groupId>gov.va.ocp.framework</groupId>
-		<artifactId>ocp-framework-test-lib</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+          <dependency>
+             <groupId>gov.va.ocp.framework</groupId>
+	     <artifactId>ocp-framework-test-lib</artifactId>
+	     <version><!-- add the appropriate version --></version>
+	   </dependency>
 
 
 ## Overview of the packages ##
@@ -32,7 +32,7 @@ This folder has all the support classes and methods that can be re-used to build
 
 **gov.va.ocp.framework.test.restassured**:
 
-BaseStepDef: Base class for all step definition.
+BaseStepDef: Base class for all the step definition.
 
 BaseStepDefHandler: Handler object that extends BaseStepDef to handle rest based api call. Step definition class inject this object thru constructor.
 
