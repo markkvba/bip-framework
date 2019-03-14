@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.security.jwt.correlation.Sources;
 
 public class SourcesTest {
 
@@ -36,7 +35,7 @@ public class SourcesTest {
 
 		try {
 			Sources.fromValue("blah");
-			fail("Should have thrown AscentRuntimeException");
+			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
 			assertTrue(e.getMessage().startsWith("Source {} does not exist:"));

@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.security.jwt.correlation.UserStatus;
 
 public class UserStatusTest {
 
@@ -33,7 +32,7 @@ public class UserStatusTest {
 
 		try {
 			UserStatus.fromValue("X");
-			fail("Should have thrown AscentRuntimeException");
+			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
 			assertTrue(e.getMessage().startsWith("UserStatus {} does not exist:"));

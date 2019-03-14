@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.security.PersonTraits;
-import gov.va.ocp.framework.security.jwt.correlation.CorrelationIdsParser;
 
 public class CorrelationIdsParserTest {
 
@@ -55,7 +54,7 @@ public class CorrelationIdsParserTest {
 		String[] tokens = token.split("\\^");
 		try {
 			CorrelationIdsParser.parseCorrelationIds(correlationIdList, personTraits);
-			fail("Should have thrown AscentRuntimeException");
+			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			String msg = "Invalid number of elements {} in correlation id {}, should be " + ELEMENT_MAX_COUNT + " or "
 					+ ELEMENT_SS_COUNT + tokens.length + ", " + token;

@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import gov.va.ocp.framework.security.jwt.JwtAuthenticationException;
 import gov.va.ocp.framework.security.model.Person;
-import gov.va.ocp.framework.security.util.GenerateToken;
 
 public class GenerateTokenTest {
 
@@ -94,7 +93,7 @@ public class GenerateTokenTest {
 
 		try {
 			GenerateToken.generateJwt(person, expireInsec, secret, issuer, new String[] { "pid" });
-			fail("gov.va.ascent.security.jwt.JwtAuthenticationException should be thrown");
+			fail("gov.va.ocp.framework.security.jwt.JwtAuthenticationException should be thrown");
 		} catch (JwtAuthenticationException e) {
 			assertTrue(e.getMessage().contains("Invalid Token"));
 		}

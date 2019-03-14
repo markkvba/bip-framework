@@ -10,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import gov.va.ocp.framework.security.config.OcpSecurityTestConfig;
-import gov.va.ocp.framework.security.jwt.JwtAuthenticationProperties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OcpSecurityTestConfig.class)
@@ -151,7 +150,7 @@ public class JwtAuthenticationPropertiesTest {
 	 */
 	@Test
 	public void testSetExcludeUrls() {
-		String[] excludeUrls = { "http://localhost:8762/api/ascent-demo-service/swagger-ui.html" };
+		String[] excludeUrls = { "http://localhost:8762/api/ocp-reference-person/swagger-ui.html" };
 		jwtAuthenticationProperties.setExcludeUrls(excludeUrls);
 		assertTrue(jwtAuthenticationProperties.getExcludeUrls().length > 0);
 	}

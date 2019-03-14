@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.security.jwt.correlation.Issuers;
 
 public class IssuersTest {
 
@@ -33,7 +32,7 @@ public class IssuersTest {
 
 		try {
 			Issuers.fromValue("blah");
-			fail("Should have thrown AscentRuntimeException");
+			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
 			assertTrue(e.getMessage().startsWith("Issuer {} does not exist:"));
