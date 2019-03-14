@@ -268,7 +268,7 @@ public class OcpRestGlobalExceptionHandler {
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
 
-	// 500
+	// Handle all
 
 	/**
 	 * Handle ocp runtime exception.
@@ -278,7 +278,6 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = OcpRuntimeException.class)
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public final ResponseEntity<Object> handleOcpRuntimeException(HttpServletRequest req, OcpRuntimeException ex) {
 		logger.info(ex.getClass().getName());
 		logger.error("error", ex);
@@ -288,7 +287,7 @@ public class OcpRestGlobalExceptionHandler {
 				ex.getStatus());
 		return new ResponseEntity<>(apiError, ex.getStatus());
 	}
-
+	
 	/**
 	 * Handle all.
 	 *
