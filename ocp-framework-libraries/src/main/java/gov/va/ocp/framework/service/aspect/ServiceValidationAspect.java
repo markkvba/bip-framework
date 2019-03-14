@@ -32,9 +32,13 @@ import gov.va.ocp.framework.validation.Validator;
  * <li>have a companion validator named with the form <tt><i>ClassName</i>Validator</tt> that is in the "validators" package below
  * where the model object is found,
  * e.g. {@code gov.va.ocp.reference.api.model.v1.validators.PersonInfoValidator.java}.
+ * </ol>
+ * <p>
+ * Validators called by this aspect <b>should</b> extend {@link gov.va.ocp.framework.validation.AbstractStandardValidator} or
+ * similar implementation.
  *
- * @See gov.va.ocp.framework.service.DomainResponse
- * @see gov.va.ocp.framework.validation.Validatable
+ * @see gov.va.ocp.framework.validation.Validator
+ * @see gov.va.ocp.framework.validation.AbstractStandardValidator
  *
  * @author aburkholder
  */
@@ -49,8 +53,11 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	/**
 	 * Around advice for{@link BaseServiceAspect#serviceImpl()} pointcut.
 	 * <p>
-	 * This method will execute JSR-303 validations on any {@link Validatable} parameter objects in the method signature.<br/>
+	 * This method will execute validations on any parameter objects in the method signature.<br/>
 	 * Any failed validations is added to the method's response object, and is audit logged.
+	 * <p>
+	 * Validators called by this aspect <b>should</b> extend {@link gov.va.ocp.framework.validation.AbstractStandardValidator} or
+	 * similar implementation.
 	 *
 	 * @param joinPoint
 	 * @return Object
@@ -85,7 +92,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 				List<ServiceMessage> messages = new ArrayList<>();
 
 				for (final Object arg : methodParams) {
-					validateObject(arg, messages, method);
+					validateRequest(arg, messages, method);
 				}
 				// add any validation error messages
 				if (!messages.isEmpty()) {
@@ -94,9 +101,14 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 				}
 			}
 
-			// if there were no validation errors, proceed with the actual method
+			// if there were no errors, proceed with the actual method
 			if (domainResponse == null || domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty()) {
 				domainResponse = (DomainResponse) joinPoint.proceed();
+
+				// only call post-proceed() validation if there are no errors on the response
+				if (domainResponse != null && !(domainResponse.hasErrors() || domainResponse.hasFatals())) {
+					validateResponse(domainResponse, domainResponse.getMessages(), method, joinPoint.getArgs());
+				}
 			}
 
 		} catch (final Throwable throwable) {
@@ -118,20 +130,84 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	}
 
 	/**
+	 * Locate the {@link Validator} for the request object, and if it exists,
+	 * invoke the {@link Validator#getValidatedType()} method.
+	 * <p>
+	 * Validator implementations <b>must</b> exist in a validators package
+	 * under the package in which {@code object} exists.
+	 *
+	 * @see gov.va.ocp.framework.validation.Validator
+	 * @see gov.va.ocp.framework.validation.AbstractStandardValidator
+	 *
+	 * @param object the object to validate
+	 * @param messages list on which to return validation messages
+	 * @param callingMethod optional; the method that caused this validator to be called
+	 */
+	private void validateRequest(Object object, List<ServiceMessage> messages, Method callingMethod) {
+
+		Class<?> validatorClass = this.resolveValidatorClass(object);
+
+		// invoke the validator
+		try {
+			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
+			validator.setCallingMethod(callingMethod);
+			validator.initValidate(object, messages);
+
+		} catch (InstantiationException | IllegalAccessException e) {
+			// Validator programming issue - throw exception
+			String msg = "Could not find or instantiate class '" + validatorClass.getName()
+					+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName();
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+		}
+	}
+
+	/**
 	 * Locate the {@link Validator} for the object, and if it exists,
 	 * invoke the {@link Validator#getValidatedType()} method.
 	 * <p>
 	 * Validator implementations <b>must</b> exist in a validators package
 	 * under the package in which {@code object} exists.
 	 *
-	 * @see Validator
+	 * @see gov.va.ocp.framework.validation.Validator
+	 * @see gov.va.ocp.framework.validation.AbstractStandardValidator
 	 *
-	 * @param object the object to validate
-	 * @param messages list on which to return validation messages
-	 * @param callingMethod optional; the method that caused this validator to be called
+	 * @param object
+	 * @param messages
+	 * @param callingMethod
+	 * @param requestObjects
 	 */
-	private void validateObject(Object object, List<ServiceMessage> messages, Method callingMethod) {
+	private void validateResponse(DomainResponse object, List<ServiceMessage> messages, Method callingMethod,
+			Object... requestObjects) {
 
+		Class<?> validatorClass = this.resolveValidatorClass(object);
+
+		// invoke the validator
+		try {
+			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
+			validator.setCallingMethod(callingMethod);
+			validator.initValidate(object, messages, requestObjects);
+
+		} catch (InstantiationException | IllegalAccessException e) {
+			// Validator programming issue - throw exception
+			String msg = "Could not find or instantiate class '" + validatorClass.getName()
+					+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName();
+			LOGGER.error(msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+		}
+	}
+
+	/**
+	 * Determine the Validator class for the model object that is to be validated.
+	 * <p>
+	 * The pattern for Validator classes is:<br/>
+	 * <tt><i>model.objects.class.package</i>.validators.<i>ModelObjectClassSimpleName</i>Validator</tt>
+	 *
+	 * @param object
+	 * @return
+	 */
+	private Class<?> resolveValidatorClass(Object object) {
+		// Deduce the validator class name based on the pattern
 		String qualifiedValidatorName = object.getClass().getPackage() + ".validators." + object.getClass().getSimpleName() + POSTFIX;
 		qualifiedValidatorName = qualifiedValidatorName.replaceAll("package\\s+", "");
 
@@ -143,21 +219,8 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			// no validator, return without error
 			LOGGER.debug("Could not find validator class " + qualifiedValidatorName
 					+ " - skipping validation for object " + ReflectionToStringBuilder.toString(object));
-			return;
 		}
 
-		// invoke the validator
-		try {
-			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
-			validator.setCallingMethod(callingMethod);
-			validator.validate(object, messages);
-
-		} catch (InstantiationException | IllegalAccessException e) {
-			// Validator programming issue - throw exception
-			String msg = "Could not instantiate class " + validatorClass
-					+ ". Ensure that it has a no-arg constructor, and implements " + this.getClass().getName();
-			LOGGER.error(msg);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
-		}
+		return validatorClass;
 	}
 }
