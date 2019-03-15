@@ -2,6 +2,8 @@ package gov.va.ocp.framework.ws.client.remote;
 
 import org.springframework.ws.client.core.WebServiceTemplate;
 
+import gov.va.ocp.framework.exception.OcpException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.transfer.PartnerTransferObjectMarker;
 
 /**
@@ -28,6 +30,6 @@ public interface RemoteServiceCall {
 	 */
 	PartnerTransferObjectMarker callRemoteService(final WebServiceTemplate webserviceTemplate,
 			final PartnerTransferObjectMarker request,
-			final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception;
+			final Class<? extends PartnerTransferObjectMarker> requestClass) throws OcpException, OcpRuntimeException;
 
 }

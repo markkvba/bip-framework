@@ -18,9 +18,21 @@ import gov.va.ocp.framework.messages.ServiceMessage;
  *
  * @author aburkholder
  *
- * @param <T>
+ * @param <T> type-cast the object being validated
  */
 public interface Validator<T> {
+
+	/**
+	 * Provides the opportunity to perform pre-validation and/or post-validation steps.
+	 * <p>
+	 * The implementation of this method may be used to call the {@link #validate(Object, List)} method.
+	 * Check the specific implementation to confirm behavior.
+	 *
+	 * @param toValidate the object that is to be validated
+	 * @param messages to be returned to the service method caller
+	 * @param supplemental any additional data / information objects for use in the validation process
+	 */
+	void initValidate(Object toValidate, List<ServiceMessage> messages, Object... supplemental);
 
 	/**
 	 * Validate the supplied {@code toValidate} object.
@@ -30,9 +42,8 @@ public interface Validator<T> {
 	 *
 	 * @param toValidate the object that is to be validated
 	 * @param messages to be returned to the service method caller
-	 * @see Validator
 	 */
-	void validate(Object toValidate, List<ServiceMessage> messages);
+	void validate(T toValidate, List<ServiceMessage> messages);
 
 	/**
 	 * The type being validated.
@@ -40,7 +51,6 @@ public interface Validator<T> {
 	 * Implementations would typically {@code return T.class} (whatever class T is).
 	 *
 	 * @return Class of type T
-	 * @see Validator
 	 */
 	Class<T> getValidatedType();
 
@@ -55,7 +65,7 @@ public interface Validator<T> {
 	 *
 	 * @param callingMethod the method call that caused the Validator to be invoked
 	 */
-	public void setCallingMethod(Method callingMethod);
+	void setCallingMethod(Method callingMethod);
 
 	/**
 	 * Optional. Store the method that caused the Validator to be invoked.
@@ -68,5 +78,5 @@ public interface Validator<T> {
 	 *
 	 * @return Method null, or the method call that caused the Validator to be invoked
 	 */
-	public Method getCallingMethod();
+	Method getCallingMethod();
 }

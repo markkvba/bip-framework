@@ -19,6 +19,7 @@ import org.springframework.xml.transform.StringResult;
 import org.springframework.xml.transform.StringSource;
 
 import gov.va.ocp.framework.exception.OcpException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -110,7 +111,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 */
 	protected PartnerTransferObjectMarker callMockService(final WebServiceTemplate webserviceTemplate,
 			final PartnerTransferObjectMarker request,
-			final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception {
+			final Class<? extends PartnerTransferObjectMarker> requestClass) throws OcpException, OcpRuntimeException {
 
 		Defense.notNull(webserviceTemplate, "To callMockService, the WebServiceTemplate cannot be null.");
 		Defense.notNull(request, "To callMockService, the transfer object 'request' cannot be null.");
@@ -185,7 +186,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 		} catch (final IOException e) {
 			throw new OcpException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
 					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.",
-					MessageSeverity.ERROR, HttpStatus.OK, e);
+					MessageSeverity.WARN, HttpStatus.OK, e);
 		}
 		return resource;
 	}
