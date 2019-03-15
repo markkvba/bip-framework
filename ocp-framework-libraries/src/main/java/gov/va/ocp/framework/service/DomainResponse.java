@@ -14,8 +14,6 @@ import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 
 /**
  * A base Response object capable of representing the payload of a service response.
- *
- * @see gov.va.ocp.framework.transfer.AbstractTransferObject
  */
 public class DomainResponse implements DomainTransferObjectMarker, Serializable {
 	private static final long serialVersionUID = -3937937807439785385L;

@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * ServiceMessage is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate status or
+ * ServiceMessage is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate
+ * status or
  * other sorts of information during method calls between components/layers. This is serializable and can be used in SOAP or REST
  * calls.
  *
@@ -38,7 +39,7 @@ public class ServiceMessage extends AbstractMessage {
 	private String text;
 
 	private String status;
-	
+
 	@JsonIgnore
 	/** The Http status enum. */
 	private HttpStatus httpStatus;
@@ -130,7 +131,7 @@ public class ServiceMessage extends AbstractMessage {
 	public String getStatus() {
 		// Since this method is used by introspection based serialisation, it would need to return the status code number instead of
 		// the default (enum name), which is why the toString() method is used
-		status = (httpStatus == null ? null : String.valueOf(httpStatus.value()));
+		status = httpStatus == null ? null : String.valueOf(httpStatus.value());
 		return status;
 	}
 
@@ -193,7 +194,6 @@ public class ServiceMessage extends AbstractMessage {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see gov.va.ocp.framework.transfer.AbstractTransferObject#equals(java.lang.Object)
 	 */
 	@Override
 	public final boolean equals(final Object obj) {
@@ -203,7 +203,6 @@ public class ServiceMessage extends AbstractMessage {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see gov.va.ocp.framework.transfer.AbstractTransferObject#hashCode()
 	 */
 	@Override
 	public final int hashCode() {

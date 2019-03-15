@@ -20,7 +20,6 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import gov.va.ocp.framework.exception.OcpException;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.transfer.PartnerTransferObjectMarker;
-import gov.va.ocp.framework.ws.client.remote.AbstractRemoteServiceCallMock;
 import gov.va.ocp.framework.ws.client.remote.test.mocks.TestAbstractRemoteServiceCallMockRequest;
 import gov.va.ocp.framework.ws.client.remote.test.mocks.TestAbstractRemoteServiceCallMockResponse;
 
@@ -106,7 +105,7 @@ public class AbstractRemoteServiceCallMockTest {
 		final Class<? extends PartnerTransferObjectMarker> requestClass = mockRequest.getClass();
 
 		// doCallRealMethod().when(mockAbstractRemoteServiceCallMock).callMockService(any(WebServiceTemplate.class),
-		// any(AbstractTransferObject.class), any(Class.class));
+		// any(PartnerTransferObjectMarker.class), any(Class.class));
 		// let the class being tested get an actual marshaler impl
 		doReturn(mockMarshaller).when(webserviceTemplate).getMarshaller();
 

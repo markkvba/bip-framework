@@ -59,7 +59,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 * <pre>
 	 * {@code
 	 * 	&#64;Override
-	 * 	String getKeyForMockResponse(final AbstractTransferObject request) {
+	 * 	String getKeyForMockResponse(final ImplementerOfPartnerTransferObjectMarker request) {
 	 * 		Defense.notNull(request);
 	 * 		// cast the request back to the original request transfer object type so we can get the state code
 	 * 		final String stateAbbr = ((GetVAMedicalTreatmentFacilityList) request).getStateCd();
@@ -102,7 +102,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 * @param webserviceTemplate
 	 *            the template for the web service being called
 	 * @param request
-	 *            the request (a subclass of AbstractTransferObject)
+	 *            the request (an class that implements PartnerTransferObjectMarker)
 	 * @param requestClass
 	 *            the actual Class of the request object
 	 * @return PartnerTransferObjectMarker the response from the remote web service (cast
@@ -144,7 +144,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	}
 
 	/**
-	 * Mock helper for functional tests. Marshals an AbstractTransferObject request
+	 * Mock helper for functional tests. Marshals a PartnerTransferObjectMarker request
 	 * object to a StringSource formatted as XML.
 	 *
 	 * @param marshaller
@@ -165,7 +165,7 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	/**
 	 * Mock helper for functional tests. Based on the key provided by implementing
 	 * code in the abstract
-	 * {@code getKeyForMockResponse(AbstractTransferObject request)} method.
+	 * {@code getKeyForMockResponse(PartnerTransferObjectMarker request)} method.
 	 *
 	 * @param request
 	 * @param requestClass
