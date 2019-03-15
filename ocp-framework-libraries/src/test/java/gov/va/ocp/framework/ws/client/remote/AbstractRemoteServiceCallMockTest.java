@@ -17,6 +17,8 @@ import org.mockito.Spy;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
+import gov.va.ocp.framework.exception.OcpException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.transfer.PartnerTransferObjectMarker;
 import gov.va.ocp.framework.ws.client.remote.test.mocks.TestAbstractRemoteServiceCallMockRequest;
 import gov.va.ocp.framework.ws.client.remote.test.mocks.TestAbstractRemoteServiceCallMockResponse;
@@ -143,7 +145,7 @@ public class AbstractRemoteServiceCallMockTest {
 		@Override
 		public PartnerTransferObjectMarker callRemoteService(final WebServiceTemplate webserviceTemplate,
 				final PartnerTransferObjectMarker request,
-				final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception {
+				final Class<? extends PartnerTransferObjectMarker> requestClass) throws OcpException, OcpRuntimeException {
 			return super.callMockService(webserviceTemplate, request, requestClass);
 		}
 	}

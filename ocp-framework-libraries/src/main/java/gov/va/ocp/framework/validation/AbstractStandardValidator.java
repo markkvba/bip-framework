@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.exception.interceptor.ExceptionHandlingUtils;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
@@ -103,7 +104,12 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			validate((T) toValidate, messages);
 
 		} catch (Throwable t) { // NOSONAR intentionally broad catch
-			throw ExceptionHandlingUtils.resolveRuntimeException(t);
+			final OcpRuntimeException runtime = ExceptionHandlingUtils.resolveRuntimeException(t);
+			if (runtime != null) {
+				throw runtime;
+			} else { 
+				throw t;
+			}
 		}
 	}
 

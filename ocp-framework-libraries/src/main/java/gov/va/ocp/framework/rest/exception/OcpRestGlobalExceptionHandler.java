@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -164,7 +165,7 @@ public class OcpRestGlobalExceptionHandler {
 		}
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
-	
+
 	/**
 	 * Handle http message not readable exception.
 	 *
@@ -184,7 +185,7 @@ public class OcpRestGlobalExceptionHandler {
 		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
 				httpMessageNotReadableException.getMessage(),
 				HttpStatus.BAD_REQUEST);
-	
+
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
@@ -281,13 +282,16 @@ public class OcpRestGlobalExceptionHandler {
 	public final ResponseEntity<Object> handleOcpRuntimeException(HttpServletRequest req, OcpRuntimeException ex) {
 		logger.info(ex.getClass().getName());
 		logger.error("error", ex);
+		String message = ex.getMessage();
+		if (StringUtils.isEmpty(message) && ex.getCause()!=null) {
+			message = ex.getCause().getMessage();
+		}
 		final ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(ex.getSeverity(), ex.getKey(),
-				ex.getMessage(),
-				ex.getStatus());
+				message, ex.getStatus());
 		return new ResponseEntity<>(apiError, ex.getStatus());
 	}
-	
+
 	/**
 	 * Handle all.
 	 *
@@ -301,10 +305,13 @@ public class OcpRestGlobalExceptionHandler {
 		logger.info(ex.getClass().getName());
 		logger.error("error", ex);
 		//
+		String message = ex.getLocalizedMessage();
+		if (StringUtils.isEmpty(message) && ex.getCause()!=null) {
+			message = ex.getCause().getMessage();
+		}
 		final ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.name(),
-				ex.getLocalizedMessage(),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+				message, HttpStatus.INTERNAL_SERVER_ERROR);
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
