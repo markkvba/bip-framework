@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.messages;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -21,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  * @author vanapalliv
  */
-public abstract class AbstractMessage {
+public abstract class AbstractMessage implements Serializable {
 
 	/** The Constant serialVersisonUID. */
 	private static final long serialVersionUID = -1711431368372127556L;
