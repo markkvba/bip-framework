@@ -119,7 +119,8 @@ to be used to Authenticate, URL's to be processed etc.
 	
 - OcpServiceAutoConfiguration has below beans configured and their responsibilities are as below:
 
-  a. ServiceTimerAspect: Logs the time taken to execute Service methods and Rest End points
+  a. ServiceTimerAspect: Logs the time taken to execute Service methods and Rest End points.
+  
   b. ServiceValidationAspect: This aspect invokes business validations on eligible service API methods.
 	 Eligible service operations are any those which:
  	-have public scope
