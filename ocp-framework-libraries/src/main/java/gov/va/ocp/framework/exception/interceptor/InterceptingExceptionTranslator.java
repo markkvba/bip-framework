@@ -62,6 +62,8 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 
 		// skip conversion if the throwable is in the exclusion set
 		try {
+			// exclusionSet is initialized in BaseWsClientConfig.getInterceptingExceptionTranslator()
+			// with value of BaseWsClientConfig.PACKAGE_FRAMEWORK_EXCEPTION
 			if (exclusionSet != null
 					&& (exclusionSet.contains(throwable.getClass().getPackage().getName()) || exclusionSet
 							.contains(throwable.getClass().getName()))) {
