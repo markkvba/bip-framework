@@ -41,6 +41,7 @@ import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.OcpLogger;
@@ -48,8 +49,8 @@ import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
-import gov.va.ocp.framework.util.Defense;
-import gov.va.ocp.framework.ws.client.remote.RemoteServiceCallInterceptor;
+import gov.va.ocp.framework.validation.Defense;
+import gov.va.ocp.framework.ws.client.remote.AuditAroundRemoteServiceCallInterceptor;
 
 /**
  * Base WebService Client configuration, consolidates core/common web service configuration operations used across the applications.
@@ -452,7 +453,7 @@ public class BaseWsClientConfig {
 					| UnrecoverableKeyException e) {
 				String msg = "Could not establish SSL context due to " + e.getClass().getSimpleName() + ": " + e.getMessage();
 				LOGGER.error(msg, e);
-				throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.INTERNAL_SERVER_ERROR, e);
+				throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 			}
 		}
 	}
@@ -506,7 +507,7 @@ public class BaseWsClientConfig {
 	 */
 	@SuppressWarnings(AnnotationConstants.UNCHECKED)
 	public final InterceptingExceptionTranslator getInterceptingExceptionTranslator(final String defaultExceptionClass,
-			final String exceptionPackagesToExclude) throws ClassNotFoundException {
+			final Set<String> exceptionPackagesToExclude) {
 		// RR: second param should be made a Set
 
 		Defense.notNull(defaultExceptionClass);
@@ -515,13 +516,24 @@ public class BaseWsClientConfig {
 		final InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
 
 		// set the default type of exception that should be returned when this interceptor runs
-		interceptingExceptionTranslator
-				.setDefaultExceptionType((Class<? extends OcpRuntimeException>) Class.forName(defaultExceptionClass));
+		try {
+			interceptingExceptionTranslator
+					.setDefaultExceptionType((Class<? extends OcpRuntimeException>) Class.forName(defaultExceptionClass));
+		} catch (ClassNotFoundException e) {
+			String msg = "Could not find class for '" + defaultExceptionClass
+					+ "'. Most likely, a class that extends BaseWsClientConfig is mis-configured.";
+			throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+		}
 
 		// define packages that contain "our exceptions" that we want to propagate through
 		// without again logging and/or wrapping
 		final Set<String> exclusionSet = new HashSet<>();
 		exclusionSet.add(PACKAGE_FRAMEWORK_EXCEPTION);
+		for (String exclusion : exceptionPackagesToExclude) {
+			if (StringUtils.isNotBlank(exclusion)) {
+				exclusionSet.add(exclusion);
+			}
+		}
 		interceptingExceptionTranslator.setExclusionSet(exclusionSet);
 
 		return interceptingExceptionTranslator;
@@ -548,7 +560,8 @@ public class BaseWsClientConfig {
 		try {
 			marshaller.afterPropertiesSet();
 		} catch (final Exception ex) {
-			throw new IllegalArgumentException("Error configuring JAXB marshaller", ex);
+			throw new OcpPartnerRuntimeException("", "Error configuring JAXB marshaller", MessageSeverity.FATAL,
+					HttpStatus.INTERNAL_SERVER_ERROR, ex);
 		}
 		return marshaller;
 	}
@@ -566,12 +579,12 @@ public class BaseWsClientConfig {
 	}
 
 	/**
-	 * Gets the RemoteServiceCallInterceptor interceptor.
+	 * Gets the AuditAroundRemoteServiceCallInterceptor interceptor.
 	 *
 	 * @return the performance interceptor
 	 */
-	public final RemoteServiceCallInterceptor getRemoteServiceCallInterceptor() {
-		return new RemoteServiceCallInterceptor();
+	public final AuditAroundRemoteServiceCallInterceptor getRemoteServiceCallInterceptor() {
+		return new AuditAroundRemoteServiceCallInterceptor();
 	}
 
 	/**

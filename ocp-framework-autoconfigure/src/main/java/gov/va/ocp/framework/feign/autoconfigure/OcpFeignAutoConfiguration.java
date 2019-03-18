@@ -21,7 +21,7 @@ import feign.hystrix.HystrixFeign;
 import feign.hystrix.SetterFactory;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * Auto configuration for feign enabled REST clients (e.g. {@code EnableFeignClients}).

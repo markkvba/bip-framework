@@ -27,7 +27,7 @@ import gov.va.ocp.framework.rest.client.resttemplate.RestClientTemplate;
 import gov.va.ocp.framework.rest.exception.OcpRestGlobalExceptionHandler;
 import gov.va.ocp.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.ocp.framework.rest.provider.aspect.RestProviderTimerAspect;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * A collection of spring beans used for REST server and/or client operations.

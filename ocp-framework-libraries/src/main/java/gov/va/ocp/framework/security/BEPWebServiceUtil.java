@@ -13,8 +13,8 @@ import org.springframework.util.Assert;
 
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.util.Defense;
 import gov.va.ocp.framework.util.HashGenerator;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * Provides a common method of handling elements of web service calls made to VA

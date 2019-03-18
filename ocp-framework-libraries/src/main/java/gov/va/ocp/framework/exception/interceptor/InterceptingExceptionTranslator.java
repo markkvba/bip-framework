@@ -65,12 +65,10 @@ public class InterceptingExceptionTranslator implements ThrowsAdvice {
 			// exclusionSet is initialized in BaseWsClientConfig.getInterceptingExceptionTranslator()
 			// with value of BaseWsClientConfig.PACKAGE_FRAMEWORK_EXCEPTION
 			if (exclusionSet != null
-					&& (exclusionSet.contains(throwable.getClass().getPackage().getName()) || exclusionSet
-							.contains(throwable.getClass().getName()))) {
-				if (LOGGER.isDebugEnabled()) {
-					InterceptingExceptionTranslator.LOGGER.debug("Exception translator caught exception ["
-							+ throwable.getClass() + "] however per configuration not translating this exception.");
-				}
+					&& (exclusionSet.contains(throwable.getClass().getPackage().getName())
+							|| exclusionSet.contains(throwable.getClass().getName()))) {
+				LOGGER.debug("InterceptingExceptionTranslator is configured to ignore exceptions of type ["
+						+ throwable.getClass().getName() + "] - not translating this exception.");
 				// let the throwable bubble up through the app untouched
 				return;
 
