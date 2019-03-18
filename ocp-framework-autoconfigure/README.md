@@ -31,12 +31,10 @@ OCP Framework Autoconfigure Project is a suite of POM files that provides applic
 - Define behavior through properties for the Feign client like connectionTimeoOut, etc is possible
 - FeignCustomErrorDecoder has been created to interrogate and modify the Exception being propagated. 
 
-
-	@Configuration
-	public class OcpFeignAutoConfiguration {
+		@Configuration
+		public class OcpFeignAutoConfiguration {
 
 **gov.va.ocp.framework.hystrix.autoconfigure**: Hystrix auto-configuration to set RequestAttributes to be passed from ThreadLocal to Hystrix threads through RequestAttributeAwareCallableWrapper bean. This will enable to pass the RequestAttributes from User thread to Hystrix thread(THREAD strategy). 
-
 
 	@Configuration
 	@ConditionalOnProperty(value = "hystrix.wrappers.enabled", matchIfMissing = true)
