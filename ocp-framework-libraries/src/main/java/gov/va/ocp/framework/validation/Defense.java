@@ -1,23 +1,27 @@
-package gov.va.ocp.framework.util;
+package gov.va.ocp.framework.validation;
 
 import java.util.Collection;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
+import gov.va.ocp.framework.exception.OcpValidationRuntimeException;
+import gov.va.ocp.framework.messages.MessageSeverity;
+
 /**
- * Utility class to make runtime assertions against parameters. Currently delegates many of its exposed calls to
- * Spring's internal Assert class, however using this custom Defense interface is prefered as opposed to directly
- * using Springs internal class to avoid unnecessarily coupling clients to the Spring API. The Spring dependency could
- * be removed in future releases without affecting clients.
+ * Make assertions as runtime validations of service layer method arguments.
+ * Failed validations will always return {@link OcpValidationRuntimeException},
+ * with the underlying assertion error as the cause.
  *
- * @author Jon Shrader, Jimmy Ray
+ * @author Jon Shrader, Jimmy Ray, aburkholder
  */
 public final class Defense {
 
 	/**
-	 * Instantiates a new defense.
+	 * Defense is a static class. Do not instantiate it.
 	 */
 	private Defense() {
+		throw new IllegalAccessError("Defense is a static class. Do not instantiate it.");
 	}
 
 	/**
@@ -28,7 +32,11 @@ public final class Defense {
 	 * @see Assert#isInstanceOf(Class, Object)
 	 */
 	public static void isInstanceOf(final Class<?> clazz, final Object obj) {
-		Assert.isInstanceOf(clazz, obj);
+		try {
+			Assert.isInstanceOf(clazz, obj);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -40,7 +48,11 @@ public final class Defense {
 	 * @see Assert#state(boolean, String)
 	 */
 	public static void state(final boolean expression, final String message) {
-		Assert.state(expression, message);
+		try {
+			Assert.state(expression, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -51,7 +63,11 @@ public final class Defense {
 	 * @see Assert#state(boolean, String)
 	 */
 	public static void state(final boolean expression) {
-		Assert.state(expression, "[Assertion failed] - this state invariant must be true");
+		try {
+			Assert.state(expression, "[Assertion failed] - this state invariant must be true");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -61,7 +77,11 @@ public final class Defense {
 	 * @see Assert#isNull(Object, String)
 	 */
 	public static void isNull(final Object ref) {
-		Assert.isNull(ref, "[Assertion failed] - the object argument must be null");
+		try {
+			Assert.isNull(ref, "[Assertion failed] - the object argument must be null");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -72,7 +92,11 @@ public final class Defense {
 	 * @see Assert#isNull(Object, String)
 	 */
 	public static void isNull(final Object ref, final String message) {
-		Assert.isNull(ref, message);
+		try {
+			Assert.isNull(ref, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -82,7 +106,11 @@ public final class Defense {
 	 * @see Assert#isNull(Object, String)
 	 */
 	public static void notNull(final Object ref) {
-		Assert.notNull(ref, "[Assertion failed] - this argument is required; it must not be null");
+		try {
+			Assert.notNull(ref, "[Assertion failed] - this argument is required; it must not be null");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -93,7 +121,11 @@ public final class Defense {
 	 * @see Assert#isNull(Object, String)
 	 */
 	public static void notNull(final Object ref, final String message) {
-		Assert.notNull(ref, message);
+		try {
+			Assert.notNull(ref, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -105,7 +137,11 @@ public final class Defense {
 	 * @see Assert#hasText(String, String)
 	 */
 	public static void hasText(final String text) {
-		Assert.hasText(text, "[Assertion failed] - this String argument must have text; it must not be null, empty, or blank");
+		try {
+			Assert.hasText(text, "[Assertion failed] - this String argument must have text; it must not be null, empty, or blank");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -118,7 +154,11 @@ public final class Defense {
 	 * @see Assert#hasText(String, String)
 	 */
 	public static void hasText(final String text, final String message) {
-		Assert.hasText(text, message);
+		try {
+			Assert.hasText(text, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -130,7 +170,11 @@ public final class Defense {
 	 * @see Assert#notEmpty(Collection, String)
 	 */
 	public static void notEmpty(final Collection<?> ref) {
-		Assert.notEmpty(ref, "[Assertion failed] - this collection must not be empty: it must contain at least 1 element");
+		try {
+			Assert.notEmpty(ref, "[Assertion failed] - this collection must not be empty: it must contain at least 1 element");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -143,7 +187,11 @@ public final class Defense {
 	 * @see Assert#notEmpty(Collection, String)
 	 */
 	public static void notEmpty(final Collection<?> ref, final String message) {
-		Assert.notEmpty(ref, message);
+		try {
+			Assert.notEmpty(ref, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -156,7 +204,11 @@ public final class Defense {
 	 * @see Assert#notEmpty(Object[], String)
 	 */
 	public static void notEmpty(final String[] ref, final String message) {
-		Assert.notEmpty(ref, message);
+		try {
+			Assert.notEmpty(ref, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -169,8 +221,12 @@ public final class Defense {
 	 * @see Assert#isTrue(boolean, String)
 	 */
 	public static void isTrue(final Boolean expression) {
-		Assert.notNull(expression, "[Assertion failed] - this argument is required; it must not be null");
-		Assert.isTrue(expression, "[Assertion failed] - this expression must be true");
+		try {
+			Assert.notNull(expression, "[Assertion failed] - this argument is required; it must not be null");
+			Assert.isTrue(expression, "[Assertion failed] - this expression must be true");
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 	/**
@@ -184,8 +240,12 @@ public final class Defense {
 	 * @see Assert#isTrue(boolean, String)
 	 */
 	public static void isTrue(final Boolean expression, final String message) {
-		Assert.notNull(expression, message);
-		Assert.isTrue(expression, message);
+		try {
+			Assert.notNull(expression, message);
+			Assert.isTrue(expression, message);
+		} catch (Exception e) {
+			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+		}
 	}
 
 }

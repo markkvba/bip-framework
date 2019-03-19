@@ -5,6 +5,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.soap.SOAPException;
 
@@ -29,10 +31,10 @@ import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 
+import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
-import gov.va.ocp.framework.ws.client.BaseWsClientConfig;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BaseWsClientConfigTest {
@@ -180,8 +182,10 @@ public class BaseWsClientConfigTest {
 	@Test
 	public void testGetInterceptingExceptionTranslator() {
 		BaseWsClientConfig test = new BaseWsClientConfig();
+		Set<String> exclusions = new HashSet<>();
+		exclusions.add("java.lang");
 		try {
-			assertTrue(test.getInterceptingExceptionTranslator("Exception", "java.lang") instanceof InterceptingExceptionTranslator);
+			assertTrue(test.getInterceptingExceptionTranslator("Exception", exclusions) instanceof InterceptingExceptionTranslator);
 		} catch (Exception e) {
 
 		}
@@ -194,7 +198,8 @@ public class BaseWsClientConfigTest {
 		try {
 			test.getMarshaller("com.oracle.xmlns.internal.webservices.jaxws_databinding", resources, true);
 		} catch (Exception e) {
-			Assert.assertTrue(e instanceof IllegalArgumentException);
+			Assert.assertTrue(OcpPartnerRuntimeException.class.isAssignableFrom(e.getClass()));
+			Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
 			Assert.assertNotNull(e.getMessage());
 		}
 	}

@@ -8,14 +8,14 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.service.aspect.TestRequest;
-import gov.va.ocp.framework.validation.Validator;
+import gov.va.ocp.framework.validation.AbstractStandardValidator;
 
 /**
  * USED BY ServiceValidationAspectTest to test ServiceValidationAspect and Validator.
  *
  * @author aburkholder
  */
-public class TestRequestValidator implements Validator<TestRequest> {
+public class TestRequestValidator extends AbstractStandardValidator<TestRequest> {
 
 	public static final String KEY = "some.key";
 	public static final String TEXT = "Some error message";
@@ -28,7 +28,7 @@ public class TestRequestValidator implements Validator<TestRequest> {
 	}
 
 	@Override
-	public void validate(Object toValidate, List<ServiceMessage> messages) {
+	public void validate(TestRequest toValidate, List<ServiceMessage> messages) {
 		if (callingMethod != null && callingMethod.getName().contains("Sad")) {
 			messages.add(new ServiceMessage(SEVERITY, KEY, TEXT, STATUS));
 		}

@@ -67,7 +67,7 @@ public final class ExceptionHandlingUtils {
 		} else {
 			// make a new OcpRuntimeException from the non-OCP throwable
 			resolvedRuntimeException =
-					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, throwable);
+					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 		}
 
 		return resolvedRuntimeException;

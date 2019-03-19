@@ -19,11 +19,12 @@ import org.springframework.xml.transform.StringResult;
 import org.springframework.xml.transform.StringSource;
 
 import gov.va.ocp.framework.exception.OcpException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.transfer.PartnerTransferObjectMarker;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * <p>
@@ -56,15 +57,13 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 * </p>
 	 *
 	 * <pre>
-	 * {@code
-	 * 	&#64;Override
-	 * 	String getKeyForMockResponse(final AbstractTransferObject request) {
-	 * 		Defense.notNull(request);
-	 * 		// cast the request back to the original request transfer object type so we can get the state code
-	 * 		final String stateAbbr = ((GetVAMedicalTreatmentFacilityList) request).getStateCd();
-	 * 		Defense.hasText(stateAbbr);
-	 * 		return stateAbbr;
-	 * 	}
+	 * &#64;Override
+	 * String getKeyForMockResponse(final ImplementerOfPartnerTransferObjectMarker request) {
+	 * 	Defense.notNull(request);
+	 * 	// cast the request back to the original request transfer object type so we can get the state code
+	 * 	final String stateAbbr = ((GetVAMedicalTreatmentFacilityList) request).getStateCd();
+	 * 	Defense.hasText(stateAbbr);
+	 * 	return stateAbbr;
 	 * }
 	 * </pre>
 	 *
@@ -101,49 +100,47 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	 * @param webserviceTemplate
 	 *            the template for the web service being called
 	 * @param request
-	 *            the request (a subclass of AbstractTransferObject)
+	 *            the request (an class that implements PartnerTransferObjectMarker)
 	 * @param requestClass
 	 *            the actual Class of the request object
 	 * @return PartnerTransferObjectMarker the response from the remote web service (cast
 	 *         it to the desired response type)
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	protected PartnerTransferObjectMarker callMockService(final WebServiceTemplate webserviceTemplate,
 			final PartnerTransferObjectMarker request,
-			final Class<? extends PartnerTransferObjectMarker> requestClass) throws Exception {
+			final Class<? extends PartnerTransferObjectMarker> requestClass) {
 
 		Defense.notNull(webserviceTemplate, "To callMockService, the WebServiceTemplate cannot be null.");
 		Defense.notNull(request, "To callMockService, the transfer object 'request' cannot be null.");
 		Defense.notNull(requestClass, "To callMockService, the 'requestClass' of the request transfer object cannot be null.");
 
+		LOGGER.debug("Running mock service on webserviceTemplate with request "
+				+ (request == null ? "null" : ReflectionToStringBuilder.toString(request)));
 		PartnerTransferObjectMarker response = null;
 
-		try {
-			final Source requestPayload =
-					marshalMockRequest((Jaxb2Marshaller) webserviceTemplate.getMarshaller(), request, requestClass);
-			final Source responsePayload = readMockResponseByKey(request);
+		final Source requestPayload =
+				marshalMockRequest((Jaxb2Marshaller) webserviceTemplate.getMarshaller(), request, requestClass);
+		final Source responsePayload = readMockResponseByKey(request);
 
-			synchronized (webserviceTemplate) {
+		synchronized (webserviceTemplate) {
 
-				final MockWebServiceServer mockSoapServer = MockWebServiceServer.createServer(webserviceTemplate);
+			final MockWebServiceServer mockSoapServer = MockWebServiceServer.createServer(webserviceTemplate);
 
-				mockSoapServer.expect(payload(requestPayload)).andRespond(withPayload(responsePayload));
+			mockSoapServer.expect(payload(requestPayload)).andRespond(withPayload(responsePayload));
 
-				response = (PartnerTransferObjectMarker) webserviceTemplate.marshalSendAndReceive(requestClass.cast(request));
+			response = (PartnerTransferObjectMarker) webserviceTemplate.marshalSendAndReceive(requestClass.cast(request));
 
-				mockSoapServer.verify();
-			}
-		} catch (Exception e) {
-			LOGGER.error("MOCK service call failed with requestClass "
-					+ requestClass.getName() + " and request object " + ReflectionToStringBuilder.toString(request), e);
-			throw e;
+			mockSoapServer.verify();
 		}
 
+		LOGGER.debug("Ran mock service, returning response "
+				+ (response == null ? "null" : ReflectionToStringBuilder.toString(response)));
 		return response;
 	}
 
 	/**
-	 * Mock helper for functional tests. Marshals an AbstractTransferObject request
+	 * Mock helper for functional tests. Marshals a PartnerTransferObjectMarker request
 	 * object to a StringSource formatted as XML.
 	 *
 	 * @param marshaller
@@ -164,15 +161,15 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 	/**
 	 * Mock helper for functional tests. Based on the key provided by implementing
 	 * code in the abstract
-	 * {@code getKeyForMockResponse(AbstractTransferObject request)} method.
+	 * {@code getKeyForMockResponse(PartnerTransferObjectMarker request)} method.
 	 *
 	 * @param request
 	 * @param requestClass
 	 * @return
-	 * @throws OcpException 
+	 * @throws OcpException
 	 * @throws IOException
 	 */
-	private ResourceSource readMockResponseByKey(final PartnerTransferObjectMarker request) throws OcpException {
+	private ResourceSource readMockResponseByKey(final PartnerTransferObjectMarker request) {
 		// get the key from the calling class
 		final String key = getKeyForMockResponse(request);
 
@@ -183,9 +180,9 @@ public abstract class AbstractRemoteServiceCallMock implements RemoteServiceCall
 		try {
 			resource = new ResourceSource(new ClassPathResource(MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)));
 		} catch (final IOException e) {
-			throw new OcpException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
+			throw new OcpRuntimeException("", "Could not read mock XML file '" + MessageFormat.format(MOCK_FILENAME_TEMPLATE, key)
 					+ "' using key '" + key + "'. Please make sure this response file exists in the main/resources directory.",
-					MessageSeverity.ERROR, HttpStatus.OK, e);
+					MessageSeverity.WARN, HttpStatus.OK, e);
 		}
 		return resource;
 	}

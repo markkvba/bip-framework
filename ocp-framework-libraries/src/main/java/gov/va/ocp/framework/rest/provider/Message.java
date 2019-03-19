@@ -181,7 +181,6 @@ public class Message implements Serializable {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see gov.va.ocp.framework.transfer.AbstractTransferObject#equals(java.lang.Object)
 	 */
 	@Override
 	public final boolean equals(final Object obj) {
@@ -191,7 +190,6 @@ public class Message implements Serializable {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see gov.va.ocp.framework.transfer.AbstractTransferObject#hashCode()
 	 */
 	@Override
 	public final int hashCode() {

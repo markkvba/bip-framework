@@ -14,7 +14,7 @@ import gov.va.ocp.framework.cache.autoconfigure.OcpCacheProperties;
 import gov.va.ocp.framework.config.OcpCommonSpringProfiles;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 import redis.embedded.RedisServer;
 
 /**

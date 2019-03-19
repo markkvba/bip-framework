@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
-import gov.va.ocp.framework.exception.impl.OcpFeignRuntimeException;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 public class OcpFeignRuntimeExceptionTest {

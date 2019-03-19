@@ -14,8 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.service.aspect.validators.TestRequestValidator;
@@ -147,13 +145,4 @@ public class ServiceValidationAspectTest {
 
 	}
 
-	@Test
-	public final void testValidateObject() {
-		try {
-			ReflectionTestUtils.invokeMethod(aspect, "validateObject", new Object(), null, null);
-		} catch (Exception e) {
-			fail("Should not throw an exception");
-		}
-
-	}
 }

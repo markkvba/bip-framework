@@ -9,7 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.validation.Defense;
 
 public class DefenseTest {
 
@@ -23,11 +24,11 @@ public class DefenseTest {
 
 	@Test
 	public void testIsInstanceOf() {
-		try{
+		try {
 			Defense defenseObj = Defense.class.newInstance();
 			Defense.isInstanceOf(Defense.class, defenseObj);
-		}catch(Exception e) {
-			
+		} catch (Exception e) {
+
 		}
 	}
 
@@ -35,15 +36,15 @@ public class DefenseTest {
 	public void testStateBooleanString() {
 		Defense.state(true, "Boolean Condition is not satisfied");
 	}
-	
+
 	@Test
 	public void testStateBooleanStringForException() {
-		try{
+		try {
 			Defense.state(false, "Boolean Condition is not satisfied");
-		}catch(IllegalStateException e) {
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Boolean Condition is not satisfied"));
 		}
-	}	
+	}
 
 	@Test
 	public void testStateBoolean() {
@@ -69,15 +70,15 @@ public class DefenseTest {
 	public void testNotNullObjectString() {
 		Defense.notNull(this, "Object cannot be null");
 	}
-	
+
 	@Test
 	public void testNotNullObjectStringForException() {
 		try {
 			Defense.notNull(null, "Object cannot be null");
-		}catch(IllegalArgumentException e) {
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Object cannot be null"));
 		}
-	}	
+	}
 
 	@Test
 	public void testHasTextString() {
@@ -93,13 +94,12 @@ public class DefenseTest {
 	public void testHasTextStringStringForException() {
 		try {
 			Defense.hasText("", "Text cannot be blank");
-		}catch(IllegalArgumentException e) {
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Text cannot be blank"));
 		}
-		
+
 	}
-	
-	
+
 	@Test
 	public void testNotEmptyCollectionOfQ() {
 		List<String> dummyList = new ArrayList<String>();
@@ -111,34 +111,34 @@ public class DefenseTest {
 	public void testNotEmptyCollectionOfQString() {
 		List<String> dummyList = new ArrayList<String>();
 		dummyList.add("value1");
-		Defense.notEmpty(dummyList,"Dummy List cannot be empty");
+		Defense.notEmpty(dummyList, "Dummy List cannot be empty");
 	}
-	
+
 	@Test
 	public void testNotEmptyCollectionOfQStringForException() {
 		try {
 			List<String> dummyList = new ArrayList<String>();
-			Defense.notEmpty(dummyList,"Dummy List cannot be empty");
-		}catch(IllegalArgumentException e) {
+			Defense.notEmpty(dummyList, "Dummy List cannot be empty");
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Dummy List cannot be empty"));
 		}
-	}	
+	}
 
 	@Test
 	public void testNotEmptyStringArrayString() {
-		String[] strArr = {"value1,value2"}; 
+		String[] strArr = { "value1,value2" };
 		Defense.notEmpty(strArr, "Array cannot be empty");
 	}
-	
+
 	@Test
 	public void testNotEmptyStringArrayStringForException() {
-		try{
+		try {
 			String[] strArr = null;
 			Defense.notEmpty(strArr, "Array cannot be empty");
-		}catch(IllegalArgumentException e) {
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Array cannot be empty"));
 		}
-	}	
+	}
 
 	@Test
 	public void testIsTrueBoolean() {
@@ -147,10 +147,10 @@ public class DefenseTest {
 
 	@Test
 	public void testIsTrueBooleanString() {
-		try{
+		try {
 			Defense.isTrue(false, "Boolean condition not met");
-			
-		}catch(IllegalArgumentException e) {
+
+		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().equals("Boolean condition not met"));
 		}
 	}

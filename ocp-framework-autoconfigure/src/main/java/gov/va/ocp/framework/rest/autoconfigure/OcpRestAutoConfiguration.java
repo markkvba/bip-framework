@@ -27,7 +27,7 @@ import gov.va.ocp.framework.rest.client.resttemplate.RestClientTemplate;
 import gov.va.ocp.framework.rest.exception.OcpRestGlobalExceptionHandler;
 import gov.va.ocp.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.ocp.framework.rest.provider.aspect.RestProviderTimerAspect;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * A collection of spring beans used for REST server and/or client operations.
@@ -117,17 +117,11 @@ public class OcpRestAutoConfiguration {
 				.setBufferSize(Integer.valueOf(connectionBufferSize))
 				.build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
-		PoolingHttpClientConnectionManager poolingConnectionManager;
-		poolingConnectionManager = new PoolingHttpClientConnectionManager();
-		try {
-			poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
-			poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
-			poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
-		} catch (Exception e) {
-			LOGGER.debug("Error setting properties in pooling manager", e);
-		} finally {
-			poolingConnectionManager.close();
-		}
+		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
+		                                                                                                        // shut down the connection pool only if exclusively owned by the client
+		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
+		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
+		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
 
 		clientBuilder.setConnectionManager(poolingConnectionManager);
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
@@ -170,15 +164,15 @@ public class OcpRestAutoConfiguration {
 	@ConditionalOnMissingBean
 	public RestClientTemplate restClientTemplate() {
 		RestTemplate restTemplate = new RestTemplate(httpComponentsClientHttpRequestFactory());
+		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+		restTemplate.getMessageConverters().stream().filter(StringHttpMessageConverter.class::isInstance)
+		.map(StringHttpMessageConverter.class::cast).forEach(a -> {
+			a.setWriteAcceptCharset(false);
+			a.setDefaultCharset(StandardCharsets.UTF_8);
+		});
 		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 		interceptors.add(tokenClientHttpRequestInterceptor());
 		restTemplate.setInterceptors(interceptors);
-		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
-		restTemplate.getMessageConverters().stream().filter(StringHttpMessageConverter.class::isInstance)
-				.map(StringHttpMessageConverter.class::cast).forEach(a -> {
-					a.setWriteAcceptCharset(false);
-					a.setDefaultCharset(StandardCharsets.UTF_8);
-				});
 		return new RestClientTemplate(restTemplate);
 	}
 

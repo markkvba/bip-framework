@@ -22,7 +22,7 @@ import gov.va.ocp.framework.constants.AnnotationConstants;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.util.Defense;
+import gov.va.ocp.framework.validation.Defense;
 
 /**
  * This interceptor is intended to wrap all of the web service simulators. Apply
