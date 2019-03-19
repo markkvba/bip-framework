@@ -238,15 +238,19 @@ public class OcpRestGlobalExceptionHandler {
 		log(ex, "", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 		final ProviderResponse apiError = new ProviderResponse();
-		for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-			apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
-					error.getDefaultMessage(),
-					HttpStatus.BAD_REQUEST);
-		}
-		for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-			apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
-					error.getDefaultMessage(),
-					HttpStatus.BAD_REQUEST);
+		if (ex == null || ex.getBindingResult() == null) {
+			return failSafeHandler();
+		} else {
+			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
+				apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
+						error.getDefaultMessage(),
+						HttpStatus.BAD_REQUEST);
+			}
+			for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+				apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
+						error.getDefaultMessage(),
+						HttpStatus.BAD_REQUEST);
+			}
 		}
 		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
 	}
@@ -265,8 +269,9 @@ public class OcpRestGlobalExceptionHandler {
 		log(httpClientErrorException, "", null, null);
 
 		ProviderResponse apiError = new ProviderResponse();
-		if (httpClientErrorException != null) {
-
+		if (httpClientErrorException == null) {
+			return failSafeHandler();
+		} else {
 			byte[] responseBody = httpClientErrorException.getResponseBodyAsByteArray();
 
 			try {
@@ -277,8 +282,6 @@ public class OcpRestGlobalExceptionHandler {
 						new String(responseBody),
 						httpClientErrorException.getStatusCode());
 			}
-		} else {
-			failSafeHandler();
 		}
 
 		return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -317,10 +320,14 @@ public class OcpRestGlobalExceptionHandler {
 	public final ResponseEntity<Object> handleConstraintViolation(HttpServletRequest req, final ConstraintViolationException ex) {
 		log(ex, "", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		final ProviderResponse apiError = new ProviderResponse();
-		for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-			apiError.addMessage(MessageSeverity.ERROR, violation.getRootBeanClass().getName() + " " + violation.getPropertyPath(),
-					violation.getMessage(),
-					HttpStatus.BAD_REQUEST);
+		if (ex == null || ex.getConstraintViolations() == null) {
+			return failSafeHandler();
+		} else {
+			for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+				apiError.addMessage(MessageSeverity.ERROR, violation.getRootBeanClass().getName() + " " + violation.getPropertyPath(),
+						violation.getMessage(),
+						HttpStatus.BAD_REQUEST);
+			}
 		}
 		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
