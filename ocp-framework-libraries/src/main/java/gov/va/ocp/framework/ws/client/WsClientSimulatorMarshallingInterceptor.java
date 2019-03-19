@@ -33,7 +33,7 @@ import gov.va.ocp.framework.validation.Defense;
  * @author jshrader
  */
 public class WsClientSimulatorMarshallingInterceptor implements
-		MethodInterceptor {
+MethodInterceptor {
 
 	/** The Constant LOGGER. */
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(WsClientSimulatorMarshallingInterceptor.class);
@@ -215,8 +215,7 @@ public class WsClientSimulatorMarshallingInterceptor implements
 					objectToMarshal = createMethod.invoke(objectFactory, obj);
 				} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException
 						| InvocationTargetException methodEx) {
-					LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-							methodEx.getMessage(), methodEx);
+					logError(methodEx);
 					LOGGER.info(methodEx.getMessage(), methodEx);
 					LOGGER.warn(obj.getClass().getName() + XML_ROOT_ERROR);
 				}
@@ -232,18 +231,20 @@ public class WsClientSimulatorMarshallingInterceptor implements
 				ret = outputStream.toString();
 			}
 		} catch (Exception ex) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					ex.getMessage(), ex);
+			logError(ex);
 		} finally {
 			if (outputStream != null) {
 				try {
 					outputStream.close();
 				} catch (IOException ioe) {
-					LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-							ioe.getMessage(), ioe);
+					logError(ioe);
 				}
 			}
 		}
 		return ret;
+	}
+
+	private void logError(final Exception ex) {
+		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), ex.getMessage(), ex);
 	}
 }

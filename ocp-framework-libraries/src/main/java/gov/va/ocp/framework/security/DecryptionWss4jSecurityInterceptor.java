@@ -45,8 +45,7 @@ public abstract class DecryptionWss4jSecurityInterceptor extends AbstractWss4jSe
 			setValidationDecryptionCrypto(crypto);
 			setValidationSignatureCrypto(crypto);
 		} catch (WSSecurityException e) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
-					"Error: Decryption Validation Crypto Factory Bean" + e.getMessage(), e);
+			logError(e);
 
 		}
 
@@ -55,5 +54,10 @@ public abstract class DecryptionWss4jSecurityInterceptor extends AbstractWss4jSe
 		final KeyStoreCallbackHandler keyStoreCallbackHandler = new KeyStoreCallbackHandler();
 		keyStoreCallbackHandler.setPrivateKeyPassword(retrieveCryptoProps().getCryptoKeystorePw());
 		this.setValidationCallbackHandler(keyStoreCallbackHandler);
+	}
+
+	private static void logError(final WSSecurityException e) {
+		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
+				"Error: Decryption Validation Crypto Factory Bean" + e.getMessage(), e);
 	}
 }

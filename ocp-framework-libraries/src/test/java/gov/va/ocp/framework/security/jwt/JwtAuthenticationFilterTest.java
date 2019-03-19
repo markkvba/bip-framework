@@ -1,13 +1,23 @@
 package gov.va.ocp.framework.security.jwt;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -93,5 +103,30 @@ public class JwtAuthenticationFilterTest {
 		} catch (final Exception e) {
 			Assert.assertTrue(e.getMessage().contains("Malformed"));
 		}
+	}
+
+	@Test
+	public void testSuccessfulAuthentication() throws Exception {
+		final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/user");
+		final MockHttpServletResponse response = new MockHttpServletResponse();
+		FilterChain mockChain = mock(FilterChain.class);
+		final JwtAuthenticationFilter filter =
+				new JwtAuthenticationFilter(properties, new JwtAuthenticationSuccessHandler(), provider);
+		Authentication mockAuthentication = mock(Authentication.class);
+		filter.successfulAuthentication(request, response, mockChain, mockAuthentication);
+		verify(mockChain, times(1)).doFilter(request, response);
+	}
+
+	@Test
+	public void testUnsuccessfulAuthentication() throws Exception {
+		final HttpServletRequest request = mock(HttpServletRequest.class);
+		final HttpServletResponse response = mock(HttpServletResponse.class);
+		AuthenticationException mockException = mock(AuthenticationException.class);
+		final JwtAuthenticationFilter filter =
+				new JwtAuthenticationFilter(properties, new JwtAuthenticationSuccessHandler(), provider);
+		filter.unsuccessfulAuthentication(request, response, mockException);
+		verify(response, times(1)).setStatus(HttpStatus.UNAUTHORIZED.value());
+		verify(response, times(1)).sendError(HttpServletResponse.SC_UNAUTHORIZED, mockException.getLocalizedMessage());
+
 	}
 }
