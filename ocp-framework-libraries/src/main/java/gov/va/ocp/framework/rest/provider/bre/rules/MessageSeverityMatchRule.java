@@ -45,7 +45,7 @@ public final class MessageSeverityMatchRule implements MessagesToHttpStatusRule 
 	public HttpStatus eval(final Set<Message> messagesToEval) {
 		if (messagesToEval != null) {
 			for (final Message serviceMessage : messagesToEval) {
-				if (severityToMatch.equals(serviceMessage.getSeverity())) {
+				if (severityToMatch.getLevel().name().equals(serviceMessage.getSeverity())) {
 					return httpStatus;
 				}
 			}

@@ -36,12 +36,11 @@ public class MessageSeverityMatchRuleTest {
 		messagesToEval.clear();
 	}
 
-	// TODO
-//	@Test
-//	public void testEval() {
-//		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
-//		assertEquals(HttpStatus.UNAUTHORIZED, messageSeverityMatchRule.eval(messagesToEval));
-//	}
+	@Test
+	public void testEval() {
+		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
+		assertEquals(HttpStatus.UNAUTHORIZED, messageSeverityMatchRule.eval(messagesToEval));
+	}
 
 	@Test
 	public void testEvalMessagesNull() {
@@ -50,20 +49,20 @@ public class MessageSeverityMatchRuleTest {
 	}
 
 	// TODO
-//	@Test
-//	public void testEvalMessagesEmpty() {
-//		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
-//		assertEquals(null, messageSeverityMatchRule.eval(new HashSet<Message>()));
-//	}
-//
-//	@Test
-//	public void testEvalMessagesDoNotMatch() {
-//		Message msg = new Message(MessageSeverity.INFO, "InfoKey", "Info Text", null);
-//		Set<Message> serviceMessages = new HashSet<>();
-//		serviceMessages.add(msg);
-//		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
-//		assertEquals(null, messageSeverityMatchRule.eval(serviceMessages));
-//	}
+	//	@Test
+	//	public void testEvalMessagesEmpty() {
+	//		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
+	//		assertEquals(null, messageSeverityMatchRule.eval(new HashSet<Message>()));
+	//	}
+	//
+	//	@Test
+	//	public void testEvalMessagesDoNotMatch() {
+	//		Message msg = new Message(MessageSeverity.INFO, "InfoKey", "Info Text", null);
+	//		Set<Message> serviceMessages = new HashSet<>();
+	//		serviceMessages.add(msg);
+	//		messageSeverityMatchRule = new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.UNAUTHORIZED);
+	//		assertEquals(null, messageSeverityMatchRule.eval(serviceMessages));
+	//	}
 
 	@Test
 	public void testToString() {

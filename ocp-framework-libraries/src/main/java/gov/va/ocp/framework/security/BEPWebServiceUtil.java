@@ -58,7 +58,7 @@ public final class BEPWebServiceUtil {
 			try {
 				computedVal = HashGenerator.getMd5ForString(computedVal);
 			} catch (final NoSuchAlgorithmException e) {
-				LOGGER.error(e.getMessage(), e);
+				logError(e);
 				computedVal = null;
 			}
 		}
@@ -122,10 +122,14 @@ public final class BEPWebServiceUtil {
 				}
 			}
 		} catch (final SocketException e) {
-			LOGGER.error(e.getMessage(), e);
+			logError(e);
 			// handled further down
 		}
 		return computedVal;
+	}
+
+	static void logError(final Exception e) {
+		LOGGER.error(e.getMessage(), e);
 	}
 
 	/**

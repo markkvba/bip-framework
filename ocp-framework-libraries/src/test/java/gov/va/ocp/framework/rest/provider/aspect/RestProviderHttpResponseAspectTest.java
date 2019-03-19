@@ -36,7 +36,6 @@ import gov.va.ocp.framework.audit.Auditable;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
-import gov.va.ocp.framework.rest.provider.bre.MessagesToHttpStatusRulesEngine;
 import gov.va.ocp.framework.rest.provider.bre.rules.MessageSeverityMatchRule;
 import gov.va.ocp.framework.service.DomainRequest;
 import gov.va.ocp.framework.service.DomainResponse;
@@ -203,18 +202,6 @@ public class RestProviderHttpResponseAspectTest extends AbstractBaseLogTester {
 
 		}
 		assertNotNull(returnObject);
-	}
-
-	// TODO
-	@Ignore
-	@Test
-	public void testConstructorWithParam() {
-		final MessagesToHttpStatusRulesEngine ruleEngine = new MessagesToHttpStatusRulesEngine();
-		ruleEngine.addRule(new MessageSeverityMatchRule(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR));
-		ruleEngine.addRule(new MessageSeverityMatchRule(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST));
-//TODO		restProviderHttpResponseAspect = new RestProviderHttpResponseAspect(ruleEngine);
-		assertNotNull(restProviderHttpResponseAspect);
-
 	}
 
 	// TODO

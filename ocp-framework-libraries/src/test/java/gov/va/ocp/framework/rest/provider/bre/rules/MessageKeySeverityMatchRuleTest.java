@@ -1,10 +1,15 @@
 package gov.va.ocp.framework.rest.provider.bre.rules;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.Message;
@@ -30,26 +35,26 @@ public class MessageKeySeverityMatchRuleTest {
 	public void tearDown() throws Exception {
 		messagesToEval.clear();
 	}
-//TODO
-//	@Test
-//	public void testEval() {
-//		Message messageToMatch = new Message(MessageSeverity.ERROR, "ErrorKey", "Error Text", HttpStatus.UNAUTHORIZED);
-//		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
-//		assertEquals(HttpStatus.UNAUTHORIZED, messageKeySeverityMatchRule.eval(messagesToEval));
-//	}
-//
-//	@Test
-//	public void testToString() {
-//		Message messageToMatch = new Message(MessageSeverity.ERROR, "ErrorKey", "Error Text", HttpStatus.UNAUTHORIZED);
-//		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
-//		assertNotNull(messageKeySeverityMatchRule.toString());
-//	}
-//
-//	@Test
-//	public void testEvalNull() {
-//		Message messageToMatch = new Message(MessageSeverity.ERROR, "klahsdjh", "Error kuahdkj", null);
-//		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
-//		assertEquals(null, messageKeySeverityMatchRule.eval(messagesToEval));
-//	}
+
+	@Test
+	public void testEval() {
+		Message messageToMatch = new Message("ERROR", "ErrorKey", "Error Text", HttpStatus.UNAUTHORIZED.value());
+		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
+		assertEquals(HttpStatus.UNAUTHORIZED, messageKeySeverityMatchRule.eval(messagesToEval));
+	}
+
+	@Test
+	public void testToString() {
+		Message messageToMatch = new Message("ERROR", "ErrorKey", "Error Text", HttpStatus.UNAUTHORIZED.value());
+		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
+		assertNotNull(messageKeySeverityMatchRule.toString());
+	}
+
+	@Test
+	public void testEvalNull() {
+		Message messageToMatch = new Message("ERROR", "klahsdjh", "Error kuahdkj", null);
+		messageKeySeverityMatchRule = new MessageKeySeverityMatchRule(messageToMatch, HttpStatus.UNAUTHORIZED);
+		assertEquals(null, messageKeySeverityMatchRule.eval(messagesToEval));
+	}
 
 }

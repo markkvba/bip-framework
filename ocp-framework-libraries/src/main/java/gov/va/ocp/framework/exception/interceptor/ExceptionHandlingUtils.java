@@ -59,29 +59,10 @@ public final class ExceptionHandlingUtils {
 
 		if (OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
 			// have to cast so the "Throwable throwable" variable can be returned as-is
-			try {
-				resolvedRuntimeException = (OcpRuntimeException) throwable;
-			} catch (ClassCastException e) {
-				String msg = "Could not cast " + throwable.getClass().getName() + " to OcpRuntimeException";
-				LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
-				throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			resolvedRuntimeException = castToOcpRuntimeException(throwable);
 
 		} else if (OcpExceptionExtender.class.isAssignableFrom(throwable.getClass())) {
-			try {
-				// cast "Throwable throwable" variable to the OCP exception interface
-				OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
-				// instantiate the Runtime version of the interface
-				resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
-						.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
-						.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
-			} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				String msg = "Could not instantiate OcpRuntimeException using values from throwable "
-						+ throwable.getClass().getName();
-				LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
-				throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			resolvedRuntimeException = convertFromOcpExceptionExtender(throwable);
 
 		} else {
 			// make a new OcpRuntimeException from the non-OCP throwable
@@ -89,6 +70,37 @@ public final class ExceptionHandlingUtils {
 					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, throwable);
 		}
 
+		return resolvedRuntimeException;
+	}
+
+	static OcpRuntimeException convertFromOcpExceptionExtender(final Throwable throwable) {
+		OcpRuntimeException resolvedRuntimeException;
+		try {
+			// cast "Throwable throwable" variable to the OCP exception interface
+			OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
+			// instantiate the Runtime version of the interface
+			resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
+					.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
+					.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
+		} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			String msg = "Could not instantiate OcpRuntimeException using values from throwable "
+					+ throwable.getClass().getName();
+			LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return resolvedRuntimeException;
+	}
+
+	static OcpRuntimeException castToOcpRuntimeException(final Throwable throwable) { // method added for testability
+		OcpRuntimeException resolvedRuntimeException = null;
+		try {
+			resolvedRuntimeException = (OcpRuntimeException) throwable;
+		} catch (ClassCastException e) {
+			String msg = "Could not cast " + throwable.getClass().getName() + " to OcpRuntimeException";
+			LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
+			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		return resolvedRuntimeException;
 	}
 
@@ -104,18 +116,18 @@ public final class ExceptionHandlingUtils {
 			final Throwable throwable) {
 		final OcpLogger errorLogger =
 				OcpLoggerFactory.getLogger(method.getDeclaringClass().getName() + LOG_EXCEPTION_DOT + method.getName()
-						+ LOG_EXCEPTION_UNDERSCORE + throwable.getClass().getName());
+				+ LOG_EXCEPTION_UNDERSCORE + throwable.getClass().getName());
 		final String errorMessage =
 				throwable.getClass().getName() + " thrown by " + method.getDeclaringClass().getName()
-						+ LOG_EXCEPTION_DOT + method.getName();
+				+ LOG_EXCEPTION_DOT + method.getName();
 		if (errorLogger.isWarnEnabled()) {
 			errorLogger.warn(catcher + LOC_EXCEPTION_PREFIX + errorMessage + LOG_EXCEPTION_MID + Arrays.toString(args)
-					+ LOG_EXCEPTION_POSTFIX, throwable);
+			+ LOG_EXCEPTION_POSTFIX, throwable);
 		} else {
 			// if we disable warn logging (all the details and including stack trace) we only show minimal
 			// evidence of the error in the logs
 			errorLogger.error(catcher + LOC_EXCEPTION_PREFIX + errorMessage + LOG_EXCEPTION_MID + Arrays.toString(args)
-					+ LOG_EXCEPTION_POSTFIX);
+			+ LOG_EXCEPTION_POSTFIX);
 		}
 	}
 
