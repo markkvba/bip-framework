@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.service.aspect.validators.TestRequestValidator;
 
@@ -40,7 +40,7 @@ public class ServiceValidationAspectTest {
 	public void tearDown() throws Exception {
 	}
 
-	DomainResponse testMethodOneArg(TestRequest test) {
+	DomainResponse testMethodOneArg(final TestRequest test) {
 		DomainResponse dr = null;
 		return dr;
 	}
@@ -50,7 +50,7 @@ public class ServiceValidationAspectTest {
 		return dr;
 	}
 
-	DomainResponse testMethodSad(TestRequest test) {
+	DomainResponse testMethodSad(final TestRequest test) {
 		DomainResponse dr = null;
 		return dr;
 	}
@@ -130,4 +130,19 @@ public class ServiceValidationAspectTest {
 		assertTrue(TestRequestValidator.STATUS.equals(
 				returned.getMessages().get(0).getHttpStatus()));
 	}
+
+	@Test
+	public final void testAroundAdviceWhenExceptionIsThrown() {
+		Object[] args = new Object[1];
+		args[0] = new TestRequest();
+
+		try {
+			aspect.aroundAdvice(proceedingJoinPoint);
+			fail("Should throw an exception");
+		} catch (Exception e) {
+			assertTrue(e instanceof OcpRuntimeException);
+		}
+
+	}
+
 }

@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -42,29 +41,22 @@ public class DomainResponseTest {
 		testMessages.add(fatalMessage);
 	}
 
-	// TODO
-	@Ignore
 	@Test
 	public void testAddMessageWithNullMessages() {
 
 		mockServiceResponse.setMessages(null);
 		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null,
 				1, new String[] { "pName" }, new String[] { "pValue" });
-//		assertNotNull(mockServiceResponse.validate(null));
 
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
 
 	}
 
-	// TODO
-	@Ignore
 	@Test
 	public void testAddMessageWithParams() {
 		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null,
 				1, new String[] { "pName" }, new String[] { "pValue" });
-//		assertNotNull(mockServiceResponse.validate(null));
-
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
 
@@ -75,31 +67,16 @@ public class DomainResponseTest {
 		testMessages.clear();
 	}
 
-	// TODO
-	@Ignore
 	@Test
 	public void testAddMessage() {
 		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null);
-//		assertNotNull(mockServiceResponse.validate(null));
-
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
 
 	}
 
-	// TODO
-	@Ignore
 	@Test
 	public void testAddMessages() {
-		mockServiceResponse.addMessages(testMessages);
-		assertNotNull(mockServiceResponse.getMessages());
-//		Map<String, List<ViolationMessageParts>> messages = new HashMap<>();
-//		assertNotNull(mockServiceResponse.validate(messages));
-		assertEquals(4, mockServiceResponse.getMessages().size());
-	}
-
-	@Test
-	public void testGetMessages() {
 		mockServiceResponse.addMessages(testMessages);
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(4, mockServiceResponse.getMessages().size());

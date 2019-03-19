@@ -2,13 +2,13 @@ package gov.va.ocp.framework.security;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import gov.va.ocp.framework.security.BEPWebServiceUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,10 +49,20 @@ public class BEPWebServiceUtilTest {
 		final String retVal = BEPWebServiceUtil.getClientMachine("localhost");
 		assertNotNull(retVal);
 	}
-	
+
 	@Test
 	public void testGetClientMachineNull() {
 		final String retVal = BEPWebServiceUtil.getClientMachine(null);
 		assertNotNull(retVal);
+	}
+
+	@Test
+	public void testLogError() {
+		try {
+			BEPWebServiceUtil.logError(new Exception("test error message"));
+		} catch (Exception e) {
+			fail("exception should not be thrown");
+		}
+
 	}
 }
