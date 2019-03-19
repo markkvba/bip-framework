@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import gov.va.ocp.framework.exception.impl.OcpFeignRuntimeException;
+import gov.va.ocp.framework.exception.OcpFeignRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
