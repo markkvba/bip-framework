@@ -39,7 +39,9 @@ import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
 
 /**
- * The Class OcpRestGlobalExceptionHandler.
+ * A global exception handler as the last line of defense before sending response to the service consumer.
+ * This class converts exceptions to appropriate {@link gov.va.ocp.framework.rest.provider.Message} objects and puts them on the
+ * response.
  */
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -48,8 +50,17 @@ public class OcpRestGlobalExceptionHandler {
 	/** The Constant LOGGER. */
 	private static final Logger logger = LoggerFactory.getLogger(OcpRestGlobalExceptionHandler.class);
 
-	/** Return value if no key has been specified */
+	/**
+	 * Return value if no key has been specified.
+	 * To get default key, use {@link #deriveKey(OcpExceptionExtender)} or {@link #deriveKey(String)}.
+	 */
 	private static final String NO_KEY = "NO-KEY";
+
+	/**
+	 * Return value if no exception exists to provide a message.
+	 * To get default message text, use {@link #deriveMessage(Exception)}.
+	 */
+	private static final String NO_MESSAGE = "Source exception has no message.";
 
 	/**
 	 * For java.lang.Exception and all subclasses.
@@ -59,10 +70,10 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return String the message
 	 */
 	private String deriveMessage(Exception ex) {
-		return ex == null ? "null"
+		return ex == null ? NO_MESSAGE
 				: StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
 						? ex.getCause().getMessage()
-						: ex.getMessage();
+						: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
 	}
 
 	/**
@@ -73,7 +84,7 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return String the key, or NO_KEY
 	 */
 	private String deriveKey(OcpExceptionExtender ex) {
-		return deriveKey(ex == null ? "" : ex.getKey());
+		return deriveKey(ex == null || StringUtils.isBlank(ex.getKey()) ? NO_KEY : ex.getKey());
 	}
 
 	/**
@@ -124,6 +135,18 @@ public class OcpRestGlobalExceptionHandler {
 	}
 
 	/**
+	 * A last resort to return a (somewhat) meaningful response to the consumer when there is no source exception.
+	 *
+	 * @return ResponseEntity the HTTP Response Entity
+	 */
+	protected ResponseEntity<Object> failsafeHandler() {
+		log(Level.ERROR, null, NO_KEY, NO_MESSAGE, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		ProviderResponse apiError = new ProviderResponse();
+		apiError.addMessage(MessageSeverity.FATAL, NO_KEY, NO_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	/**
 	 * Standard exception handler for any exception that implements {@link OcpExceptionExtender}.
 	 *
 	 * @param ex the exception that implements OcpExceptionExtender
@@ -131,6 +154,9 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
 	protected ResponseEntity<Object> standardHandler(OcpExceptionExtender ex, HttpStatus httpResponseStatus) {
+		if (ex == null) {
+			return failsafeHandler();
+		}
 		return standardHandler((Exception) ex, deriveKey(ex), ex.getSeverity(), ex.getStatus(), httpResponseStatus);
 	}
 
@@ -146,6 +172,9 @@ public class OcpRestGlobalExceptionHandler {
 	 */
 	protected ResponseEntity<Object> standardHandler(Exception ex, String key, MessageSeverity severity, HttpStatus status,
 			HttpStatus httpResponseStatus) {
+		if (ex == null) {
+			return failsafeHandler();
+		}
 		ProviderResponse apiError = new ProviderResponse();
 
 		log(ex, key, severity, httpResponseStatus);
