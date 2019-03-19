@@ -1,8 +1,7 @@
-package gov.va.ocp.framework.exception.impl;
+package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
-import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
