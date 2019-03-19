@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
- * The root OCP class for managing runtime exceptions.
+ * The root OCP class for managing <b>runtime</b> exceptions.
  * <p>
  * To support the requirements of consumer responses, OCP Exception classes that need
- * to bubble back to the provider controller should extend this class.
+ * to immediately bubble back to the provider controller should extend this class.
  *
  * @see OcpExceptionExtender
  * @see RuntimeException
