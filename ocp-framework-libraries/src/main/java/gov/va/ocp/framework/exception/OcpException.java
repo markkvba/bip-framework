@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
- * The root OCP class for managing checked exceptions.
+ * The root OCP class for managing <b>checked</b> exceptions.
  * <p>
  * To support the requirements of consumer responses, all OCP checked Exception classes
  * that will be handled internally by the service should extend this class.
@@ -26,7 +26,7 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	private HttpStatus status;
 
 	/**
-	 * Constructs a new checked Exception with the specified detail key, message, severity, and status.
+	 * Constructs a new <b>checked</b> Exception with the specified detail key, message, severity, and status.
 	 * The cause is not initialized, and may subsequently be initialized by
 	 * a call to {@link #initCause}.
 	 *
@@ -46,7 +46,7 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	}
 
 	/**
-	 * Constructs a new checked Exception with the specified detail key, message, severity, status, and cause.
+	 * Constructs a new <b>checked</b> Exception with the specified detail key, message, severity, status, and cause.
 	 *
 	 * @see Exception#Exception(String, Throwable)
 	 *

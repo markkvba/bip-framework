@@ -24,9 +24,9 @@ import gov.va.ocp.framework.messages.MessageSeverity;
  * @see org.aopalliance.intercept.MethodInterceptor
  */
 @Component
-public class RemoteServiceCallInterceptor implements MethodInterceptor {
+public class AuditAroundRemoteServiceCallInterceptor implements MethodInterceptor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteServiceCallInterceptor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuditAroundRemoteServiceCallInterceptor.class);
 
 	@Autowired
 	AuditLogSerializer asyncLogging;

@@ -82,8 +82,8 @@ public class InterceptingExceptionTranslatorTest extends AbstractBaseLogTester {
 		interceptingExceptionTranslator.afterThrowing(this.getClass().getMethod("testExcludeThrowableDebugStatementException"), null,
 				null, throwable);
 
-		Assert.assertEquals("Exception translator caught exception [class java.lang.Throwable]"
-				+ " however per configuration not translating this exception.", super.getAppender().get(0).getMessage());
+		Assert.assertEquals("InterceptingExceptionTranslator is configured to ignore exceptions of type [java.lang.Throwable]"
+				+ " - not translating this exception.", super.getAppender().get(0).getMessage());
 
 	}
 

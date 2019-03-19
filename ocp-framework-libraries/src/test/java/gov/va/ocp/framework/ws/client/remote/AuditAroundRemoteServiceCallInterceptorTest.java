@@ -15,11 +15,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
 import gov.va.ocp.framework.audit.AuditLogSerializer;
-import gov.va.ocp.framework.ws.client.remote.RemoteServiceCallInterceptor;
+import gov.va.ocp.framework.ws.client.remote.AuditAroundRemoteServiceCallInterceptor;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class RemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
+public class AuditAroundRemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
 
 
 	
@@ -30,11 +30,11 @@ public class RemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
 	AuditLogSerializer asyncLogging;
 	
 	@InjectMocks
-	RemoteServiceCallInterceptor remoteServiceCallInterceptor;
+	AuditAroundRemoteServiceCallInterceptor auditAroundRemoteServiceCallInterceptor;
 
 	@Before
 	public void setUp() {
-		remoteServiceCallInterceptor = new RemoteServiceCallInterceptor();
+		auditAroundRemoteServiceCallInterceptor = new AuditAroundRemoteServiceCallInterceptor();
 		MockitoAnnotations.initMocks(this);
 	}
 
@@ -55,7 +55,7 @@ public class RemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
 		when(methodInvocation.getArguments()).thenReturn(args);
 		when(methodInvocation.getMethod()).thenReturn(Helper.class.getMethod("getString"));
 	
-		assertNull(remoteServiceCallInterceptor.invoke(methodInvocation));
+		assertNull(auditAroundRemoteServiceCallInterceptor.invoke(methodInvocation));
 
 	}
 	
@@ -71,7 +71,7 @@ public class RemoteServiceCallInterceptorTest extends AbstractBaseLogTester {
 		when(methodInvocation.getArguments()).thenReturn(args);
 		when(methodInvocation.getMethod()).thenReturn(Helper.class.getMethod("getString"));
 		when(methodInvocation.proceed()).thenThrow(new Exception("Exception Test"));
-		remoteServiceCallInterceptor.invoke(methodInvocation);
+		auditAroundRemoteServiceCallInterceptor.invoke(methodInvocation);
 	}
 
 
