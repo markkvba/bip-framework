@@ -72,7 +72,7 @@ public class OcpRestGlobalExceptionHandler {
 	private String deriveMessage(Exception ex) {
 		return ex == null ? NO_MESSAGE
 				: StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
-						? ex.getCause().getMessage()
+				? ex.getCause().getMessage()
 						: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
 	}
 
@@ -139,7 +139,7 @@ public class OcpRestGlobalExceptionHandler {
 	 *
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> failsafeHandler() {
+	protected ResponseEntity<Object> failSafeHandler() {
 		log(Level.ERROR, null, NO_KEY, NO_MESSAGE, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.FATAL, NO_KEY, NO_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -155,7 +155,7 @@ public class OcpRestGlobalExceptionHandler {
 	 */
 	protected ResponseEntity<Object> standardHandler(OcpExceptionExtender ex, HttpStatus httpResponseStatus) {
 		if (ex == null) {
-			return failsafeHandler();
+			return failSafeHandler();
 		}
 		return standardHandler((Exception) ex, deriveKey(ex), ex.getSeverity(), ex.getStatus(), httpResponseStatus);
 	}
@@ -173,7 +173,7 @@ public class OcpRestGlobalExceptionHandler {
 	protected ResponseEntity<Object> standardHandler(Exception ex, String key, MessageSeverity severity, HttpStatus status,
 			HttpStatus httpResponseStatus) {
 		if (ex == null) {
-			return failsafeHandler();
+			return failSafeHandler();
 		}
 		ProviderResponse apiError = new ProviderResponse();
 
@@ -265,18 +265,23 @@ public class OcpRestGlobalExceptionHandler {
 		log(httpClientErrorException, "", null, null);
 
 		ProviderResponse apiError = new ProviderResponse();
+		if (httpClientErrorException != null) {
 
-		byte[] responseBody = httpClientErrorException.getResponseBodyAsByteArray();
+			byte[] responseBody = httpClientErrorException.getResponseBodyAsByteArray();
 
-		try {
-			apiError = new ObjectMapper().readValue(responseBody, ProviderResponse.class);
-		} catch (IOException e) {
-			apiError.addMessage(MessageSeverity.ERROR, httpClientErrorException.getStatusCode().name(),
-					new String(responseBody),
-					httpClientErrorException.getStatusCode());
+			try {
+				apiError = new ObjectMapper().readValue(responseBody, ProviderResponse.class);
+			} catch (IOException e) {
+				log(e,"", MessageSeverity.ERROR, null);
+				apiError.addMessage(MessageSeverity.ERROR, httpClientErrorException.getStatusCode().name(),
+						new String(responseBody),
+						httpClientErrorException.getStatusCode());
+			}
+		} else {
+			failSafeHandler();
 		}
 
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
 	/**
@@ -297,7 +302,7 @@ public class OcpRestGlobalExceptionHandler {
 		final ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
 				message, HttpStatus.BAD_REQUEST);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
 	/**
