@@ -9,8 +9,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.soap.MessageFactory;
@@ -27,6 +25,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.wss4j.dom.WSConstants;
 import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -40,17 +40,14 @@ import org.springframework.ws.soap.axiom.AxiomSoapMessageFactory;
 import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
-import gov.va.ocp.framework.constants.AnnotationConstants;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
-import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 import gov.va.ocp.framework.validation.Defense;
-import gov.va.ocp.framework.ws.client.remote.AuditAroundRemoteServiceCallInterceptor;
+import gov.va.ocp.framework.ws.client.remote.aspect.WsClientAspect;
 
 /**
  * Base WebService Client configuration, consolidates core/common web service configuration operations used across the applications.
@@ -68,6 +65,19 @@ public class BaseWsClientConfig {
 
 	/** base package for framework exceptions */
 	public static final String PACKAGE_FRAMEWORK_EXCEPTION = "gov.va.ocp.framework.exception";
+
+	/**
+	 * Aspect bean of the {@link WsClientAspect}.
+	 * Currently executed before and after returning from
+	 * {@link gov.va.ocp.framework.ws.client.remote.RemoteServiceCall#callRemoteService(WebServiceTemplate, gov.va.ocp.framework.transfer.PartnerTransferObjectMarker, Class)}.
+	 *
+	 * @return WsClientAspect
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public WsClientAspect wsClientAspect() {
+		return new WsClientAspect();
+	}
 
 	/**
 	 * Creates the default web service template using the default audit request/response interceptors and no web service interceptors.
@@ -498,48 +508,6 @@ public class BaseWsClientConfig {
 	}
 
 	/**
-	 * Gets the intercepting exception translator.
-	 *
-	 * @param defaultExceptionClass the default exception class
-	 * @param exceptionPackagesToExclude the exception packages to exclude
-	 * @return the intercepting exception translator
-	 * @throws ClassNotFoundException the class not found exception
-	 */
-	@SuppressWarnings(AnnotationConstants.UNCHECKED)
-	public final InterceptingExceptionTranslator getInterceptingExceptionTranslator(final String defaultExceptionClass,
-			final Set<String> exceptionPackagesToExclude) {
-		// RR: second param should be made a Set
-
-		Defense.notNull(defaultExceptionClass);
-		Defense.notNull(exceptionPackagesToExclude);
-
-		final InterceptingExceptionTranslator interceptingExceptionTranslator = new InterceptingExceptionTranslator();
-
-		// set the default type of exception that should be returned when this interceptor runs
-		try {
-			interceptingExceptionTranslator
-					.setDefaultExceptionType((Class<? extends OcpRuntimeException>) Class.forName(defaultExceptionClass));
-		} catch (ClassNotFoundException e) {
-			String msg = "Could not find class for '" + defaultExceptionClass
-					+ "'. Most likely, a class that extends BaseWsClientConfig is mis-configured.";
-			throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
-		}
-
-		// define packages that contain "our exceptions" that we want to propagate through
-		// without again logging and/or wrapping
-		final Set<String> exclusionSet = new HashSet<>();
-		exclusionSet.add(PACKAGE_FRAMEWORK_EXCEPTION);
-		for (String exclusion : exceptionPackagesToExclude) {
-			if (StringUtils.isNotBlank(exclusion)) {
-				exclusionSet.add(exclusion);
-			}
-		}
-		interceptingExceptionTranslator.setExclusionSet(exclusionSet);
-
-		return interceptingExceptionTranslator;
-	}
-
-	/**
 	 * Gets the marshaller.
 	 *
 	 * @param transferPackage the transfer package
@@ -579,15 +547,6 @@ public class BaseWsClientConfig {
 	}
 
 	/**
-	 * Gets the AuditAroundRemoteServiceCallInterceptor interceptor.
-	 *
-	 * @return the performance interceptor
-	 */
-	public final AuditAroundRemoteServiceCallInterceptor getRemoteServiceCallInterceptor() {
-		return new AuditAroundRemoteServiceCallInterceptor();
-	}
-
-	/**
 	 * Gets the security interceptor.
 	 *
 	 * @param username the username
@@ -610,5 +569,4 @@ public class BaseWsClientConfig {
 		}
 		return interceptor;
 	}
-
 }
