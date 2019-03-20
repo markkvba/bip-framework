@@ -1,43 +1,42 @@
 package gov.va.ocp.framework.test.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.delete;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
 public class RESTUtilTest {
 
-	WireMockServer wireMockServer;
+	private static WireMockServer wireMockServer;
 	RESTUtil restUtil = new RESTUtil();
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		wireMockServer = new WireMockServer(9999);
 		wireMockServer.start();
 		setupStub();
 	}
 
-	@After
-	public void teardown() {
+	@AfterClass
+	public static void teardown() {
 		wireMockServer.stop();
 	}
 
-	public void setupStub() {
+	public static void setupStub() {
 		addGetPersonStub();
 		addPostPersonStub();
 		addDeletePersonStub();
@@ -45,26 +44,26 @@ public class RESTUtilTest {
 		addPostMultiPart();
 	}
 
-	private void addGetPersonStub() {
+	private static void addGetPersonStub() {
 		wireMockServer.stubFor(get(urlEqualTo("/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/get-person-response.json")));
 	}
 
-	private void addPostPersonStub() {
+	private static void addPostPersonStub() {
 		wireMockServer.stubFor(post(urlEqualTo("/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/post-person-response.json")));
 	}
 
-	private void addPutPersonStub() {
+	private static void addPutPersonStub() {
 		wireMockServer.stubFor(put(urlEqualTo("/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/put-person-response.json")));
 	}
 
-	private void addDeletePersonStub() {
+	private static void addDeletePersonStub() {
 		wireMockServer.stubFor(delete(urlEqualTo("/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/delete-person-response.json")));
 	}
-	private void addPostMultiPart() {
+	private static void addPostMultiPart() {
 		wireMockServer.stubFor(post(urlEqualTo("/multipart/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/post-multipart-person-response.json")));
 	}
