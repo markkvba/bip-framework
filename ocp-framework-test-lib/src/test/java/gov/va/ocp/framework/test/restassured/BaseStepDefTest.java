@@ -38,7 +38,7 @@ public class BaseStepDefTest {
 	@Before
 	public void init() {
 		Map<String, String> tblHeader = new HashMap<>();
-		tblHeader.put("Acept", "application/json");
+		tblHeader.put("Accept", "application/json");
 		tblHeader.put("Content-Type", "application/json");
 		subject.passHeaderInformation(tblHeader);
 		subject.initREST();
@@ -125,7 +125,7 @@ public class BaseStepDefTest {
 	public void test_invokeAPIUsingPostWithMultiPart_Success() {
 		// Overwrite header with multi part
 		Map<String, String> tblHeader = new HashMap<>();
-		tblHeader.put("Acept", "application/json");
+		tblHeader.put("Accept", "application/json");
 		tblHeader.put("Content-Type", "multipart/form-data");
 		subject.passHeaderInformation(tblHeader);
 		subject.invokeAPIUsingPostWithMultiPart("http://localhost:9999/multipart/person", "document.txt",
@@ -145,7 +145,7 @@ public class BaseStepDefTest {
 	public void test_invokeAPIUsingPostWithMultiPart_ByteArray_Success() {
 		// Overwrite header with multi part
 		Map<String, String> tblHeader = new HashMap<>();
-		tblHeader.put("Acept", "application/json");
+		tblHeader.put("Accept", "application/json");
 		tblHeader.put("Content-Type", "multipart/form-data");
 		subject.passHeaderInformation(tblHeader);
 		subject.invokeAPIUsingPostWithMultiPart("http://localhost:9999/multipart/person", "document.txt",
@@ -157,7 +157,7 @@ public class BaseStepDefTest {
 	public void test_postResponseWithMultipart_ByteArray_InvalidPart_Failed() {
 		// Overwrite header with multi part
 		Map<String, String> tblHeader = new HashMap<>();
-		tblHeader.put("Acept", "application/json");
+		tblHeader.put("Accept", "application/json");
 		tblHeader.put("Content-Type", "multipart/form-data");
 		subject.passHeaderInformation(tblHeader);
 

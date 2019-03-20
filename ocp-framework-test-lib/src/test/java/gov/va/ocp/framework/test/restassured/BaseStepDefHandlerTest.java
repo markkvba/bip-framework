@@ -16,6 +16,9 @@ import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
+/**
+ * The Class BaseStepDefHandlerTest.
+ */
 public class BaseStepDefHandlerTest {
 
 	BaseStepDefHandler subject = new BaseStepDefHandler();
@@ -37,7 +40,7 @@ public class BaseStepDefHandlerTest {
 	@Before
 	public void init() {
 		Map<String, String> tblHeader = new HashMap<>();
-		tblHeader.put("Acept", "application/json");
+		tblHeader.put("Accept", "application/json");
 		tblHeader.put("Content-Type", "application/json");
 		subject.passHeaderInformation(tblHeader);
 		subject.initREST();
