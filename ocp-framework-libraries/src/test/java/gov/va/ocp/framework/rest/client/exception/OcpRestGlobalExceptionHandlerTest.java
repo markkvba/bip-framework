@@ -56,8 +56,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 	public void handleIllegalArgumentExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		IllegalArgumentException ex = new IllegalArgumentException("test illegal argument exception message");
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleIllegalArgumentException(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleIllegalArgumentException(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -90,8 +90,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 
 		when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
 
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleMethodArgumentNotValidException(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleMethodArgumentNotValidException(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	public void methodForExtractingMethodObject(final String parameter) {
@@ -105,8 +105,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		HttpClientErrorException ex = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text", headers,
 				"test body".getBytes(), Charset.defaultCharset());
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleHttpClientErrorException(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleHttpClientErrorException(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -123,8 +123,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 		}
 		MethodArgumentTypeMismatchException ex = new MethodArgumentTypeMismatchException("test value", String.class, "test name",
 				parameter, new Exception("test wrapped message"));
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleMethodArgumentTypeMismatch(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleMethodArgumentTypeMismatch(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -139,8 +139,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 		Set<? extends ConstraintViolation<?>> constaintViolations = validator.validate(dummyObject, Default.class);
 
 		ConstraintViolationException ex = new ConstraintViolationException("test message", constaintViolations);
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleConstraintViolation(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleConstraintViolation(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -163,8 +163,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 					}
 				});
 
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleHttpMessageNotReadableException(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleHttpMessageNotReadableException(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -174,9 +174,9 @@ public class OcpRestGlobalExceptionHandlerTest {
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		NoHandlerFoundException ex = new NoHandlerFoundException("test msg", "wrapped message", headers);
 
-		ResponseEntity<Object> reponse =
+		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleNoHandlerFoundException", req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.NOT_FOUND));
+		assertTrue(response.getStatusCode().equals(HttpStatus.NOT_FOUND));
 	}
 
 	@Test
@@ -187,9 +187,9 @@ public class OcpRestGlobalExceptionHandlerTest {
 		List<String> suppotedMethods = Arrays.asList(new String[] { "GET" });
 		HttpRequestMethodNotSupportedException ex = new HttpRequestMethodNotSupportedException("test method name", suppotedMethods);
 
-		ResponseEntity<Object> reponse =
+		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleHttpRequestMethodNotSupported", req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.METHOD_NOT_ALLOWED));
+		assertTrue(response.getStatusCode().equals(HttpStatus.METHOD_NOT_ALLOWED));
 	}
 
 	@Test
@@ -202,9 +202,9 @@ public class OcpRestGlobalExceptionHandlerTest {
 		supportedMediatypes.add(MediaType.TEXT_HTML);
 		HttpMediaTypeNotSupportedException ex = new HttpMediaTypeNotSupportedException(MediaType.TEXT_PLAIN, supportedMediatypes);
 
-		ResponseEntity<Object> reponse =
+		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleHttpMediaTypeNotSupported", req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+		assertTrue(response.getStatusCode().equals(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
 	}
 
 	@Test
@@ -212,9 +212,9 @@ public class OcpRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		OcpRuntimeException ex = new OcpRuntimeException("test key", "test message", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
-		ResponseEntity<Object> reponse =
+		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpRuntimeException", req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
@@ -222,8 +222,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		Exception ex = new Exception("test message");
 
-		ResponseEntity<Object> reponse = ocpRestGlobalExceptionHandler.handleAll(req, ex);
-		assertTrue(reponse.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleAll(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	static class DummyObjectToBeValidated {
