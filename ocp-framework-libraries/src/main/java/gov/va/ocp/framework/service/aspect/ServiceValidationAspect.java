@@ -147,6 +147,10 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		Class<?> validatorClass = this.resolveValidatorClass(object);
 
+		if (validatorClass == null) {
+			throw new OcpRuntimeException("", "No validator available for object of type " + object.getClass().getName(),
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		// invoke the validator
 		try {
 			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
