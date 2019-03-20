@@ -1,10 +1,13 @@
 package gov.va.ocp.framework.security;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import gov.va.ocp.framework.security.CryptoProperties;
 import gov.va.ocp.framework.security.DecryptionWss4jSecurityInterceptor;
@@ -77,6 +80,51 @@ public class DecryptionWss4jSecurityInterceptorTest {
 			}
 		};
 		assertNotNull(interceptor);
+	}
+
+	@Test
+	public void logErrorTest() {
+		DecryptionWss4jSecurityInterceptor interceptor = new DecryptionWss4jSecurityInterceptor() {
+
+			@Override
+			public CryptoProperties retrieveCryptoProps() {
+				CryptoProperties props = new CryptoProperties() {
+
+					private static final long serialVersionUID = 4980226916621404426L;
+
+					@Override
+					public String getCryptoEncryptionAlias() {
+						return this.getProperty(APACHE_KS_ALIAS);
+					}
+
+					@Override
+					public String getCryptoDefaultAlias() {
+						return this.getProperty(APACHE_KS_ALIAS);
+					}
+
+					@Override
+					public String getCryptoKeystorePw() {
+						return this.getProperty(APACHE_KS_PW);
+					}
+
+					@Override
+					public String getTimeStampTtl() {
+						return this.getProperty(TIMESTAMP_TTL);
+					}
+
+				};
+				return props;
+
+			}
+		};
+
+		try {
+			ReflectionTestUtils.invokeMethod(interceptor, "logError", new WSSecurityException(
+					WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, new Exception("test error message"), "test error message 2"));
+		} catch (Exception e) {
+			fail("exeption should not be thrown");
+		}
+
 	}
 
 }

@@ -56,11 +56,11 @@ public class ProviderResponse implements ProviderTransferObjectMarker, Serializa
 	 *
 	 * @param messages the messages
 	 */
-	public final void addMessages(List<Message> messages) {
-		if (messages == null) {
-			messages = new LinkedList<>();
+	public final void addMessages(final List<Message> messages) {
+		if (this.messages == null) {
+			this.messages = new LinkedList<>();
 		}
-		messages.addAll(messages);
+		this.messages.addAll(messages);
 	}
 
 	/**

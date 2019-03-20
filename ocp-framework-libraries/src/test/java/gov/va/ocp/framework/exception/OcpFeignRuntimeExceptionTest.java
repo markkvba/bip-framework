@@ -24,4 +24,15 @@ public class OcpFeignRuntimeExceptionTest {
 		Assert.assertTrue(ocpFeignRuntimeException.getSeverity().equals(TEST_SEVERITY));
 	}
 
+	@Test
+	public void instantiateUsingOtherConstructorOcpFeignRuntimeExceptionTest() throws Exception {
+		OcpFeignRuntimeException ocpFeignRuntimeException = new OcpFeignRuntimeException(TEST_KEY, TEST_TEXT, TEST_SEVERITY,
+				TEST_HTTP_STATUS, new Exception("test wrapped error"));
+
+		Assert.assertTrue(ocpFeignRuntimeException.getKey().equals(TEST_KEY));
+		Assert.assertTrue(ocpFeignRuntimeException.getMessage().equals(TEST_TEXT));
+		Assert.assertTrue(ocpFeignRuntimeException.getStatus().equals(TEST_HTTP_STATUS));
+		Assert.assertTrue(ocpFeignRuntimeException.getSeverity().equals(TEST_SEVERITY));
+	}
+
 }

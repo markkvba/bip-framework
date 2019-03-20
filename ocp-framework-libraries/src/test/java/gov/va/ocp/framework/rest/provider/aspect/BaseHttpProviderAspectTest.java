@@ -1,8 +1,17 @@
 package gov.va.ocp.framework.rest.provider.aspect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
@@ -112,6 +122,22 @@ public class BaseHttpProviderAspectTest {
 		assertEquals(expResult, result.getEvent());
 		assertEquals("Unknown", result.getActivity());
 		assertEquals("Unknown", result.getAuditClass());
+	}
+
+	@Test
+	public void testPopulateHeadersMap() throws Exception {
+		BaseHttpProviderAspect baseHttpProviderAspect = new BaseHttpProviderAspect();
+		HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+		when(httpServletResponse.getHeader("contentType")).thenReturn("text/xml");
+		when(httpServletResponse.getHeader("Accept")).thenReturn("text/xml");
+		Map<String, String> headersToBePopulated = new HashMap<>();
+		Collection<String> listOfHeaderNames = new LinkedList<>();
+		listOfHeaderNames.add("contentType");
+		listOfHeaderNames.add("Accept");
+		ReflectionTestUtils.invokeMethod(baseHttpProviderAspect, "populateHeadersMap", httpServletResponse, headersToBePopulated,
+				listOfHeaderNames);
+		assertTrue(headersToBePopulated.get("contentType").equals("text/xml"));
+		assertTrue(headersToBePopulated.get("Accept").equals("text/xml"));
 	}
 
 	public Method myMethod() throws NoSuchMethodException {

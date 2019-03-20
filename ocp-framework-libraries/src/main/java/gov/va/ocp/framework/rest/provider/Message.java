@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
- * The Class Message.
+ * Message model object used to return messages (errors, warnings, etc) to the service consumer.
  */
 public class Message implements Serializable {
 	private static final long serialVersionUID = -8835969328009728923L;

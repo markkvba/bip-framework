@@ -182,14 +182,20 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			entity = writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.", e);
-			ProviderResponse body = new ProviderResponse();
-			body.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.name(),
-					adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.",
-					HttpStatus.INTERNAL_SERVER_ERROR);
-			entity = new ResponseEntity<ProviderResponse>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+			entity = handleAnyRethrownExceptions(adviceName, e);
 		}
+		return entity;
+	}
+
+	private ResponseEntity<ProviderResponse> handleAnyRethrownExceptions(String adviceName, Throwable e) {
+		ResponseEntity<ProviderResponse> entity;
+		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+				adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.", e);
+		ProviderResponse body = new ProviderResponse();
+		body.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.name(),
+				adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.",
+				HttpStatus.INTERNAL_SERVER_ERROR);
+		entity = new ResponseEntity<ProviderResponse>(body, HttpStatus.INTERNAL_SERVER_ERROR);
 		return entity;
 	}
 
