@@ -9,6 +9,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.soap.MessageFactory;
@@ -25,8 +28,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.wss4j.dom.WSConstants;
 import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,9 @@ import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 import gov.va.ocp.framework.validation.Defense;
-import gov.va.ocp.framework.ws.client.remote.aspect.WsClientAspect;
+import gov.va.ocp.framework.ws.client.interceptor.AuditWsInterceptor;
+import gov.va.ocp.framework.ws.client.interceptor.AuditWsInterceptorConfig;
+import io.jsonwebtoken.lang.Collections;
 
 /**
  * Base WebService Client configuration, consolidates core/common web service configuration operations used across the applications.
@@ -67,20 +70,9 @@ public class BaseWsClientConfig {
 	public static final String PACKAGE_FRAMEWORK_EXCEPTION = "gov.va.ocp.framework.exception";
 
 	/**
-	 * Aspect bean of the {@link WsClientAspect}.
-	 * Currently executed before and after returning from
-	 * {@link gov.va.ocp.framework.ws.client.remote.RemoteServiceCall#callRemoteService(WebServiceTemplate, gov.va.ocp.framework.transfer.PartnerTransferObjectMarker, Class)}.
-	 *
-	 * @return WsClientAspect
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	public WsClientAspect wsClientAspect() {
-		return new WsClientAspect();
-	}
-
-	/**
 	 * Creates the default web service template using the default audit request/response interceptors and no web service interceptors.
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -105,6 +97,8 @@ public class BaseWsClientConfig {
 	/**
 	 * Creates the default web service template using the default audit request/response interceptors and the provided web service
 	 * interceptors
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -131,6 +125,8 @@ public class BaseWsClientConfig {
 	/**
 	 * Creates the default web service template using the supplied http request/response interceptors and the provided web service
 	 * interceptors with axiom message factory
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -171,6 +167,8 @@ public class BaseWsClientConfig {
 	/**
 	 * Creates the web service template using the the default audit request/response interceptors and the provided web service
 	 * interceptors with saaj message factory.
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -199,6 +197,8 @@ public class BaseWsClientConfig {
 
 	/**
 	 * Creates the ssl web service template using the default audit request/response interceptors and no web service interceptors.
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -234,7 +234,9 @@ public class BaseWsClientConfig {
 
 	/**
 	 * Creates the ssl web service template using the default audit request/response interceptors and the provided web service
-	 * interceptors
+	 * interceptors.
+	 * <p>
+	 * Auditing {@link AuditWsInterceptor} is added automatically.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -273,6 +275,12 @@ public class BaseWsClientConfig {
 	/**
 	 * Creates the ssl web service template using the supplied http request/response interceptors and the provided web service
 	 * interceptors with axiom message factory
+	 *
+	 * {@link AuditWsInterceptor} to audit the request and response are added automatically to
+	 * the {@code wsInterceptors} array of {@link ClientInterceptor}s.
+	 * If the {@code wsInterceptors} array already has AuditWebserviceInterceptors at the beginning and the end
+	 * of the array, the array will be left untouched. Any other instances (e.g. in the middle of the array)
+	 * will be removed.
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -322,6 +330,12 @@ public class BaseWsClientConfig {
 	 * Creates the SAAJ SSL web service template using the the default audit request/response interceptors and the provided web service
 	 * interceptors with saaj message factory.
 	 *
+	 * {@link AuditWsInterceptor} to audit the request and response are added automatically to
+	 * the {@code wsInterceptors} array of {@link ClientInterceptor}s.
+	 * If the {@code wsInterceptors} array already has AuditWebserviceInterceptors at the beginning and the end
+	 * of the array, the array will be left untouched. Any other instances (e.g. in the middle of the array)
+	 * will be removed.
+	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
 	 * @param connectionTimeout the connection timeout
@@ -362,6 +376,13 @@ public class BaseWsClientConfig {
 	/**
 	 * Creates web service template using the supplied http request/response interceptors and the provided web service
 	 * interceptors and message factory - if web service clients wish to configure their own message factory.
+	 *
+	 * {@link AuditWsInterceptor} to audit the request and response are added automatically to
+	 * the {@code wsInterceptors} array of {@link ClientInterceptor}s.
+	 * If the {@code wsInterceptors} array already has AuditWebserviceInterceptors at the beginning and the end
+	 * of the array, the array will be left untouched. Any other instances (e.g. in the middle of the array)
+	 * will be removed.
+	 *
 	 *
 	 * @param endpoint the endpoint
 	 * @param readTimeout the read timeout
@@ -430,7 +451,7 @@ public class BaseWsClientConfig {
 		webServiceTemplate.setDefaultUri(endpoint);
 		webServiceTemplate.setMarshaller(marshaller);
 		webServiceTemplate.setUnmarshaller(unmarshaller);
-		webServiceTemplate.setInterceptors(wsInterceptors);
+		webServiceTemplate.setInterceptors(addAuditLoggingInterceptors(wsInterceptors));
 		return webServiceTemplate;
 	}
 
@@ -491,6 +512,42 @@ public class BaseWsClientConfig {
 			LOGGER.debug("KeyStore load done");
 		}
 		return keyStore;
+	}
+
+	/**
+	 * Adds audit logging interceptors to the {@link ClientInterceptor} array.
+	 * <p>
+	 * If the {@code wsInterceptor} parameter is NOT null or empty, an audit interceptor
+	 * will be added to log BEFORE the other interceptors run (a "raw" log),
+	 * and second interceptor to log AFTER the other interceptors run (a "wire" log).
+	 *
+	 * @param wsInterceptors the ClientInterceptor array being added to the configuration
+	 * @return ClientInterceptor[] - the updated array of interceptors
+	 */
+	@SuppressWarnings("unchecked")
+	private ClientInterceptor[] addAuditLoggingInterceptors(ClientInterceptor[] wsInterceptors) {
+
+		// if no other interceptors run, no need to add "After" audit log
+		boolean logAfter = wsInterceptors != null && wsInterceptors.length > 0;
+		LOGGER.debug("Initial ClientInterceptors list: " + Arrays.toString(wsInterceptors));
+
+		List<ClientInterceptor> list = new ArrayList<>();
+
+		/* Add audit logging interceptors for Before and After any other interceptors run */
+		if (!logAfter) {
+			LOGGER.debug("Adding audit interceptor only for " + AuditWsInterceptorConfig.AFTER.name());
+			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));
+		} else {
+			LOGGER.debug("Adding audit interceptor only for both " + AuditWsInterceptorConfig.BEFORE.name()
+					+ " and " + AuditWsInterceptorConfig.AFTER.name());
+			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.BEFORE));
+			list.addAll(Collections.arrayToList(wsInterceptors));
+			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));
+		}
+
+		ClientInterceptor[] newWsInterceptors = list.toArray(new ClientInterceptor[list.size()]);
+		LOGGER.debug("Final ClientInterceptors list: " + Arrays.toString(newWsInterceptors));
+		return newWsInterceptors;
 	}
 
 	/**
