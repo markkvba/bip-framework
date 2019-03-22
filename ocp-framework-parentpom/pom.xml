@@ -28,7 +28,7 @@
 		<repo.baseurl>https://nexus.dev.bip.va.gov/repository</repo.baseurl>
 		<repo.mirror>${repo.baseurl}/maven-public</repo.mirror>
 		<repo.release>${repo.baseurl}/maven-releases</repo.release>
-		<repo.snapshot>${repo.baseurl}/nmaven-snapshots</repo.snapshot>
+		<repo.snapshot>${repo.baseurl}/maven-snapshots</repo.snapshot>
 
 		<!-- Test coverage configuration properties -->
 		<jacoco.outputRootDir>${project.basedir}/target/jacoco</jacoco.outputRootDir>
