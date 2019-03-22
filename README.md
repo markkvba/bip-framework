@@ -1,8 +1,8 @@
-## What is this repository for? ##
+## What is this repository for?
 
 To run spring boot and spring cloud enabled services on the BIP Platform, it must adhere to various service patterns. This repository contains suite of framework libraries, auto configurations, test libraries and parent POM that must be included as dependencies to enable the patterns
 
-## Project Breakdown ##
+## Project Breakdown
 
 1. ocp-framework-autoconfigure: Shared auto-configuration for the services to enable the patterns for audit, cache, feign, rest, security, swagger, service, vault etc
 
@@ -12,7 +12,7 @@ To run spring boot and spring cloud enabled services on the BIP Platform, it mus
 
 1. ocp-framework-test-lib: Test library framework to support functional testing for the services
 
-## How to include and download these dependency libraries in your project ##
+## How to include and download these dependency libraries in your project
 
      <dependency>
          <groupId>gov.va.ocp.framework</groupId>
@@ -53,9 +53,9 @@ To make these libraries available locally for the service projects to compile an
 			<url>https://nexus.dev.bip.va.gov/repository/maven-public</url>
 		</repository>
 	</repositories>
-      
+	
 **OPTION 3**
-**If you are NOT on VA network, a temporary solution in provided where GitHub repository acts as your nexus repository.
+**If you are NOT on VA network, a temporary solution in provided where GitHub repository acts as your nexus repository.**
 
 Add the below section in the reactor (root) pom.xml of your service project. See example: https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml
  
@@ -99,7 +99,7 @@ You MUST also update your local ~/.m2/settings.xml as shown below. Replace value
 	  </servers>
 	</settings>
 
-## How to deploy and host a maven repository on GitHub ##
+## How to deploy and host a maven repository on GitHub
 
 source : http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github
 
@@ -111,7 +111,6 @@ ocp-framework-parentpom/pom.xml
       
        See the section under "local-deploy" profile
 	
-
 Run command to deploy and upload artifacts to the repository
 	
 	mvn clean deploy -Plocal-deploy -DrepositoryName=bip-ocp-framework -DrepositoryOwner=EPMO 
