@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
->
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -24,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		
+
 		<!-- nexus properties -->
 		<repo.baseurl>https://nexus.dev.bip.va.gov/repository</repo.baseurl>
 		<repo.mirror>${repo.baseurl}/maven-public</repo.mirror>
@@ -44,7 +43,7 @@
 		<sonar.test.exclusions>**/test/*</sonar.test.exclusions>
 
 		<include.int.tests.pattern>**/*IT.java,**/*Runner.java</include.int.tests.pattern>
-		
+
 		<!-- Code version control configuration -->
 		<jgitflow.keepBranch>false</jgitflow.keepBranch>
 
@@ -60,9 +59,7 @@
 		<fortify.upload>false</fortify.upload> <!-- pass as -D from build server where upload is desired -->
 		<fortify.token>REPLACE WITH REAL VALUE IN SETTINGS.XML OR -D PARAM</fortify.token>
 		<fortify.url>REPLACE WITH REAL VALUE IN SETTINGS.XML OR -D PARAM</fortify.url>
-		<!--
-			3rd party maven plugin versions
-		-->
+		<!-- 3rd party maven plugin versions -->
 		<!-- build plugins -->
 		<lifecycle.mapping.version>1.0.0</lifecycle.mapping.version>
 		<templating-maven-plugin.version>1.0.0</templating-maven-plugin.version>
@@ -81,7 +78,7 @@
 
 		<!-- testing - unit / integratino / performance -->
 		<mockito-core.version>2.24.5</mockito-core.version>
-		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>		
+		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
 		<surefire-junit47.version>2.22.0</surefire-junit47.version>
 		<maven-cucumber-reporting.version>4.4.0</maven-cucumber-reporting.version>
 		<jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
@@ -111,10 +108,10 @@
 		<httpclient.version>4.5.7</httpclient.version>
 
 	</properties>
-	
+
 	<repositories>
 		<repository>
-			<id>bip</id>
+			<id>nexus3</id>
 			<name>BIP Nexus Repository</name>
 			<url>${repo.mirror}</url>
 		</repository>
@@ -135,25 +132,25 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
-			<id>bip</id>
+			<id>nexus3</id>
 			<name>BIP Nexus Repository</name>
 			<url>${repo.mirror}</url>
 		</pluginRepository>
 	</pluginRepositories>
-	
+
 	<distributionManagement>
-       <repository>
-           <id>nexus3.release</id>
-           <url>${repo.release}</url>
-       </repository>
-       <snapshotRepository>
-           <id>nexus3.snapshot</id>
-           <url>${repo.snapshot}</url>
-       </snapshotRepository>
-   </distributionManagement>
+		<repository>
+			<id>nexus3</id>
+			<url>${repo.release}</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus3</id>
+			<url>${repo.snapshot}</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 
 	<dependencyManagement>
@@ -188,10 +185,10 @@
 				<version>${logback.version}</version>
 			</dependency>
 			<dependency>
-		        <groupId>org.codehaus.janino</groupId>
-		        <artifactId>janino</artifactId>
-		        <version>${janino-version}</version>
-		    </dependency>
+				<groupId>org.codehaus.janino</groupId>
+				<artifactId>janino</artifactId>
+				<version>${janino-version}</version>
+			</dependency>
 			<!-- Embedded REDIS -->
 			<dependency>
 				<groupId>com.github.kstyrc</groupId>
@@ -239,7 +236,7 @@
 				<version>3.11.0</version>
 			</dependency>
 
-      <!-- Micormeter core dependecy -->
+			<!-- Micormeter core dependecy -->
 			<dependency>
 				<groupId>io.micrometer</groupId>
 				<artifactId>micrometer-core</artifactId>
@@ -266,7 +263,7 @@
 				</includes>
 				<excludes>
 					<exclude>**/cert/*</exclude>
-					 <exclude>**/*.jks</exclude>
+					<exclude>**/*.jks</exclude>
 					<exclude>**/vetservices-document-inttest/src/inttest/resources/documents/*</exclude>
 				</excludes>
 			</resource>
@@ -274,15 +271,15 @@
 				<directory>src/main/resources/cert</directory>
 			</resource>
 			<resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.jks</include>
-                </includes>
-            </resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.jks</include>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
-			<!-- repackages jar and war plugins so they can be executed with command
+			<!-- repackages jar and war plugins so they can be executed with command 
 				line -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -342,7 +339,7 @@
 					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -386,7 +383,7 @@
 							</resources>
 						</configuration>
 					</execution>
-					<!-- add the parsed version properties into the build environment for
+					<!-- add the parsed version properties into the build environment for 
 						usage as needed -->
 					<execution>
 						<phase>initialize</phase>
@@ -475,8 +472,8 @@
 					<maxPermGen>${fortify.maxPermGen}</maxPermGen>
 				</configuration>
 			</plugin>
-			<!-- Antrun plugin that runs fortify scans via ant. The fortify scans
-				are run using the sourceanalyzer and FPRUtility commandline applications
+			<!-- Antrun plugin that runs fortify scans via ant. The fortify scans 
+				are run using the sourceanalyzer and FPRUtility commandline applications 
 				for now, so Fortify SCA will need to be installed before running -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -494,15 +491,18 @@
 
 								<basename property="fortify.util.jar.filename" file="${fortify.util.jar.path}" />
 
-								<echo message="Using the fortify-build-utils file path: ${fortify.util.jar.path}" />
+								<echo
+									message="Using the fortify-build-utils file path: ${fortify.util.jar.path}" />
 								<echo message="Version: ${fortify.util.version}" />
 								<echo message="File name: ${fortify.util.jar.filename}" />
 								<echo message="Clean ${dir.scripts}" />
 								<delete dir="${dir.scripts}" />
 								<mkdir dir="${dir.scripts}" />
-								<copy todir="${dir.scripts}" flatten="true" overwrite="true" file="${fortify.util.jar.path}" />
+								<copy todir="${dir.scripts}" flatten="true" overwrite="true"
+									file="${fortify.util.jar.path}" />
 
-								<unzip src="${dir.scripts}/${fortify.util.jar.filename}" dest="${dir.scripts}" failOnEmptyArchive="true">
+								<unzip src="${dir.scripts}/${fortify.util.jar.filename}"
+									dest="${dir.scripts}" failOnEmptyArchive="true">
 									<mapper type="flatten" />
 									<patternset>
 										<include name="**/**/*.xml" />
@@ -513,14 +513,15 @@
 								<mkdir dir="${local.ant.lib}" />
 								<get
 									src="http://search.maven.org/remotecontent?filepath=org/eclipse/aether/aether-ant-tasks/1.0.0.v20140518/aether-ant-tasks-1.0.0.v20140518-uber.jar"
-									dest="${local.ant.lib}/aether-ant-tasks-uber.jar" verbose="true" skipexisting="true" />
+									dest="${local.ant.lib}/aether-ant-tasks-uber.jar" verbose="true"
+									skipexisting="true" />
 								<fail
-									message="Checksum mismatch for 'target/antlib/aether-ant-tasks-uber.jar'. Please delete it and rerun ant to redownload."
-								>
+									message="Checksum mismatch for 'target/antlib/aether-ant-tasks-uber.jar'. Please delete it and rerun ant to redownload.">
 									<condition>
 										<not>
-											<checksum file="${local.ant.lib}/aether-ant-tasks-uber.jar" algorithm="SHA"
-												property="95dadd03392a75564904da45108cf048abe6e5bb" verifyproperty="checksum.matches" />
+											<checksum file="${local.ant.lib}/aether-ant-tasks-uber.jar"
+												algorithm="SHA" property="95dadd03392a75564904da45108cf048abe6e5bb"
+												verifyproperty="checksum.matches" />
 										</not>
 									</condition>
 								</fail>
@@ -561,9 +562,9 @@
 			</plugin>
 		</plugins>
 		<pluginManagement>
-			<!-- NOTE: These plugins will be removed from future versions of the super
+			<!-- NOTE: These plugins will be removed from future versions of the super 
 				POM -->
-			<!-- They are kept for the moment as they are very unlikely to conflict
+			<!-- They are kept for the moment as they are very unlikely to conflict 
 				with lifecycle mappings (MNG-4453) -->
 			<plugins>
 				<plugin>
@@ -596,31 +597,31 @@
 					</executions>
 				</plugin>
 				<plugin>
-				<groupId>net.masterthought</groupId>
-				<artifactId>maven-cucumber-reporting</artifactId>
-				<version>${maven-cucumber-reporting.version}</version>
-				<executions>
-					<execution>
-						<id>execution</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<skip>${skipITs}</skip>
-							<projectName>${project.artifactId}</projectName>
-							<outputDirectory>${project.build.directory}/site/cucumber-reports
+					<groupId>net.masterthought</groupId>
+					<artifactId>maven-cucumber-reporting</artifactId>
+					<version>${maven-cucumber-reporting.version}</version>
+					<executions>
+						<execution>
+							<id>execution</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+							<configuration>
+								<skip>${skipITs}</skip>
+								<projectName>${project.artifactId}</projectName>
+								<outputDirectory>${project.build.directory}/site/cucumber-reports
 								</outputDirectory>
 								<inputDirectory>${project.build.directory}/site
 								</inputDirectory>
 								<jsonFiles>**/*.json</jsonFiles>
-							<skippedFails>true</skippedFails>
-							<enableFlashCharts>false</enableFlashCharts>
-							<buildNumber>${project.version}</buildNumber>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+								<skippedFails>true</skippedFails>
+								<enableFlashCharts>false</enableFlashCharts>
+								<buildNumber>${project.version}</buildNumber>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 				<!-- NOTE: Plugins for JMeter Performance Tests -->
 				<plugin>
 					<groupId>com.lazerycode.jmeter</groupId>
@@ -630,12 +631,12 @@
 						<skipTests>${skipPerfTests}</skipTests>
 						<!-- Enable JMeter reports -->
 						<generateReports>true</generateReports>
-						<!-- To simplify debugging, it is advisable to adapt the loglevel.
+						<!-- To simplify debugging, it is advisable to adapt the loglevel. 
 							The jmeter logs are written to the file jmeter.log. -->
 						<overrideRootLogLevel>DEBUG</overrideRootLogLevel>
-						<!-- By default, the console output during a jmeter test run is suppressed.
-							We want to display the progress using the listener "Generate Summary Results"
-							(which periodically prints stats to stdout). Therefore we have to make sure,
+						<!-- By default, the console output during a jmeter test run is suppressed. 
+							We want to display the progress using the listener "Generate Summary Results" 
+							(which periodically prints stats to stdout). Therefore we have to make sure, 
 							that the jmeter output is not suppressed. -->
 						<suppressJMeterOutput>false</suppressJMeterOutput>
 						<jmeterLogLevel>DEBUG</jmeterLogLevel>
@@ -677,7 +678,7 @@
 		<profile>
 			<id>docker-jar-project</id>
 			<activation>
-				<file><!-- add a file named .docker-jar-project-marker to war projects
+				<file><!-- add a file named .docker-jar-project-marker to war projects 
 						to activate this profile -->
 					<exists>${basedir}/.docker-jar-project-marker</exists>
 				</file>
