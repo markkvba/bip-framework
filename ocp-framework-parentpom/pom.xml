@@ -24,6 +24,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		
+		<!-- nexus properties -->
+		<repo.baseurl>https://nexus.dev.bip.va.gov/repository</repo.baseurl>
+		<repo.mirror>${repo.baseurl}/maven-public</repo.mirror>
+		<repo.release>${repo.baseurl}/maven-releases</repo.release>
+		<repo.snapshot>${repo.baseurl}/nmaven-snapshots</repo.snapshot>
 
 		<!-- Test coverage configuration properties -->
 		<jacoco.outputRootDir>${project.basedir}/target/jacoco</jacoco.outputRootDir>
@@ -103,14 +109,15 @@
 		<embedded-redis.version>0.6</embedded-redis.version>
 		<jfiglet.version>0.0.8</jfiglet.version>
 		<httpclient.version>4.5.7</httpclient.version>
-		
-		<!-- GitHub server corresponds to entry in ~/.m2/settings.xml -->
-		<!-- TEMPORARY TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
-    	<github.global.server>github</github.global.server>
 
 	</properties>
-
+	
 	<repositories>
+		<repository>
+			<id>bip</id>
+			<name>BIP Nexus Repository</name>
+			<url>${repo.mirror}</url>
+		</repository>
 		<repository>
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
@@ -128,6 +135,26 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>bip</id>
+			<name>BIP Nexus Repository</name>
+			<url>${repo.mirror}</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<distributionManagement>
+       <repository>
+           <id>nexus3.release</id>
+           <url>${repo.release}</url>
+       </repository>
+       <snapshotRepository>
+           <id>nexus3.snapshot</id>
+           <url>${repo.snapshot}</url>
+       </snapshotRepository>
+   </distributionManagement>
+
 
 	<dependencyManagement>
 		<dependencies>
@@ -255,38 +282,6 @@
             </resource>
 		</resources>
 		<plugins>
-			<!-- TEMPORARY GITHUB PLUGIN TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
-		    <plugin>
-		        <artifactId>maven-deploy-plugin</artifactId>
-		        <configuration>
-		               <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-		        </configuration>
-		    </plugin>
-		    <!-- TEMPORARY GITHUB PLUGIN TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
-		    <plugin>
-	            <groupId>com.github.github</groupId>
-	            <artifactId>site-maven-plugin</artifactId>
-	            <version>0.12</version>
-	            <configuration>
-	                <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-	                <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-	                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-	                <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-	                <includes><include>**/*</include></includes>
-	                <repositoryName>ocp-framework</repositoryName>      <!-- github repo name -->
-	                <repositoryOwner>department-of-veterans-affairs</repositoryOwner>    <!-- github username  -->
-	                <merge>true</merge>
-	            </configuration>
-	            <executions>
-	              <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-	              <execution>
-	                <goals>
-	                  <goal>site</goal>
-	                </goals>
-	                <phase>deploy</phase>
-	              </execution>
-	            </executions>
-        	</plugin>
 			<!-- repackages jar and war plugins so they can be executed with command
 				line -->
 			<plugin>
