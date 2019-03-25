@@ -5,8 +5,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.soap.SOAPException;
 
@@ -32,7 +30,6 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
-import gov.va.ocp.framework.exception.interceptor.InterceptingExceptionTranslator;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 
@@ -177,18 +174,6 @@ public class BaseWsClientConfigTest {
 		String beanNames[] = { "TestBeanName" };
 		String interceptorNames[] = { "TestInterceptorName" };
 		assertTrue(test.getBeanNameAutoProxyCreator(beanNames, interceptorNames) instanceof BeanNameAutoProxyCreator);
-	}
-
-	@Test
-	public void testGetInterceptingExceptionTranslator() {
-		BaseWsClientConfig test = new BaseWsClientConfig();
-		Set<String> exclusions = new HashSet<>();
-		exclusions.add("java.lang");
-		try {
-			assertTrue(test.getInterceptingExceptionTranslator("Exception", exclusions) instanceof InterceptingExceptionTranslator);
-		} catch (Exception e) {
-
-		}
 	}
 
 	@Test

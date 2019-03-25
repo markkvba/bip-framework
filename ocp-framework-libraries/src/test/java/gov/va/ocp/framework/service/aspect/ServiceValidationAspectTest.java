@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.After;
@@ -169,7 +170,7 @@ public class ServiceValidationAspectTest {
 			e.printStackTrace();
 			fail("unable to invoke method named testMethod");
 		} catch (OcpRuntimeException e) {
-			assertTrue(e.getMessage().startsWith("No validator available for object of type "));
+			assertTrue(e.getMessage().startsWith("Could not find or instantiate class "));
 		}
 	}
 
