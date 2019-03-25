@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.rest.provider.aspect;
+package gov.va.ocp.framework.aspect;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -17,13 +17,14 @@ import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
+import gov.va.ocp.framework.rest.provider.aspect.BaseHttpProviderAspect;
 
 @Aspect
-public class LogAnnotatedMethodRequestResponseAspect extends BaseHttpProviderAspect {
+public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 	/** The Constant LOGGER. */
-	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(LogAnnotatedMethodRequestResponseAspect.class);
+	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(AuditAnnotationAspect.class);
 
-	public LogAnnotatedMethodRequestResponseAspect() {
+	public AuditAnnotationAspect() {
 		super();
 	}
 

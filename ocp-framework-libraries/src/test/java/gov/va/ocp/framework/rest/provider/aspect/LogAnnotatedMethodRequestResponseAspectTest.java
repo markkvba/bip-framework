@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import gov.va.ocp.framework.aspect.AuditAnnotationAspect;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.Auditable;
 
@@ -107,7 +108,7 @@ public class LogAnnotatedMethodRequestResponseAspectTest {
 			fail("Unable to mock joinPoint");
 		}
 		RequestContextHolder.setRequestAttributes(attrs);
-		LogAnnotatedMethodRequestResponseAspect aspect = new LogAnnotatedMethodRequestResponseAspect();
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
 		Object returnValue = null;
 		try {
 			returnValue = aspect.logAnnotatedMethodRequestResponse(joinPoint);
