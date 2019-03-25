@@ -63,7 +63,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 		try {
 			Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 
-			auditEventData = new AuditEventData(AuditEvents.REST_REQUEST, method.getName(), method.getDeclaringClass().getName());
+			auditEventData = new AuditEventData(AuditEvents.API_REST_REQUEST, method.getName(), method.getDeclaringClass().getName());
 
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Request: {}", requestArgs);
@@ -105,7 +105,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 
 			Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 
-			auditEventData = new AuditEventData(AuditEvents.REST_RESPONSE, method.getName(), method.getDeclaringClass().getName());
+			auditEventData = new AuditEventData(AuditEvents.API_REST_RESPONSE, method.getName(), method.getDeclaringClass().getName());
 
 			writeResponseAudit(providerResponse, auditEventData, MessageSeverity.INFO, null);
 

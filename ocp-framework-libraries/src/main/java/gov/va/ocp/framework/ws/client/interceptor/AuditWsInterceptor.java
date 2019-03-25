@@ -62,7 +62,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	@Override
 	public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
 		LOGGER.debug("Executing handleFault(..) with config " + config.name());
-		doAudit(config.fault(), messageContext.getResponse());
+		doAudit(config.faultMetadata(), messageContext.getResponse());
 		return true;
 	}
 
@@ -71,11 +71,11 @@ public class AuditWsInterceptor implements ClientInterceptor {
 		if (!alreadyLogged) {
 			LOGGER.debug("Executing afterCompletion(..) with config " + config.name());
 			// log request
-			doAudit(config.request(), messageContext.getRequest());
+			doAudit(config.requestMetadata(), messageContext.getRequest());
 
 			LOGGER.debug("Partner call returned response: " + messageContext.getResponse());
 			// log response, even if it is null
-			doAudit(config.response(), messageContext.getResponse());
+			doAudit(config.responseMetadata(), messageContext.getResponse());
 
 			// remember that this interceptor has already done its job
 			alreadyLogged = true;

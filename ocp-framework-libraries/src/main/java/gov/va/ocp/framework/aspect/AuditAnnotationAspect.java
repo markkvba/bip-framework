@@ -37,7 +37,7 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 	 * @return the object
 	 */
 	@Around("auditableExecution()")
-	public Object logAnnotatedMethodRequestResponse(final ProceedingJoinPoint joinPoint) throws Throwable {
+	public Object auditAnnotationAspect(final ProceedingJoinPoint joinPoint) throws Throwable {
 		Object response = null;
 		List<Object> request = null;
 
@@ -50,7 +50,7 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 			LOGGER.debug("Method: {}", method);
 			final Auditable auditableAnnotation = method.getAnnotation(Auditable.class);
 			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
-			AuditEventData auditEventData;
+			AuditEventData auditEventData = null;
 			if (auditableAnnotation != null) {
 				auditEventData =
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
@@ -71,7 +71,7 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 			}
 		} catch (Throwable e) {
 			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					"Error while executing logAnnotatedMethodRequestResponse around auditableExecution", e);
+					"Error while executing auditAnnotationAspect around auditableExecution", e);
 		}
 		return response;
 	}

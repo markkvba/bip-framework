@@ -125,7 +125,7 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 	//
 	// Mockito.lenient().when(joinPoint.getTarget()).thenReturn(new TestClass());
 	// doThrow().when(providerHttpAspect).writeRequestInfoAudit(Arrays.asList(new Object[] {}),
-	// new AuditEventData(AuditEvents.REST_REQUEST, mockSignature.getName(), mockSignature.getDeclaringType().getName()));
+	// new AuditEventData(AuditEvents.API_REST_REQUEST, mockSignature.getName(), mockSignature.getDeclaringType().getName()));
 	//
 	// providerHttpAspect.beforeAuditAdvice(joinPoint);
 	// } catch (final Throwable throwable) {

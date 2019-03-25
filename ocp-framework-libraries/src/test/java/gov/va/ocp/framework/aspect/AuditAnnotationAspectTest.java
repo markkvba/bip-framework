@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.rest.provider.aspect;
+package gov.va.ocp.framework.aspect;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -14,12 +14,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import gov.va.ocp.framework.aspect.AuditAnnotationAspect;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.Auditable;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class LogAnnotatedMethodRequestResponseAspectTest {
+public class AuditAnnotationAspectTest {
 
 	private static final String TEST_RETURN_VALUE = "testReturnValue";
 
@@ -65,12 +64,12 @@ public class LogAnnotatedMethodRequestResponseAspectTest {
 
 		@Override
 		public Class getDeclaringType() {
-			return gov.va.ocp.framework.rest.provider.aspect.LogAnnotatedMethodRequestResponseAspectTest.class;
+			return gov.va.ocp.framework.aspect.AuditAnnotationAspectTest.class;
 		}
 
 		@Override
 		public String getDeclaringTypeName() {
-			return "gov.va.ocp.framework.rest.provider.aspect.LogAnnotatedMethodRequestResponseAspectTest";
+			return "gov.va.ocp.framework.rest.provider.aspect.AuditAnnotationAspectTest";
 		}
 
 		@Override
@@ -82,7 +81,7 @@ public class LogAnnotatedMethodRequestResponseAspectTest {
 		@Override
 		public Method getMethod() {
 			try {
-				return LogAnnotatedMethodRequestResponseAspectTest.this.getClass().getMethod("annotatedMethod", new Class[] {String.class});
+				return AuditAnnotationAspectTest.this.getClass().getMethod("annotatedMethod", new Class[] { String.class });
 			} catch (NoSuchMethodException e) {
 				fail("Error mocking the join point");
 			} catch (SecurityException e) {
@@ -99,7 +98,7 @@ public class LogAnnotatedMethodRequestResponseAspectTest {
 	private ServletRequestAttributes attrs;
 
 	@Test
-	public void testLogAnnotatedMethodRequestResponse() {
+	public void testAuditAnnotationAspect() {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
 		try {
@@ -111,14 +110,14 @@ public class LogAnnotatedMethodRequestResponseAspectTest {
 		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
 		Object returnValue = null;
 		try {
-			returnValue = aspect.logAnnotatedMethodRequestResponse(joinPoint);
+			returnValue = aspect.auditAnnotationAspect(joinPoint);
 			assertTrue(returnValue.equals(TEST_RETURN_VALUE));
 		} catch (Throwable e) {
 			fail("Exception should not be thrown");
 		}
 	}
 
-	@Auditable(event = AuditEvents.REQUEST_RESPONSE, activity = "testActivity")
+	@Auditable(event = AuditEvents.API_REST_REQUEST, activity = "testActivity")
 	public void annotatedMethod(final String parameter) {
 
 	}

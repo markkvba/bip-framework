@@ -104,6 +104,11 @@ public class OcpCacheAutoConfiguration extends CachingConfigurerSupport {
 				.withInitialCacheConfigurations(this.redisCacheConfigurations()).transactionAware().build();
 	}
 
+//	@Bean
+//	public Cache getCache() {
+//		return new
+//	}
+
 	/**
 	 * Reference cache keys follow a specific naming convention, as enforced by this bean.
 	 * <p>

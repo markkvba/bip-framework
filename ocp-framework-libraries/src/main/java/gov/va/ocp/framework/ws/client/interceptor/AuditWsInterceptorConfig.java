@@ -31,6 +31,7 @@ public enum AuditWsInterceptorConfig {
 
 	/** The class reported as being under audit */
 	private static final Class<WebServiceTemplate> AUDITED = WebServiceTemplate.class;
+	private static final String SOAP_FAULT_RESPONSE_SUFFIX = "_SOAP-FAULT";
 	/** System new-line character */
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	/** Arrow used in message prefixes */
@@ -79,9 +80,9 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Request extends AuditWsMetadata {
+	class RequestMetadata extends AuditWsMetadata {
 		/** the activity identifier string for the audit event */
-		private static final String activity = "webserviceRequest";
+		private final String activity = AuditEvents.PARTNER_SOAP_REQUEST.getDefaultActivity();
 
 		@Override
 		AuditEventData eventData() {
@@ -109,8 +110,8 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Request - the metadata for auditing webservice request objects
 	 */
-	Request request() {
-		return new Request();
+	RequestMetadata requestMetadata() {
+		return new RequestMetadata();
 	}
 
 	/**
@@ -119,9 +120,9 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Response extends AuditWsMetadata {
+	class ResponseMetadata extends AuditWsMetadata {
 		/** the activity identifier string for the audit event */
-		private static final String activity = "webserviceResponse";
+		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
 
 		@Override
 		AuditEventData eventData() {
@@ -149,8 +150,8 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Response - the metadata for auditing webservice response objects
 	 */
-	Response response() {
-		return new Response();
+	ResponseMetadata responseMetadata() {
+		return new ResponseMetadata();
 	}
 
 	/**
@@ -159,9 +160,10 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Fault extends AuditWsMetadata {
+	class FaultMetadata extends AuditWsMetadata {
 		/** the activity identifier string for the audit event */
-		private static final String activity = "webserviceResponse_SOAP-FAULT";
+		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity()
+				+ SOAP_FAULT_RESPONSE_SUFFIX;
 
 		@Override
 		AuditEventData eventData() {
@@ -189,7 +191,7 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Response - the metadata for auditing webservice response objects
 	 */
-	Fault fault() {
-		return new Fault();
+	FaultMetadata faultMetadata() {
+		return new FaultMetadata();
 	}
 }

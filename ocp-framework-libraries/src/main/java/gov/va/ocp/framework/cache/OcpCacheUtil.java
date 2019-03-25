@@ -1,7 +1,7 @@
 /**
  *
  */
-package gov.va.ocp.framework.util;
+package gov.va.ocp.framework.cache;
 
 import java.util.UUID;
 
