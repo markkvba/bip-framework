@@ -6,7 +6,7 @@
 		<groupId>gov.va.ocp.framework</groupId>
 		<artifactId>ocp-framework-parentpom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<relativePath>../ocp-framework-parentpom</relativePath>
 	</parent>
 
 	<artifactId>ocp-framework-libraries</artifactId>
