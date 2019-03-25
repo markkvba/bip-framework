@@ -10,7 +10,6 @@
 	</parent>
 
 	<artifactId>ocp-framework-test-lib</artifactId>
-	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 	<description>Test Framework for integration test on OpenShift Container Platform (OCP) Application Framework</description>
 

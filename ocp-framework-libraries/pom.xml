@@ -10,7 +10,6 @@
 	</parent>
 
 	<artifactId>ocp-framework-libraries</artifactId>
-	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 	<description>Shared libraries for OpenShift Container Platform (OCP) Application Framework - Spring Boot and Cloud Enabled</description>
 
