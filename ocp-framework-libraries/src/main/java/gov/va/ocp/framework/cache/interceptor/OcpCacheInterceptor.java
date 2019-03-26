@@ -1,6 +1,5 @@
 package gov.va.ocp.framework.cache.interceptor;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -26,9 +25,15 @@ import gov.va.ocp.framework.service.DomainResponse;
 /**
  * Audit cache GET operations.
  * <p>
- * This interceptor is equivalent to an Around aspect, so the implementation
- * must call joinPoint.proceed(). This is accomplished by calling
- * {@code super.invoke(invocation)}.
+ * This interceptor is equivalent to an Around aspect of the method that
+ * has the Cache annotation(s) - e.g. @CachePut.
+ * <p>
+ * This interceptor does not distinguish cache operations, so all executions
+ * of the application caching method will create audit records.
+ * If this behavior is undesirable, it will be necessary to override or
+ * extend {@link org.springframework.cache.interceptor.CacheAspectSupport}
+ * in order to get access to the {@code doGet(Cache cache, Object key)} method on
+ * {@link org.springframework.cache.interceptor.AbstractCacheInvoker}.
  *
  * @author aburkholder
  */
@@ -54,9 +59,15 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	/**
 	 * Perform audit logging after the method has been called.
 	 * <p>
-	 * This interceptor is equivalent to an Around aspect, so the implementation
-	 * must call joinPoint.proceed(). This is accomplished by calling
-	 * {@code super.invoke(invocation)}.
+	 * This interceptor is equivalent to an Around aspect of the method that
+	 * has the Cache annotation(s) - e.g. @CachePut.
+	 * <p>
+	 * This interceptor does not distinguish cache operations, so all executions
+	 * of the application caching method will create audit records.
+	 * If this behavior is undesirable, it will be necessary to override or
+	 * extend {@link org.springframework.cache.interceptor.CacheAspectSupport}
+	 * in order to get access to the {@code doGet(Cache cache, Object key)} method on
+	 * {@link org.springframework.cache.interceptor.AbstractCacheInvoker}.
 	 */
 	@Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -68,16 +79,19 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 		try {
 			Object returning = super.invoke(invocation);
 			if (returning == null) {
+				// no response
 				domainResponse = new DomainResponse();
 			} else if (!DomainResponse.class.isAssignableFrom(returning.getClass())) {
 
 			}
-
-			Method method = invocation.getMethod();
-			LOGGER.debug(this.getClass().getSimpleName() + ".invoke(..)"
-					+ "\n\tmethod: " + method.getName()
-					+ "\n\targs: " + Arrays.toString(invocation.getArguments())
-					+ "\n\treturning: " + ReflectionToStringBuilder.toString(returning));
+			if (LOGGER.isDebugEnabled()) {
+				String prefix = this.getClass().getSimpleName() + ".invoke(..) :: ";
+				LOGGER.debug(prefix + "Invocation class: " + invocation.getClass().toGenericString());
+				LOGGER.debug(prefix + "Invoked from: " + invocation.getThis().getClass().getName());
+				LOGGER.debug(prefix + "Invoking method: " + invocation.getMethod().toGenericString());
+				LOGGER.debug(prefix + "  having annotations: " + Arrays.toString(invocation.getStaticPart().getAnnotations()));
+				LOGGER.debug(prefix + "Returning: " + ReflectionToStringBuilder.toString(returning, null, false, false, Object.class));
+			}
 
 			ResponseAuditData auditData = new ResponseAuditData();
 			auditData.setResponse(returning);
