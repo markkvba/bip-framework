@@ -19,11 +19,11 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
 	/** The consumer facing identity key */
-	private String key;
+	private final String key;
 	/** The severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE */
-	private MessageSeverity severity;
+	private final MessageSeverity severity;
 	/** The best-fit HTTP Status, see <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a> */
-	private HttpStatus status;
+	private final HttpStatus status;
 
 	/**
 	 * Constructs a new <b>checked</b> Exception with the specified detail key, message, severity, and status.
