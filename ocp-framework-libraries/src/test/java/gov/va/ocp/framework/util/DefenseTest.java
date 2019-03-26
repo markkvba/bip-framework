@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.exception.OcpValidationRuntimeException;
 import gov.va.ocp.framework.validation.Defense;
 
 public class DefenseTest {
@@ -23,7 +24,7 @@ public class DefenseTest {
 	}
 
 	@Test
-	public void testIsInstanceOf() {
+	public void testIsInstanceOfHappyPath() {
 		try {
 			Defense defenseObj = Defense.class.newInstance();
 			Defense.isInstanceOf(Defense.class, defenseObj);
@@ -46,9 +47,19 @@ public class DefenseTest {
 		}
 	}
 
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testIsInstanceOfSadPath() {
+		Defense.isInstanceOf(null, "test string object");
+	}
+
 	@Test
 	public void testStateBoolean() {
 		Defense.state(true);
+	}
+
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testStateBooleanSadPath() {
+		Defense.state(false);
 	}
 
 	@Test
@@ -56,14 +67,29 @@ public class DefenseTest {
 		Defense.isNull(null);
 	}
 
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testIsNullObjectSadPath() {
+		Defense.isNull(new Object());
+	}
+
 	@Test
 	public void testIsNullObjectString() {
 		Defense.isNull(null, "Object should be null");
 	}
 
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testIsNullObjectStringSadPath() {
+		Defense.isNull(new Object(), "Object should be null");
+	}
+
 	@Test
 	public void testNotNullObject() {
 		Defense.notNull(this);
+	}
+
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testNotNullObjectSadPath() {
+		Defense.notNull(null);
 	}
 
 	@Test

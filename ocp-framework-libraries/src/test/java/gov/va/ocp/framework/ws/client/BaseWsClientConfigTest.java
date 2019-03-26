@@ -25,11 +25,13 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ws.WebServiceMessageFactory;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 
@@ -83,7 +85,7 @@ public class BaseWsClientConfigTest {
 
 	@Test
 	public void
-			testCreateDefaultWebServiceTemplateStringIntIntMarshallerUnmarshallerHttpRequestInterceptorArrayHttpResponseInterceptorArrayClientInterceptorArray() {
+	testCreateDefaultWebServiceTemplateStringIntIntMarshallerUnmarshallerHttpRequestInterceptorArrayHttpResponseInterceptorArrayClientInterceptorArray() {
 		BaseWsClientConfig test = new BaseWsClientConfig();
 		assertTrue(test.createDefaultWebServiceTemplate("http://dummyservice/endpoint", 30, 30, mockMarshaller, mockUnmarshaller,
 				reqInterceptors, respInterceptors, intercpetors) instanceof WebServiceTemplate);
@@ -137,7 +139,7 @@ public class BaseWsClientConfigTest {
 
 	@Test
 	public void
-			testCreateSslWebServiceTemplateStringIntIntMarshallerUnmarshallerHttpRequestInterceptorArrayHttpResponseInterceptorArrayClientInterceptorArray() {
+	testCreateSslWebServiceTemplateStringIntIntMarshallerUnmarshallerHttpRequestInterceptorArrayHttpResponseInterceptorArrayClientInterceptorArray() {
 		BaseWsClientConfig test = new BaseWsClientConfig();
 		assertTrue(test.createSslWebServiceTemplate("http://dummyservice/endpoint", 30, 30, mockMarshaller, mockUnmarshaller,
 				reqInterceptors, respInterceptors, intercpetors, KEYSTORE, KEYSTORE_PASS, TRUSTSTORE,
@@ -202,6 +204,12 @@ public class BaseWsClientConfigTest {
 		BaseWsClientConfig test = new BaseWsClientConfig();
 		assertTrue(test.getVAServiceWss4jSecurityInterceptor("testuser", "test123", "EVSS",
 				"STN_ID") instanceof VAServiceWss4jSecurityInterceptor);
+	}
+
+	@Test(expected = OcpRuntimeException.class)
+	public void testHandleExceptions() {
+		BaseWsClientConfig test = new BaseWsClientConfig();
+		ReflectionTestUtils.invokeMethod(test, "handleExceptions", new Exception());
 	}
 
 }
