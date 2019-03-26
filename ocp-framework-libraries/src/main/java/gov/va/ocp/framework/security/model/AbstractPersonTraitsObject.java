@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public abstract class AbstractPersonObject extends User {
+public abstract class AbstractPersonTraitsObject extends User {
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,12 +47,12 @@ public abstract class AbstractPersonObject extends User {
 					+ "]")
 	private List<String> correlationIds;
 
-	public AbstractPersonObject(final String username, final String password,
+	public AbstractPersonTraitsObject(final String username, final String password,
 			final Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
 	}
 
-	public AbstractPersonObject(final String username, final String password, final boolean enabled, final boolean accountNonExpired,
+	public AbstractPersonTraitsObject(final String username, final String password, final boolean enabled, final boolean accountNonExpired,
 			final boolean credentialsNonExpired, final boolean accountNonLocked,
 			final Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);

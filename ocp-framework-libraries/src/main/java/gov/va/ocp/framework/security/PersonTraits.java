@@ -2,17 +2,15 @@ package gov.va.ocp.framework.security;
 
 import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import gov.va.ocp.framework.security.model.AbstractPersonObject;
+import gov.va.ocp.framework.security.model.AbstractPersonTraitsObject;
 
 /**
  * VA person identifier data. Created by vgadda on 6/6/17.
  */
 
-public class PersonTraits extends AbstractPersonObject {
+public class PersonTraits extends AbstractPersonTraitsObject {
 
 	public enum PATTERN_FORMAT {
 		BIRTHDATE_YYYYMMDD("YYYY-MM-dd");
@@ -111,16 +109,6 @@ public class PersonTraits extends AbstractPersonObject {
 
 	public String getUser() {
 		return getFirstName() + " " + getLastName();
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj, getToStringEqualsHashExcludeFields());
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this, getToStringEqualsHashExcludeFields());
 	}
 
 	public boolean hasDodedipnid() {

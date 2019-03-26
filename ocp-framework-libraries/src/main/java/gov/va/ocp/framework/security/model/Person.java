@@ -8,7 +8,7 @@ import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 import io.swagger.annotations.ApiModel;
 
 @ApiModel(description = "Model that identifies a single individual used in the security context")
-public class Person extends AbstractPersonObject implements DomainTransferObjectMarker {
+public class Person extends AbstractPersonTraitsObject implements DomainTransferObjectMarker {
 
 	private static final long serialVersionUID = 1L;
 
