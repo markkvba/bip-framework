@@ -6,6 +6,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheInterceptor;
 import org.springframework.http.HttpStatus;
 
@@ -30,10 +31,8 @@ import gov.va.ocp.framework.service.DomainResponse;
  * <p>
  * This interceptor does not distinguish cache operations, so all executions
  * of the application caching method will create audit records.
- * If this behavior is undesirable, it will be necessary to override or
- * extend {@link org.springframework.cache.interceptor.CacheAspectSupport}
- * in order to get access to the {@code doGet(Cache cache, Object key)} method on
- * {@link org.springframework.cache.interceptor.AbstractCacheInvoker}.
+ * If this behavior is undesirable, it will be necessary to override enough
+ * of the inherited code to have control of the {@link #doGet(Cache, Object)} method.
  *
  * @author aburkholder
  */
@@ -42,8 +41,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 	/** Class logger */
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(OcpCacheInterceptor.class);
-
-	private static final String INVOKE_INTERCEPTOR = "CacheInterceptorInvoke";
+	/**  */
+	private static final String ADVICE_NAME = "invokeOcpCacheInterceptor";
+	private static final String ACTIVITY = "cacheInvoke";
 
 	/** The {@link AuditLogSerializer} for async logging */
 	@Autowired
@@ -64,17 +64,15 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	 * <p>
 	 * This interceptor does not distinguish cache operations, so all executions
 	 * of the application caching method will create audit records.
-	 * If this behavior is undesirable, it will be necessary to override or
-	 * extend {@link org.springframework.cache.interceptor.CacheAspectSupport}
-	 * in order to get access to the {@code doGet(Cache cache, Object key)} method on
-	 * {@link org.springframework.cache.interceptor.AbstractCacheInvoker}.
+	 * If this behavior is undesirable, it will be necessary to override enough
+	 * of the inherited code to have control of the {@link #doGet(Cache, Object)} method.
 	 */
 	@Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		DomainResponse domainResponse = null;
 
 		Class<?> underAudit = invocation.getThis().getClass();
-		AuditEventData auditEventData = new AuditEventData(AuditEvents.CACHED_SERVICE_RESPONSE, "cacheGet", underAudit.getName());
+		AuditEventData auditEventData = new AuditEventData(AuditEvents.CACHED_SERVICE_RESPONSE, ACTIVITY, underAudit.getName());
 
 		try {
 			Object returning = super.invoke(invocation);
@@ -82,8 +80,14 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 				// no response
 				domainResponse = new DomainResponse();
 			} else if (!DomainResponse.class.isAssignableFrom(returning.getClass())) {
-
+				throw new OcpRuntimeException("",
+						"Object returned from cache is not a DomainResponse. Cached object: "
+								+ ReflectionToStringBuilder.toString(returning),
+						MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+			} else {
+				domainResponse = (DomainResponse) returning;
 			}
+
 			if (LOGGER.isDebugEnabled()) {
 				String prefix = this.getClass().getSimpleName() + ".invoke(..) :: ";
 				LOGGER.debug(prefix + "Invocation class: " + invocation.getClass().toGenericString());
@@ -94,13 +98,14 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			}
 
 			ResponseAuditData auditData = new ResponseAuditData();
-			auditData.setResponse(returning);
+			auditData.setResponse(domainResponse);
 			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, auditData, ResponseAuditData.class,
 					MessageSeverity.INFO, null);
+
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
-			this.handleInternalException(domainResponse, INVOKE_INTERCEPTOR, INVOKE_INTERCEPTOR, auditEventData, throwable);
+			this.handleInternalException(domainResponse, ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 		} finally {
-			LOGGER.debug(INVOKE_INTERCEPTOR + " finished.");
+			LOGGER.debug(ADVICE_NAME + " finished.");
 		}
 
 		return domainResponse;
