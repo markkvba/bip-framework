@@ -148,7 +148,6 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 		}
 	}
 
-
 	@Test
 	public void testAfterThrowingAdvice() {
 		super.getAppender().clear();
