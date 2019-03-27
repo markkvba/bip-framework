@@ -174,8 +174,8 @@ public class ServiceValidationAspectTest {
 	}
 
 	@Test(expected = OcpRuntimeException.class)
-	public final void testHanldeExceptions() {
-		ReflectionTestUtils.invokeMethod(aspect, "hanldeExceptions", Object.class, new IllegalAccessException(), new Object());
+	public final void testHandleExceptions() {
+		ReflectionTestUtils.invokeMethod(aspect, "handleExceptions", Object.class, new IllegalAccessException(), new Object());
 	}
 
 	@Test(expected = OcpRuntimeException.class)

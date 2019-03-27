@@ -19,6 +19,18 @@ public enum AuditWsInterceptorConfig {
 
 	/** The title string used in the audit message prefix */
 	private String title;
+	
+	/** The class reported as being under audit */
+	private static final Class<WebServiceTemplate> AUDITED = WebServiceTemplate.class;
+	
+	/** The Constant SOAP_FAULT_RESPONSE_SUFFIX. */
+	private static final String SOAP_FAULT_RESPONSE_SUFFIX = "_SOAP-FAULT";
+	
+	/** System new-line character */
+	private static final String NEW_LINE = System.getProperty("line.separator");
+	
+	/** Arrow used in message prefixes */
+	private static final String ARROW = " -> ";
 
 	/**
 	 * Instantiate the webservice audit interceptor.
@@ -28,14 +40,6 @@ public enum AuditWsInterceptorConfig {
 	AuditWsInterceptorConfig(String title) {
 		this.title = title;
 	}
-
-	/** The class reported as being under audit */
-	private static final Class<WebServiceTemplate> AUDITED = WebServiceTemplate.class;
-	private static final String SOAP_FAULT_RESPONSE_SUFFIX = "_SOAP-FAULT";
-	/** System new-line character */
-	private static final String NEW_LINE = System.getProperty("line.separator");
-	/** Arrow used in message prefixes */
-	private static final String ARROW = " -> ";
 
 	/**
 	 * What class is deemed to be under audit.

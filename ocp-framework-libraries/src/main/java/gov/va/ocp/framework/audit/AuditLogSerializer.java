@@ -56,7 +56,7 @@ public class AuditLogSerializer {
 		if (auditData != null) {
 			try {
 				mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-				mapper.setDateFormat(new SimpleDateFormat(dateFormat, Locale.getDefault()));
+				mapper.setDateFormat(new SimpleDateFormat(dateFormat, Locale.US));
 
 				mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 				mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
@@ -73,7 +73,7 @@ public class AuditLogSerializer {
 				try {
 					auditDetails = auditDataClass.cast(auditData).toString();
 				} catch (Exception e) {
-					LOGGER.error("Error occurred on ClassCast or Custom toString() processing, calling ReflectionToStringBuilder", ex);
+					LOGGER.error("Error occurred on ClassCast or Custom toString() processing, calling ReflectionToStringBuilder", e);
 					auditDetails = ReflectionToStringBuilder.toString(auditData, ToStringStyle.JSON_STYLE, false, false, Object.class);
 				}
 			}

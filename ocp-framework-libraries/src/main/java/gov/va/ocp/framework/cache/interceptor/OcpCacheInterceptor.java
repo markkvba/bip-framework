@@ -21,7 +21,6 @@ import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
-import gov.va.ocp.framework.service.DomainResponse;
 
 /**
  * Audit cache GET operations.
@@ -47,7 +46,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 	/** The {@link AuditLogSerializer} for async logging */
 	@Autowired
-	protected AuditLogSerializer asyncLogging;
+	AuditLogSerializer asyncLogging;
 
 	/**
 	 * Instantiate an OcpCacheInterceptor.
@@ -69,24 +68,18 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	 */
 	@Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
-		DomainResponse domainResponse = null;
 
 		Class<?> underAudit = invocation.getThis().getClass();
 		AuditEventData auditEventData = new AuditEventData(AuditEvents.CACHED_SERVICE_RESPONSE, ACTIVITY, underAudit.getName());
+		
+		Object response = null;
 
 		try {
-			Object returning = super.invoke(invocation);
-			if (returning == null) {
+			response = super.invoke(invocation);
+			if (response == null) {
 				// no response
-				domainResponse = new DomainResponse();
-			} else if (!DomainResponse.class.isAssignableFrom(returning.getClass())) {
-				throw new OcpRuntimeException("",
-						"Object returned from cache is not a DomainResponse. Cached object: "
-								+ ReflectionToStringBuilder.toString(returning),
-						MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
-			} else {
-				domainResponse = (DomainResponse) returning;
-			}
+				response = new Object();
+			} 
 
 			if (LOGGER.isDebugEnabled()) {
 				String prefix = this.getClass().getSimpleName() + ".invoke(..) :: ";
@@ -94,35 +87,34 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 				LOGGER.debug(prefix + "Invoked from: " + invocation.getThis().getClass().getName());
 				LOGGER.debug(prefix + "Invoking method: " + invocation.getMethod().toGenericString());
 				LOGGER.debug(prefix + "  having annotations: " + Arrays.toString(invocation.getStaticPart().getAnnotations()));
-				LOGGER.debug(prefix + "Returning: " + ReflectionToStringBuilder.toString(returning, null, false, false, Object.class));
+				LOGGER.debug(prefix + "Returning: " + ReflectionToStringBuilder.toString(response, null, false, false, Object.class));
 			}
 
 			ResponseAuditData auditData = new ResponseAuditData();
-			auditData.setResponse(domainResponse);
+			auditData.setResponse(response);
+			LOGGER.debug("ResponseAuditData " + auditData);
 			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, auditData, ResponseAuditData.class,
 					MessageSeverity.INFO, null);
-
+			LOGGER.debug("Done ");
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
-			this.handleInternalException(domainResponse, ADVICE_NAME, ACTIVITY, auditEventData, throwable);
+			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 		} finally {
 			LOGGER.debug(ADVICE_NAME + " finished.");
 		}
 
-		return domainResponse;
+		return response;
 	}
 
 	/**
 	 * Standard handling of exceptions that are thrown from within the advice
 	 * (not exceptions thrown by application code).
 	 *
-	 * @param responseToProvider the DomainResponse being returned to the provider
 	 * @param adviceName the name of the advice method in which the exception was thrown
 	 * @param attemptingTo the attempted task that threw the exception
 	 * @param auditEventData the audit event data object
 	 * @param throwable the exception that was thrown
 	 */
-	protected void handleInternalException(final DomainResponse responseToProvider,
-			final String adviceName, final String attemptingTo,
+	protected void handleInternalException(final String adviceName, final String attemptingTo,
 			final AuditEventData auditEventData, final Throwable throwable) {
 
 		try {
@@ -132,10 +124,10 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 					new OcpRuntimeException("", msg,
 							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
 							throwable);
-			writeAuditError(responseToProvider, adviceName, ocpRuntimeException, auditEventData);
+			writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
-			handleAnyRethrownExceptions(responseToProvider, adviceName, e);
+			handleAnyRethrownExceptions(adviceName, e);
 		}
 	}
 
@@ -147,15 +139,12 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	 * @param e
 	 * @return ResponseEntity
 	 */
-	private void handleAnyRethrownExceptions(final DomainResponse responseToProvider,
+	private void handleAnyRethrownExceptions(
 			final String adviceName, final Throwable e) {
 
 		String msg = adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.";
 		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 				msg, e);
-
-		responseToProvider.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.name(),
-				msg, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	/**
@@ -165,14 +154,10 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	 * @param auditEventData
 	 * @return
 	 */
-	private void writeAuditError(final DomainResponse responseToProvider,
-			final String adviceName, final OcpRuntimeException ocpRuntimeException,
+	private void writeAuditError(final String adviceName, final OcpRuntimeException ocpRuntimeException,
 			final AuditEventData auditEventData) {
 
 		LOGGER.error(adviceName + " encountered uncaught exception.", ocpRuntimeException);
-
-		responseToProvider.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-				ocpRuntimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 
 		AuditLogger.error(auditEventData,
 				"Error ServiceMessage: " + ocpRuntimeException.getMessage(),

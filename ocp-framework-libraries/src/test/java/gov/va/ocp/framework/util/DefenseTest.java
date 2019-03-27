@@ -110,6 +110,11 @@ public class DefenseTest {
 	public void testHasTextString() {
 		Defense.hasText("Test Message");
 	}
+	
+	@Test(expected = OcpValidationRuntimeException.class)
+	public void testHasTextStringForException() {
+		Defense.hasText(null);
+	}
 
 	@Test
 	public void testHasTextStringString() {
@@ -120,7 +125,7 @@ public class DefenseTest {
 	public void testHasTextStringStringForException() {
 		try {
 			Defense.hasText("", "Text cannot be blank");
-		} catch (OcpRuntimeException e) {
+		} catch (OcpValidationRuntimeException e) {
 			assertTrue(e.getMessage().equals("Text cannot be blank"));
 		}
 
@@ -145,7 +150,7 @@ public class DefenseTest {
 		try {
 			List<String> dummyList = new ArrayList<String>();
 			Defense.notEmpty(dummyList, "Dummy List cannot be empty");
-		} catch (OcpRuntimeException e) {
+		} catch (OcpValidationRuntimeException e) {
 			assertTrue(e.getMessage().equals("Dummy List cannot be empty"));
 		}
 	}
@@ -176,7 +181,7 @@ public class DefenseTest {
 		try {
 			Defense.isTrue(false, "Boolean condition not met");
 
-		} catch (OcpRuntimeException e) {
+		} catch (OcpValidationRuntimeException e) {
 			assertTrue(e.getMessage().equals("Boolean condition not met"));
 		}
 	}

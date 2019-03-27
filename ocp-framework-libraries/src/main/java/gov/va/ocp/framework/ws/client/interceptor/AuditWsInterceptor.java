@@ -50,24 +50,24 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	}
 
 	@Override
-	public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleRequest(final MessageContext messageContext) {
 		return true;
 	}
 
 	@Override
-	public boolean handleResponse(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleResponse(final MessageContext messageContext) {
 		return true;
 	}
 
 	@Override
-	public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleFault(final MessageContext messageContext) {
 		LOGGER.debug("Executing handleFault(..) with config " + config.name());
 		doAudit(config.faultMetadata(), messageContext.getResponse());
 		return true;
 	}
 
 	@Override
-	public void afterCompletion(MessageContext messageContext, Exception ex) throws WebServiceClientException {
+	public void afterCompletion(final MessageContext messageContext, final Exception ex) {
 		if (!alreadyLogged) {
 			LOGGER.debug("Executing afterCompletion(..) with config " + config.name());
 			// log request
@@ -134,7 +134,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	 * @param e
 	 * @throws RuntimeException
 	 */
-	protected void handleInternalError(AuditEvents event, String activity, Exception e) throws RuntimeException {
+	protected void handleInternalError(final AuditEvents event, final String activity, final Exception e) {
 		RuntimeException rethrowMe = null;
 		String adviceName = this.getClass().getSimpleName() + ".afterCompletion";
 		this.writeAuditError(adviceName, e, new AuditEventData(event, activity, config.auditedName()));
