@@ -4,18 +4,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,6 +24,7 @@ import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.service.aspect.validators.TestRequestValidator;
+import gov.va.ocp.framework.validation.Validator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServiceValidationAspectTest {
@@ -34,7 +33,7 @@ public class ServiceValidationAspectTest {
 	private ProceedingJoinPoint proceedingJoinPoint;
 
 	@Mock
-	gov.va.ocp.framework.validation.Validator<DomainResponse> validator;
+	DomainResponseValidatorForTest validator;
 
 	@Mock
 	private MethodSignature signature;
@@ -174,10 +173,18 @@ public class ServiceValidationAspectTest {
 		}
 	}
 
-	@Ignore // TODO
-	@Test
-	public final void testInvokeValidate() {
-		DomainResponse domainResponse = new DomainResponse();
+	@Test(expected = OcpRuntimeException.class)
+	public final void testHandleExceptions() {
+		ReflectionTestUtils.invokeMethod(aspect, "handleExceptions", Object.class, new IllegalAccessException(), new Object());
+	}
+
+	@Test(expected = OcpRuntimeException.class)
+	public final void testHandleExceptionInAroundAspect() {
+		ReflectionTestUtils.invokeMethod(aspect, "handleExceptionInAroundAspect", new OcpRuntimeException(null, null, null, null));
+	}
+
+	@Test(expected = OcpRuntimeException.class)
+	public final void testValidateRequest() {
 		LinkedList<ServiceMessage> messages = new LinkedList<ServiceMessage>();
 		Method testMethod = null;
 		try {
@@ -187,22 +194,51 @@ public class ServiceValidationAspectTest {
 			fail("unable to find method named testMethod");
 		} catch (SecurityException e) {
 			e.printStackTrace();
-			fail("unable to invoke method named testMethod");
+			fail("unable to find method named testMethod");
 		}
-		Object[] objectsParamArray = new Object[] {};
-		try {
-			ReflectionTestUtils.invokeMethod(aspect, "invokeValidate", validator, domainResponse, messages, testMethod,
-					objectsParamArray);
-
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			fail("unable to invoke method named invokeValidate");
-		}
-		verify(validator, times(1)).initValidate(domainResponse, messages, objectsParamArray);
+		ReflectionTestUtils.invokeMethod(aspect, "validateRequest", new DomainResponse(), messages, testMethod);
 	}
 
 	public void testMethod(final String testParam) {
 		// do nothing
+	}
+
+	public static class DomainResponseValidatorForTest implements Validator<DomainResponse> {
+
+		public DomainResponseValidatorForTest() {
+
+		}
+
+		@Override
+		public void initValidate(final Object toValidate, final List<ServiceMessage> messages, final Object... supplemental) {
+			// do nothing
+
+		}
+
+		@Override
+		public void validate(final DomainResponse toValidate, final List<ServiceMessage> messages) {
+			// do nothing
+
+		}
+
+		@Override
+		public Class<DomainResponse> getValidatedType() {
+			// do nothing
+			return null;
+		}
+
+		@Override
+		public void setCallingMethod(final Method callingMethod) {
+			// do nothing
+
+		}
+
+		@Override
+		public Method getCallingMethod() {
+			// do nothing
+			return null;
+		}
+
 	}
 
 }

@@ -73,7 +73,7 @@ public class AuditLogSerializer {
 				try {
 					auditDetails = auditDataClass.cast(auditData).toString();
 				} catch (Exception e) {
-					LOGGER.error("Error occurred on ClassCast or Custom toString() processing, calling ReflectionToStringBuilder", ex);
+					LOGGER.error("Error occurred on ClassCast or Custom toString() processing, calling ReflectionToStringBuilder", e);
 					auditDetails = ReflectionToStringBuilder.toString(auditData, ToStringStyle.JSON_STYLE, false, false, Object.class);
 				}
 			}

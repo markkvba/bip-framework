@@ -67,7 +67,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void initValidate(Object toValidate, List<ServiceMessage> messages, Object... supplemental) {
+	public void initValidate(final Object toValidate, List<ServiceMessage> messages, final Object... supplemental) {
 		try {
 			this.supplemental = supplemental;
 
@@ -77,7 +77,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 			this.callingMethodName = callingMethod == null ? ""
 					: callingMethod.getDeclaringClass().getSimpleName()
-							+ "." + callingMethod.getName() + ": ";
+					+ "." + callingMethod.getName() + ": ";
 
 			LOGGER.debug("Validating " + (toValidate == null ? "null" : toValidate.getClass().getSimpleName())
 					+ " for " + callingMethodName);
@@ -90,13 +90,10 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 				return;
 			}
 
-			this.toValidateClass = (Class<T>) toValidate.getClass();
-			// check class is correct
-			if (!getValidatedType().isAssignableFrom(this.toValidateClass)) {
-				String msg = callingMethodName + "Validated object '" + toValidate.getClass().getName()
-						+ "' is not of type '" + getValidatedType().getName() + "'";
-				LOGGER.debug(msg);
-				messages.add(new ServiceMessage(MessageSeverity.ERROR, "", msg, HttpStatus.BAD_REQUEST));
+			setToValidateClass(toValidate);
+			// check class is correct (if correct it will not be null)
+			if (this.toValidateClass == null) { // NOSONAR : will always be false
+				handleInvalidClass(toValidate, messages);
 				return;
 			}
 
@@ -104,13 +101,34 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			validate((T) toValidate, messages);
 
 		} catch (Throwable t) { // NOSONAR intentionally broad catch
-			final OcpRuntimeException runtime = ExceptionHandlingUtils.resolveRuntimeException(t);
+			final OcpRuntimeException runtime = resolveRunTimeException(t);
 			if (runtime != null) {
 				throw runtime;
 			} else { 
 				throw t;
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setToValidateClass(final Object toValidate) {
+		this.toValidateClass = null;
+		try {
+			this.toValidateClass = (Class<T>) toValidate.getClass();
+		} catch (Exception e) {
+			LOGGER.debug("Unable to set the type to be validated", e);
+		}
+	}
+
+	private OcpRuntimeException resolveRunTimeException(final Throwable t) {
+		return ExceptionHandlingUtils.resolveRuntimeException(t);
+	}
+
+	private void handleInvalidClass(final Object toValidate, final List<ServiceMessage> messages) {
+		String msg = callingMethodName + "Validated object '" + toValidate.getClass().getName()
+				+ "' is not of type '" + getValidatedType().getName() + "'";
+		LOGGER.debug(msg);
+		messages.add(new ServiceMessage(MessageSeverity.ERROR, "", msg, HttpStatus.BAD_REQUEST));
 	}
 
 	/**

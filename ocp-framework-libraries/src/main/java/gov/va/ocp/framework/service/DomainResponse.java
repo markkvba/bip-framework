@@ -10,12 +10,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
+import gov.va.ocp.framework.transfer.AbstractResponseObject;
 import gov.va.ocp.framework.transfer.DomainTransferObjectMarker;
 
 /**
  * A base Response object capable of representing the payload of a service response.
  */
-public class DomainResponse implements DomainTransferObjectMarker, Serializable {
+public class DomainResponse extends AbstractResponseObject implements DomainTransferObjectMarker, Serializable {
 	private static final long serialVersionUID = -3937937807439785385L;
 
 	/** The serviceMessages. */
@@ -128,49 +129,13 @@ public class DomainResponse implements DomainTransferObjectMarker, Serializable 
 	 * @param severity the severity
 	 * @return true, if successful
 	 */
-	private boolean hasMessagesOfType(final MessageSeverity severity) {
+	protected boolean hasMessagesOfType(final MessageSeverity severity) {
 		for (final ServiceMessage serviceMessage : getMessages()) {
 			if (severity.equals(serviceMessage.getSeverity())) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Checks for fatals.
-	 *
-	 * @return true, if successful
-	 */
-	public final boolean hasFatals() {
-		return hasMessagesOfType(MessageSeverity.FATAL);
-	}
-
-	/**
-	 * Checks for errors.
-	 *
-	 * @return true, if successful
-	 */
-	public final boolean hasErrors() {
-		return hasMessagesOfType(MessageSeverity.ERROR);
-	}
-
-	/**
-	 * Checks for warnings.
-	 *
-	 * @return true, if successful
-	 */
-	public final boolean hasWarnings() {
-		return hasMessagesOfType(MessageSeverity.WARN);
-	}
-
-	/**
-	 * Checks for infos.
-	 *
-	 * @return true, if successful
-	 */
-	public final boolean hasInfos() {
-		return hasMessagesOfType(MessageSeverity.INFO);
 	}
 
 	/**

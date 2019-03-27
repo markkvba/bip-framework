@@ -467,26 +467,30 @@ public class BaseWsClientConfig {
 	protected void addSslContext(final HttpClientBuilder httpClient,
 			final Resource keystoreResource, final String keystorePass, final Resource truststore, final String truststorePass) {
 
-		if (keystoreResource != null && truststore != null) {
+		if ((keystoreResource != null) && (truststore != null)) {
 			// Add SSL
 			try {
 				KeyStore keystore = this.keyStore(keystoreResource, keystorePass.toCharArray());
 
 				SSLContext sslContext =
 						SSLContextBuilder.create()
-								.loadKeyMaterial(keystore, keystorePass.toCharArray())
-								.loadTrustMaterial(truststore.getURL(), truststorePass.toCharArray()).build();
+						.loadKeyMaterial(keystore, keystorePass.toCharArray())
+						.loadTrustMaterial(truststore.getURL(), truststorePass.toCharArray()).build();
 				// use NoopHostnameVerifier to turn off host name verification
 				SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 				httpClient.setSSLSocketFactory(csf);
 
 			} catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException | CertificateException | IOException
 					| UnrecoverableKeyException e) {
-				String msg = "Could not establish SSL context due to " + e.getClass().getSimpleName() + ": " + e.getMessage();
-				LOGGER.error(msg, e);
-				throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+				handleExceptions(e);
 			}
 		}
+	}
+
+	private void handleExceptions(final Exception e) {
+		String msg = "Could not establish SSL context due to " + e.getClass().getSimpleName() + ": " + e.getMessage();
+		LOGGER.error(msg, e);
+		throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 	}
 
 	/**
@@ -500,7 +504,7 @@ public class BaseWsClientConfig {
 	 * @throws CertificateException the certificate exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	private KeyStore keyStore(Resource keystoreResource, char[] pass)
+	private KeyStore keyStore(final Resource keystoreResource, final char[] pass)
 			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		KeyStore keyStore = KeyStore.getInstance("JKS");
 
@@ -525,10 +529,10 @@ public class BaseWsClientConfig {
 	 * @return ClientInterceptor[] - the updated array of interceptors
 	 */
 	@SuppressWarnings("unchecked")
-	private ClientInterceptor[] addAuditLoggingInterceptors(ClientInterceptor[] wsInterceptors) {
+	private ClientInterceptor[] addAuditLoggingInterceptors(final ClientInterceptor[] wsInterceptors) {
 
 		// if no other interceptors run, no need to add "After" audit log
-		boolean logAfter = wsInterceptors != null && wsInterceptors.length > 0;
+		boolean logAfter = (wsInterceptors != null) && (wsInterceptors.length > 0);
 		LOGGER.debug("Initial ClientInterceptors list: " + Arrays.toString(wsInterceptors));
 
 		List<ClientInterceptor> list = new ArrayList<>();
@@ -539,7 +543,7 @@ public class BaseWsClientConfig {
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));
 		} else {
 			LOGGER.debug("Adding audit interceptor only for both " + AuditWsInterceptorConfig.BEFORE.name()
-					+ " and " + AuditWsInterceptorConfig.AFTER.name());
+			+ " and " + AuditWsInterceptorConfig.AFTER.name());
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.BEFORE));
 			list.addAll(Collections.arrayToList(wsInterceptors));
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));

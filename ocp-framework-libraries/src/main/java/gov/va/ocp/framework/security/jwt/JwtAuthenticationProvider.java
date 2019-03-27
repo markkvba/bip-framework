@@ -48,7 +48,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 		final String token = authenticationToken.getToken();// pass this for verification
 
 		final PersonTraits person = parser.parseJwt(token);
-		if (person == null || !isPersonTraitsValid(person, jwtTokenRequiredParameterList)) {
+		if ((person == null) || !isPersonTraitsValid(person, jwtTokenRequiredParameterList)) {
 			throw new JwtAuthenticationException("Invalid Token");
 		}
 		return person;
@@ -68,7 +68,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 	}
 
 	private static boolean checkIfEachParameterIsValid(final PersonTraits person, final String parameter) {
-		for (Method method : PersonTraits.class.getDeclaredMethods()) {
+		for (Method method : PersonTraits.class.getMethods()) {
 			if (method.getName().startsWith("get") && method.getName().substring(3).equalsIgnoreCase(parameter)) {
 				try {
 					return method.invoke(person) instanceof String ? StringUtils.isNotBlank((String) method.invoke(person))
