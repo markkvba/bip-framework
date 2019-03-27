@@ -149,6 +149,11 @@
 					private void validateRequest(final Object object, final List<ServiceMessage> messages, final Method callingMethod) {
 				
 						Class<?> validatorClass = this.resolveValidatorClass(object);
+						
+						if (validatorClass == null) {
+							handleExceptions(validatorClass, 
+									new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
+						}
 				
 						// invoke the validator
 						try {
@@ -157,11 +162,11 @@
 							validator.initValidate(object, messages);
 				
 						} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
-							hanldeExceptions(validatorClass, e, object);
+							handleExceptions(validatorClass, e, object);
 						}
 					}
 				
-					private void hanldeExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
+					private void handleExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
 						// Validator programming issue - throw exception
 						String msg = "Could not find or instantiate class '" + (validatorClass != null ? validatorClass.getName()
 								: "to validate given object of type " + object.getClass().getName()
@@ -189,6 +194,11 @@
 							final Object... requestObjects) {
 				
 						Class<?> validatorClass = this.resolveValidatorClass(object);
+						
+						if (validatorClass == null) {
+							handleExceptions(validatorClass, 
+									new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
+						}
 				
 						// invoke the validator
 						try {
@@ -197,7 +207,7 @@
 							validator.initValidate(object, messages, requestObjects);
 				
 						} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
-							hanldeExceptions(validatorClass, e, object);
+							handleExceptions(validatorClass, e, object);
 						}
 					}
 				
