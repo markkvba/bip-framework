@@ -17,7 +17,7 @@ public class OcpServiceAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public AuditAnnotationAspect myAspect() {
+	public AuditAnnotationAspect auditAnnotationAspect() {
 		return new AuditAnnotationAspect();
 	}
 

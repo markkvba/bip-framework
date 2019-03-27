@@ -71,7 +71,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 		Class<?> underAudit = invocation.getThis().getClass();
 		AuditEventData auditEventData = new AuditEventData(AuditEvents.CACHED_SERVICE_RESPONSE, ACTIVITY, underAudit.getName());
-		
+
 		Object response = null;
 
 		try {
@@ -79,7 +79,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			if (response == null) {
 				// no response
 				response = new Object();
-			} 
+			}
 
 			if (LOGGER.isDebugEnabled()) {
 				String prefix = this.getClass().getSimpleName() + ".invoke(..) :: ";
@@ -95,7 +95,8 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			LOGGER.debug("ResponseAuditData " + auditData);
 			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, auditData, ResponseAuditData.class,
 					MessageSeverity.INFO, null);
-			LOGGER.debug("Done ");
+			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
+
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 		} finally {
