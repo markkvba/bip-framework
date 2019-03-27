@@ -41,7 +41,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	/**
 	 * Instantiate the interceptor to use the given configuration.
 	 *
-	 * @param config
+	 * @param config the config
 	 */
 	public AuditWsInterceptor(AuditWsInterceptorConfig config) {
 		Defense.notNull(config);
@@ -153,9 +153,9 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	/**
 	 * Write into Audit when exceptions occur while attempting to log audit records.
 	 *
-	 * @param rte
-	 * @param auditEventData
-	 * @return
+	 * @param adviceName the advice name
+	 * @param e the exception
+	 * @param auditEventData the audit event data
 	 */
 	protected void writeAuditError(final String adviceName, final Exception e, final AuditEventData auditEventData) {
 		LOGGER.error(adviceName + " encountered uncaught exception.", e);

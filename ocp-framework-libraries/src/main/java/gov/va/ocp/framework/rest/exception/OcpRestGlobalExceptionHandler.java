@@ -166,7 +166,6 @@ public class OcpRestGlobalExceptionHandler {
 	 * @param ex the Exception
 	 * @param key the key to use for reporting to support/maintenance
 	 * @param severity the MessageSeverity to report for the exception
-	 * @param status the status to report for the exception
 	 * @param httpResponseStatus the status to put on the HTTP Response Entity.
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
