@@ -65,13 +65,12 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 			LOGGER.debug("Response: {}", response);
 
 			if (auditableAnnotation != null) {
-				auditEventData = new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
-						auditableAnnotation.auditClass());
 				writeResponseAudit(response, auditEventData, MessageSeverity.INFO, null);
 			}
-		} catch (Throwable e) {
+		} catch (Throwable throwable) {
 			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					"Error while executing auditAnnotationAspect around auditableExecution", e);
+					"Error while executing auditAnnotationAspect around auditableExecution", throwable);
+			throw throwable;
 		}
 		return response;
 	}
