@@ -220,9 +220,9 @@ public class BaseHttpProviderAspect {
 	/**
 	 * Read the first 1024 bytes and convert that into a string.
 	 *
-	 * @param in
-	 * @return
-	 * @throws IOException
+	 * @param in the input stream
+	 * @return the string
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	protected static String convertBytesToString(final InputStream in) throws IOException {
 		int offset = 0;
