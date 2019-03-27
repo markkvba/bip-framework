@@ -107,10 +107,6 @@ public class PersonTraits extends AbstractPersonTraitsObject {
 		this.tokenId = tokenId;
 	}
 
-	public String getUser() {
-		return getFirstName() + " " + getLastName();
-	}
-
 	public boolean hasDodedipnid() {
 		return !StringUtils.isEmpty(dodedipnid);
 	}
