@@ -231,8 +231,8 @@
 							validatorClass = Class.forName(qualifiedValidatorName);
 						} catch (ClassNotFoundException e) {
 							// no validator, return without error
-							LOGGER.debug("Could not find validator class " + qualifiedValidatorName
-									+ " - skipping validation for object " + ReflectionToStringBuilder.toString(object));
+							LOGGER.error("Could not find validator class " + qualifiedValidatorName
+									+ " - skipping validation for object " + ReflectionToStringBuilder.toString(object), e);
 						}
 				
 						return validatorClass;
