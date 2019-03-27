@@ -92,7 +92,6 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 			ResponseAuditData auditData = new ResponseAuditData();
 			auditData.setResponse(response);
-			LOGGER.debug("ResponseAuditData " + auditData);
 			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, auditData, ResponseAuditData.class,
 					MessageSeverity.INFO, null);
 			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
