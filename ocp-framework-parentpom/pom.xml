@@ -299,6 +299,13 @@
 			<plugin>
             	<groupId>pl.project13.maven</groupId>
             	<artifactId>git-commit-id-plugin</artifactId>
+            	<configuration>
+	            	<excludeProperties>
+					    <excludeProperty>git.build.user.*</excludeProperty>
+					    <excludeProperty>git.commit.user.*</excludeProperty>
+					</excludeProperties>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+				</configuration>
        	     </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
