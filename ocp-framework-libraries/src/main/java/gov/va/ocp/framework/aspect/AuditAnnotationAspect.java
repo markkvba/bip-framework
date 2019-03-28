@@ -8,12 +8,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.event.Level;
 
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.Auditable;
-import gov.va.ocp.framework.constants.AnnotationConstants;
-import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -40,6 +37,8 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 	public Object auditAnnotationAspect(final ProceedingJoinPoint joinPoint) throws Throwable {
 		Object response = null;
 		List<Object> request = null;
+		Auditable auditableAnnotation = null;
+		AuditEventData auditEventData = null;
 
 		try {
 			if (joinPoint.getArgs().length > 0) {
@@ -48,9 +47,8 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 
 			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 			LOGGER.debug("Method: {}", method);
-			final Auditable auditableAnnotation = method.getAnnotation(Auditable.class);
+			auditableAnnotation = method.getAnnotation(Auditable.class);
 			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
-			AuditEventData auditEventData = null;
 			if (auditableAnnotation != null) {
 				auditEventData =
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
@@ -62,16 +60,14 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 
 			response = joinPoint.proceed();
 
+		} finally {
 			LOGGER.debug("Response: {}", response);
 
 			if (auditableAnnotation != null) {
 				writeResponseAudit(response, auditEventData, MessageSeverity.INFO, null);
 			}
-		} catch (Throwable throwable) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-					"Error while executing auditAnnotationAspect around auditableExecution", throwable);
-			throw throwable;
 		}
+
 		return response;
 	}
 }

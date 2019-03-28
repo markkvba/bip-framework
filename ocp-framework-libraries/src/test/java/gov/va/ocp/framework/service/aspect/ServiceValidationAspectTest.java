@@ -182,16 +182,6 @@ public class ServiceValidationAspectTest {
 	}
 
 	@Test(expected = OcpRuntimeException.class)
-	public final void testHandleExceptions() {
-		ReflectionTestUtils.invokeMethod(aspect, "handleExceptions", Object.class, new IllegalAccessException(), new Object());
-	}
-
-	@Test(expected = OcpRuntimeException.class)
-	public final void testHandleExceptionInAroundAspect() {
-		ReflectionTestUtils.invokeMethod(aspect, "handleExceptionInAroundAspect", new OcpRuntimeException(null, null, null, null));
-	}
-
-	@Test(expected = OcpRuntimeException.class)
 	public final void testValidateRequest() {
 		LinkedList<ServiceMessage> messages = new LinkedList<ServiceMessage>();
 		Method testMethod = null;
