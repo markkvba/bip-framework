@@ -1,7 +1,11 @@
 package gov.va.ocp.framework.util;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,25 @@ public class DefenseTest {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void testPrivateConstructor() {
+		Constructor<Defense> constructor = null;
+		try {
+			constructor = Defense.class.getDeclaredConstructor(null);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			fail("Should NOT have thrown exception");
+		}
+		constructor.setAccessible(true);
+		try {
+			constructor.newInstance(null);
+			fail("Should have thrown exception");
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			assertNotNull(e);
+			assertTrue(InvocationTargetException.class.isAssignableFrom(e.getClass()));
+			assertTrue(IllegalAccessError.class.isAssignableFrom(e.getCause().getClass()));
+		}
 	}
 
 	@Test
@@ -110,7 +133,7 @@ public class DefenseTest {
 	public void testHasTextString() {
 		Defense.hasText("Test Message");
 	}
-	
+
 	@Test(expected = OcpValidationRuntimeException.class)
 	public void testHasTextStringForException() {
 		Defense.hasText(null);

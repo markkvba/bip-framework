@@ -61,10 +61,10 @@ public class PerformanceLoggingAspect {
 			}
 
 			returnObject = joinPoint.proceed();
-		} catch (Throwable throwable) {
-			LOGGER.error("PerformanceLoggingAspect encountered uncaught exception: " + throwable.getClass().getSimpleName() + ": "
-					+ throwable.getMessage(), throwable);
-			throw throwable;
+//		} catch (Throwable throwable) {
+//			LOGGER.error("PerformanceLoggingAspect encountered uncaught exception: " + throwable.getClass().getSimpleName() + ": "
+//					+ throwable.getMessage(), throwable);
+//			throw throwable;
 		} finally {
 			LOGGER.debug("PerformanceLoggingAspect after method was called.");
 			final long elapsedTime = System.currentTimeMillis() - startTime;
