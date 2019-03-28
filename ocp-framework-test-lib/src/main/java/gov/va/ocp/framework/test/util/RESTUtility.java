@@ -36,7 +36,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import gov.va.ocp.framework.test.service.RESTConfigService;
-import io.restassured.RestAssured;
 
 /**
  * It is a wrapper for rest assured API for making HTTP calls, parse JSON and
@@ -105,7 +104,7 @@ public class RESTUtility {
 	}
 	
 	/**
-	 * Invokes REST end point for a GET method using REST assured API and return
+	 * Invokes REST end point for a GET method using REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
@@ -118,7 +117,7 @@ public class RESTUtility {
 	}
 	
 	/**
-	 * Invokes REST end point for a GET method using REST assured API and return
+	 * Invokes REST end point for a POST method using  REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
@@ -131,12 +130,26 @@ public class RESTUtility {
 		return executeAPI(serviceURL, request, HttpMethod.POST);
 	}
 	
+	/**
+	 * Invokes REST end point for a PUT method using  REST Template API and return
+	 * response JSON object.
+	 *
+	 * @param serviceURL
+	 * @return
+	 */
 	
 	public String putResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
 		HttpEntity<?> request = new HttpEntity<>(headers);				
 		return executeAPI(serviceURL, request, HttpMethod.PUT);	
 	}
+	/**
+	 * Invokes REST end point for a DELETE method using  REST Template API and return
+	 * response JSON object.
+	 *
+	 * @param serviceURL
+	 * @return
+	 */
 	
 	public String deleteResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
@@ -228,7 +241,6 @@ public class RESTUtility {
 	 * @param intStatusCode
 	 */
 	public void validateStatusCode(final int intStatusCode) {
-		//final int actStatusCode = response.getStatusCodeValue();
 		assertThat(httpResponseCode, equalTo(intStatusCode));
 		
 	}
