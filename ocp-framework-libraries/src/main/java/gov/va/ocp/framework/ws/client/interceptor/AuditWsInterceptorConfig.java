@@ -126,7 +126,7 @@ public enum AuditWsInterceptorConfig {
 	 */
 	class ResponseMetadata extends AuditWsMetadata {
 		/** the activity identifier string for the audit event */
-		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
+		final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
 
 		@Override
 		AuditEventData eventData() {
@@ -164,30 +164,11 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class FaultMetadata extends AuditWsMetadata {
+	class FaultMetadata extends ResponseMetadata {
 		/** the activity identifier string for the audit event */
-		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity()
+		final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity()
 				+ SOAP_FAULT_RESPONSE_SUFFIX;
 
-		@Override
-		AuditEventData eventData() {
-			return new AuditEventData(AuditEvents.PARTNER_SOAP_RESPONSE, activity, AUDITED.getName());
-		}
-
-		@Override
-		AuditEvents event() {
-			return AuditEvents.PARTNER_SOAP_RESPONSE;
-		}
-
-		@Override
-		String activity() {
-			return activity;
-		}
-
-		@Override
-		String messagePrefix() {
-			return activity + ARROW + title + " : " + NEW_LINE;
-		}
 	}
 
 	/**

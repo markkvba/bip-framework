@@ -19,7 +19,7 @@ public class OcpBanner {
 	private Level level;
 
 	/** The font file */
-	protected static final String FONT_FILE = "classpath:/flf/digital.flf";
+	public static final String FONT_FILE = "classpath:/flf/digital.flf";
 
 	/**
 	 * Create an ASCII Art representation of some text.

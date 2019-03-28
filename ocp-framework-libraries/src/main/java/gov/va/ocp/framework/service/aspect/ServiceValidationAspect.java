@@ -9,12 +9,10 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.event.Level;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -69,7 +67,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		DomainResponse domainResponse = null;
 
-//		try {
+		//		try {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(this.getClass().getSimpleName() + " executing around method:" + joinPoint.toLongString());
 		}
@@ -102,35 +100,35 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		}
 
 		// if there were no errors, proceed with the actual method
-		if (domainResponse == null || domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty()) {
+		if ((domainResponse == null) || (domainResponse.getMessages() == null) || domainResponse.getMessages().isEmpty()) {
 			domainResponse = (DomainResponse) joinPoint.proceed();
 
 			// only call post-proceed() validation if there are no errors on the response
-			if (domainResponse != null && !(domainResponse.hasErrors() || domainResponse.hasFatals())) {
+			if ((domainResponse != null) && !(domainResponse.hasErrors() || domainResponse.hasFatals())) {
 				validateResponse(domainResponse, domainResponse.getMessages(), method, joinPoint.getArgs());
 			}
 		}
 
-//		} catch (final Throwable throwable) {
-//			handleExceptionInAroundAspect(throwable);
-//		} finally {
-//			LOGGER.debug(this.getClass().getSimpleName() + " after method was called.");
-//		}
+		//		} catch (final Throwable throwable) {
+		//			handleExceptionInAroundAspect(throwable);
+		//		} finally {
+		//			LOGGER.debug(this.getClass().getSimpleName() + " after method was called.");
+		//		}
 
 		return domainResponse;
 
 	}
 
-	private void handleExceptionInAroundAspect(final Throwable throwable) {
-		if (OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
-			throw (OcpRuntimeException) throwable;
-		} else {
-			LOGGER.error(new OcpBanner("Aspect Error", Level.ERROR),
-					this.getClass().getSimpleName() + " encountered " + throwable.getClass().getName() + ": " + throwable.getMessage(),
-					throwable);
-			throw new OcpRuntimeException("", "", MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
-		}
-	}
+	// private void handleExceptionInAroundAspect(final Throwable throwable) {
+	// if (OcpRuntimeException.class.isAssignableFrom(throwable.getClass())) {
+	// throw (OcpRuntimeException) throwable;
+	// } else {
+	// LOGGER.error(new OcpBanner("Aspect Error", Level.ERROR),
+	// this.getClass().getSimpleName() + " encountered " + throwable.getClass().getName() + ": " + throwable.getMessage(),
+	// throwable);
+	// throw new OcpRuntimeException("", "", MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
+	// }
+	// }
 
 	/**
 	 * Locate the {@link Validator} for the request object, and if it exists,
@@ -157,20 +155,25 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		// invoke the validator
 		try {
-			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
-			validator.setCallingMethod(callingMethod);
-			validator.initValidate(object, messages);
+			invokeValidator(object, messages, callingMethod, validatorClass);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleExceptions(validatorClass, e, object);
 		}
 	}
 
+	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
+			final Class<?> validatorClass) throws InstantiationException, IllegalAccessException {
+		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
+		validator.setCallingMethod(callingMethod);
+		validator.initValidate(object, messages);
+	}
+
 	private void handleExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
 		// Validator programming issue - throw exception
 		String msg = "Could not find or instantiate class '" + (validatorClass != null ? validatorClass.getName()
 				: "to validate given object of type " + object.getClass().getName()
-						+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName());
+				+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName());
 		LOGGER.error(msg, e);
 		throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 	}
@@ -202,9 +205,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		// invoke the validator
 		try {
-			Validator<?> validator = (Validator<?>) validatorClass.newInstance();
-			validator.setCallingMethod(callingMethod);
-			validator.initValidate(object, messages, requestObjects);
+			invokeValidator(object, messages, callingMethod, validatorClass);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleExceptions(validatorClass, e, object);
@@ -238,3 +239,4 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		return validatorClass;
 	}
 }
+
