@@ -36,10 +36,6 @@ import gov.va.ocp.framework.service.DomainResponse;
 @RunWith(MockitoJUnitRunner.class)
 public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 
-	private static final String TEST_RETURN_VALUE = "testReturnValue";
-
-	private static final String TEST_STRING_ARGUMENTS = "Test_String1";
-
 	private final OcpLogger providerHttpLog = super.getLogger(ProviderHttpAspect.class);
 
 	private ProviderHttpAspect providerHttpAspect;

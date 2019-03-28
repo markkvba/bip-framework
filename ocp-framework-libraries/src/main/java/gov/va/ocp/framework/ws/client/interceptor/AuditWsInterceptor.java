@@ -41,7 +41,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	/**
 	 * Instantiate the interceptor to use the given configuration.
 	 *
-	 * @param config
+	 * @param config the config
 	 */
 	public AuditWsInterceptor(AuditWsInterceptorConfig config) {
 		Defense.notNull(config);
@@ -50,24 +50,24 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	}
 
 	@Override
-	public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleRequest(final MessageContext messageContext) {
 		return true;
 	}
 
 	@Override
-	public boolean handleResponse(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleResponse(final MessageContext messageContext) {
 		return true;
 	}
 
 	@Override
-	public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
+	public boolean handleFault(final MessageContext messageContext) {
 		LOGGER.debug("Executing handleFault(..) with config " + config.name());
 		doAudit(config.fault(), messageContext.getResponse());
 		return true;
 	}
 
 	@Override
-	public void afterCompletion(MessageContext messageContext, Exception ex) throws WebServiceClientException {
+	public void afterCompletion(final MessageContext messageContext, final Exception ex) {
 		if (!alreadyLogged) {
 			LOGGER.debug("Executing afterCompletion(..) with config " + config.name());
 			// log request
@@ -134,7 +134,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	 * @param e
 	 * @throws RuntimeException
 	 */
-	protected void handleInternalError(AuditEvents event, String activity, Exception e) throws RuntimeException {
+	protected void handleInternalError(final AuditEvents event, final String activity, final Exception e) {
 		RuntimeException rethrowMe = null;
 		String adviceName = this.getClass().getSimpleName() + ".afterCompletion";
 		this.writeAuditError(adviceName, e, new AuditEventData(event, activity, config.auditedName()));
@@ -153,9 +153,9 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	/**
 	 * Write into Audit when exceptions occur while attempting to log audit records.
 	 *
-	 * @param rte
-	 * @param auditEventData
-	 * @return
+	 * @param adviceName the advice name
+	 * @param e the exception
+	 * @param auditEventData the audit event data
 	 */
 	protected void writeAuditError(final String adviceName, final Exception e, final AuditEventData auditEventData) {
 		LOGGER.error(adviceName + " encountered uncaught exception.", e);

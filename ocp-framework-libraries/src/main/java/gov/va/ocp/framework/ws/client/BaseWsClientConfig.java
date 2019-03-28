@@ -11,9 +11,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.soap.MessageFactory;
@@ -43,7 +41,6 @@ import org.springframework.ws.soap.axiom.AxiomSoapMessageFactory;
 import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
-import gov.va.ocp.framework.constants.AnnotationConstants;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
