@@ -8,9 +8,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.event.Level;
 
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.Auditable;
+import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -38,45 +41,37 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 		Object response = null;
 		List<Object> request = null;
 
-//		try {
-		if (joinPoint.getArgs().length > 0) {
-			request = Arrays.asList(joinPoint.getArgs());
+		try {
+			if (joinPoint.getArgs().length > 0) {
+				request = Arrays.asList(joinPoint.getArgs());
+			}
+
+			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+			LOGGER.debug("Method: {}", method);
+			final Auditable auditableAnnotation = method.getAnnotation(Auditable.class);
+			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
+			AuditEventData auditEventData = null;
+			if (auditableAnnotation != null) {
+				auditEventData =
+						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
+								auditableAnnotation.auditClass());
+				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
+
+				writeRequestInfoAudit(request, auditEventData);
+			}
+
+			response = joinPoint.proceed();
+
+			LOGGER.debug("Response: {}", response);
+
+			if (auditableAnnotation != null) {
+				writeResponseAudit(response, auditEventData, MessageSeverity.INFO, null);
+			}
+		} catch (Throwable throwable) {
+			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+					"Error while executing auditAnnotationAspect around auditableExecution", throwable);
+			throw throwable;
 		}
-
-		final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-		LOGGER.debug("Method: {}", method);
-		final Auditable auditableAnnotation = method.getAnnotation(Auditable.class);
-		LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
-		AuditEventData auditEventData = null;
-		if (auditableAnnotation != null) {
-			auditEventData =
-					new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
-							auditableAnnotation.auditClass());
-			LOGGER.debug("AuditEventData: {}", auditEventData.toString());
-
-			writeRequestInfoAudit(request, auditEventData);
-		}
-
-		response = joinPoint.proceed();
-
-		LOGGER.debug("Response: {}", response);
-
-		if (auditableAnnotation != null) {
-			auditEventData = new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
-					auditableAnnotation.auditClass());
-			writeResponseAudit(response, auditEventData, MessageSeverity.INFO, null);
-		}
-//		} catch (Throwable e) {
-//			if (OcpRuntimeException.class.isAssignableFrom(e.getClass())) {
-//				throw (OcpRuntimeException) e;
-//			} else {
-//				LOGGER.error(new OcpBanner("Aspect Error", Level.ERROR),
-//						this.getClass().getSimpleName() + " encountered " + e.getClass().getName() + ": " + e.getMessage(),
-//						e);
-//				throw new OcpRuntimeException("", "", MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
-//			}
-//		}
 		return response;
 	}
-
 }
