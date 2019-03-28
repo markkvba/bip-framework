@@ -149,22 +149,6 @@ public class ServiceValidationAspectTest {
 	}
 
 	@Test
-	public final void testAroundAdviceWhenExceptionIsThrown() {
-		Object[] args = new Object[1];
-		args[0] = new TestRequest();
-
-		try {
-			aspect.aroundAdvice(proceedingJoinPoint);
-			fail("Should throw an exception");
-		} catch (Exception e) {
-			assertTrue(e instanceof OcpRuntimeException);
-		} catch (Throwable e) {
-			fail("Something went wrong");
-		}
-
-	}
-
-	@Test
 	public final void testValidateResponse() {
 		try {
 			ReflectionTestUtils.invokeMethod(aspect, "validateResponse", new DomainResponse(),
@@ -178,6 +162,20 @@ public class ServiceValidationAspectTest {
 			fail("unable to invoke method named testMethod");
 		} catch (OcpRuntimeException e) {
 			assertTrue(e.getMessage().startsWith("Could not find or instantiate class "));
+		}
+	}
+
+	@Test
+	public final void testInvokeValidator() {
+		try {
+			ReflectionTestUtils.invokeMethod(aspect, "invokeValidator", new DomainResponse(), new LinkedList<ServiceMessage>(),
+					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			fail("unable to find method named testMethod");
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			fail("unable to invoke method named testMethod");
 		}
 	}
 

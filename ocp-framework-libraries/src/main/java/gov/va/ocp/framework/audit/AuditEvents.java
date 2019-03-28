@@ -15,6 +15,8 @@ public enum AuditEvents {
 	PARTNER_SOAP_REQUEST("webserviceRequest"),
 	/** Partner client SOAP response event */
 	PARTNER_SOAP_RESPONSE("webserviceResponse"),
+	/** Partner client SOAP response event */
+	PARTNER_SOAP_FAULT("webserviceFault"),
 	/** REST request event at the micro-service application's REST API */
 	API_REST_REQUEST("apiRestRequest"),
 	/** REST response event at the micro-service application's REST API */

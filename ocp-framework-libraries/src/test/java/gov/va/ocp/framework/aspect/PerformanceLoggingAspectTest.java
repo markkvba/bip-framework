@@ -113,8 +113,7 @@ public class PerformanceLoggingAspectTest extends AbstractBaseLogTester {
 			PerformanceLoggingAspect.aroundAdvice(proceedingJoinPoint);
 			fail("Should have thrown exception.");
 		} catch (Throwable e) {
-			assertTrue(super.getAppender().get(0).getMessage().startsWith("Unit Testing"));
-			assertEquals(ch.qos.logback.classic.Level.ERROR, super.getAppender().get(0).getLevel());
+			assertTrue(e.getMessage().startsWith("Unit Testing"));
 		}
 	}
 

@@ -19,16 +19,13 @@ public enum AuditWsInterceptorConfig {
 
 	/** The title string used in the audit message prefix */
 	private String title;
-	
+
 	/** The class reported as being under audit */
 	private static final Class<WebServiceTemplate> AUDITED = WebServiceTemplate.class;
-	
-	/** The Constant SOAP_FAULT_RESPONSE_SUFFIX. */
-	private static final String SOAP_FAULT_RESPONSE_SUFFIX = "_SOAP-FAULT";
-	
+
 	/** System new-line character */
 	private static final String NEW_LINE = System.getProperty("line.separator");
-	
+
 	/** Arrow used in message prefixes */
 	private static final String ARROW = " -> ";
 
@@ -126,7 +123,17 @@ public enum AuditWsInterceptorConfig {
 	 */
 	class ResponseMetadata extends AuditWsMetadata {
 		/** the activity identifier string for the audit event */
-		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
+		private final String activity;
+
+		/** Instantiate default metadata */
+		public ResponseMetadata() {
+			this.activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
+		}
+
+		/** Intended for subclasses to instantiate default metadata */
+		protected ResponseMetadata(AuditEvents auditEvent) {
+			this.activity = auditEvent.getDefaultActivity();
+		}
 
 		@Override
 		AuditEventData eventData() {
@@ -164,29 +171,10 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class FaultMetadata extends AuditWsMetadata {
-		/** the activity identifier string for the audit event */
-		private final String activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity()
-				+ SOAP_FAULT_RESPONSE_SUFFIX;
-
-		@Override
-		AuditEventData eventData() {
-			return new AuditEventData(AuditEvents.PARTNER_SOAP_RESPONSE, activity, AUDITED.getName());
-		}
-
-		@Override
-		AuditEvents event() {
-			return AuditEvents.PARTNER_SOAP_RESPONSE;
-		}
-
-		@Override
-		String activity() {
-			return activity;
-		}
-
-		@Override
-		String messagePrefix() {
-			return activity + ARROW + title + " : " + NEW_LINE;
+	class FaultMetadata extends ResponseMetadata {
+		/** Instantiate with the activity identifier string for the audit event */
+		public FaultMetadata() {
+			super(AuditEvents.PARTNER_SOAP_FAULT);
 		}
 	}
 
