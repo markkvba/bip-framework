@@ -26,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
+import gov.va.ocp.framework.aspect.AuditAnnotationAspect;
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.messages.MessageSeverity;
@@ -53,7 +54,7 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 	private MethodSignature mockSignature;
 
 	@InjectMocks
-	private final LogAnnotatedMethodRequestResponseAspect logAnnotatedAspect = new LogAnnotatedMethodRequestResponseAspect();
+	private final AuditAnnotationAspect logAnnotatedAspect = new AuditAnnotationAspect();
 
 	private final Object[] mockArray = { new Object() };
 
@@ -120,7 +121,7 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 	//
 	// Mockito.lenient().when(joinPoint.getTarget()).thenReturn(new TestClass());
 	// doThrow().when(providerHttpAspect).writeRequestInfoAudit(Arrays.asList(new Object[] {}),
-	// new AuditEventData(AuditEvents.REST_REQUEST, mockSignature.getName(), mockSignature.getDeclaringType().getName()));
+	// new AuditEventData(AuditEvents.API_REST_REQUEST, mockSignature.getName(), mockSignature.getDeclaringType().getName()));
 	//
 	// providerHttpAspect.beforeAuditAdvice(joinPoint);
 	// } catch (final Throwable throwable) {

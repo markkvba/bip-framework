@@ -70,10 +70,13 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return String the message
 	 */
 	private String deriveMessage(Exception ex) {
-		return ex == null ? NO_MESSAGE
-				: StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
-				? ex.getCause().getMessage()
-						: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
+		if (ex == null) {
+			return NO_MESSAGE;
+		} else {
+			return StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
+					? ex.getCause().getMessage()
+							: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
+		}
 	}
 
 	/**

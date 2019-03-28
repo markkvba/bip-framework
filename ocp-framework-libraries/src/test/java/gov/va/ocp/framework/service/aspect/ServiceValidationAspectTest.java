@@ -85,6 +85,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNull(returned);
@@ -103,6 +105,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNull(returned);
@@ -127,6 +131,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNotNull(returned);
@@ -140,20 +146,6 @@ public class ServiceValidationAspectTest {
 				returned.getMessages().get(0).getText()));
 		assertTrue(TestRequestValidator.STATUS.equals(
 				returned.getMessages().get(0).getHttpStatus()));
-	}
-
-	@Test
-	public final void testAroundAdviceWhenExceptionIsThrown() {
-		Object[] args = new Object[1];
-		args[0] = new TestRequest();
-
-		try {
-			aspect.aroundAdvice(proceedingJoinPoint);
-			fail("Should throw an exception");
-		} catch (Exception e) {
-			assertTrue(e instanceof OcpRuntimeException);
-		}
-
 	}
 
 	@Test
@@ -173,14 +165,18 @@ public class ServiceValidationAspectTest {
 		}
 	}
 
-	@Test(expected = OcpRuntimeException.class)
-	public final void testHandleExceptions() {
-		ReflectionTestUtils.invokeMethod(aspect, "handleExceptions", Object.class, new IllegalAccessException(), new Object());
-	}
-
-	@Test(expected = OcpRuntimeException.class)
-	public final void testHandleExceptionInAroundAspect() {
-		ReflectionTestUtils.invokeMethod(aspect, "handleExceptionInAroundAspect", new OcpRuntimeException(null, null, null, null));
+	@Test
+	public final void testInvokeValidator() {
+		try {
+			ReflectionTestUtils.invokeMethod(aspect, "invokeValidator", new DomainResponse(), new LinkedList<ServiceMessage>(),
+					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			fail("unable to find method named testMethod");
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			fail("unable to invoke method named testMethod");
+		}
 	}
 
 	@Test(expected = OcpRuntimeException.class)

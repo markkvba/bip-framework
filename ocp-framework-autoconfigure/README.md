@@ -11,7 +11,7 @@ OCP Framework Autoconfigure Project is a suite of POM files that provides applic
 	
     		@Bean
     		@ConditionalOnMissingBean
-    		public AuditLogSerializer requestResponseAsyncLogging() {
+    		public AuditLogSerializer auditLogSerializer() {
        		 return new AuditLogSerializer();
     		}
 	}
