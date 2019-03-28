@@ -65,6 +65,12 @@
 			<artifactId>cucumber-picocontainer</artifactId>
 			<version>${cucumber.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>		
+		</dependency>
+		
 
 		<!-- Rest assured library Dependencies -->
 		<dependency>
