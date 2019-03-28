@@ -98,6 +98,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
+			throw throwable;
 		} finally {
 			LOGGER.debug(ADVICE_NAME + " finished.");
 		}

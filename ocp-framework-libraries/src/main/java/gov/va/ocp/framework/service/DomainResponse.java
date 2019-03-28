@@ -139,16 +139,18 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	}
 
 	/**
+	 * Checks if is do not cache response.
 	 *
-	 * @return
+	 * @return true, if is do not cache response
 	 */
 	public boolean isDoNotCacheResponse() {
 		return doNotCacheResponse;
 	}
 
 	/**
+	 * Sets the do not cache response.
 	 *
-	 * @param doNotcacheResponse
+	 * @param doNotCacheResponse the new do not cache response
 	 */
 	public void setDoNotCacheResponse(final boolean doNotCacheResponse) {
 		this.doNotCacheResponse = doNotCacheResponse;

@@ -113,6 +113,6 @@ ocp-framework-parentpom/pom.xml
 	
 Run command to deploy and upload artifacts to the repository
 	
-	mvn clean deploy -Plocal-deploy -DrepositoryName=bip-ocp-framework -DrepositoryOwner=EPMO 
+     mvn clean deploy -Plocal-deploy -DrepositoryName=bip-ocp-framework -DrepositoryOwner=EPMO 
          -- OR --
-        mvn clean deploy -Plocal-deploy -DrepositoryName=ocp-framework -DrepositoryOwner=department-of-veterans-affairs
+     mvn clean deploy -Plocal-deploy -DrepositoryName=ocp-framework -DrepositoryOwner=department-of-veterans-affairs

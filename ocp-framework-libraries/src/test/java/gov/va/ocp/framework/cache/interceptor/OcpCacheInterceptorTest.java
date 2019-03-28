@@ -2,7 +2,6 @@ package gov.va.ocp.framework.cache.interceptor;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
@@ -105,22 +104,10 @@ public class OcpCacheInterceptorTest {
 		assertTrue(((DomainResponse) ret).getMessages().isEmpty());
 	}
 
-	@Test
-	public final void testHandleInternalException() {
+	@Test (expected = Throwable.class)
+	public final void testHandleInternalException() throws Throwable {
 		BrokenTestInvocation testInvocation = new BrokenTestInvocation();
 
-		try {
-			ocpCacheInterceptor.invoke(testInvocation);
-		} catch (Throwable e) {
-			fail("Should not have thrown exception");
-			e.printStackTrace();
-		}
+		ocpCacheInterceptor.invoke(testInvocation);
 	}
-
-//	@Test
-//	public final void testHandleAnyRethrownExceptions() {
-//		OcpCacheInterceptor spied = spy(ocpCacheInterceptor);
-//		when(spied).
-//	}
-
 }

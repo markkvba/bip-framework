@@ -85,6 +85,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNull(returned);
@@ -103,6 +105,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNull(returned);
@@ -127,6 +131,8 @@ public class ServiceValidationAspectTest {
 			cce.printStackTrace();
 			fail("Could not cast Object from aroundAdvice to DomainResponse: "
 					+ cce.getClass().getSimpleName() + " - " + cce.getMessage());
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 		assertNotNull(returned);
@@ -152,6 +158,8 @@ public class ServiceValidationAspectTest {
 			fail("Should throw an exception");
 		} catch (Exception e) {
 			assertTrue(e instanceof OcpRuntimeException);
+		} catch (Throwable e) {
+			fail("Something went wrong");
 		}
 
 	}
