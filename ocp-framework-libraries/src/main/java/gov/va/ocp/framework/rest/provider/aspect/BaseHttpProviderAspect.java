@@ -163,20 +163,14 @@ public class BaseHttpProviderAspect {
 				|| contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/mixed"))) {
 			final List<String> attachmentTextList = new ArrayList<>();
 			InputStream inputstream = null;
-			// NOSONAR try (ByteArrayInputStream partTooBigMessage =
-			// NOSONAR new ByteArrayInputStream("This part of the request is too big to be displayed.".getBytes())) {
 			try {
 				for (final Part part : httpServletRequest.getParts()) {
 					final Map<String, String> partHeaders = new HashMap<>();
 					populateHeadersMap(part, partHeaders, part.getHeaderNames());
 					inputstream = part.getInputStream();
-					// NOSONAR if (inputstream.available() > gov.va.ocp.framework.log.OcpBaseLogger.MAX_MSG_LENGTH) {
-					// NOSONAR inputstream.close();
-					// NOSONAR inputstream = partTooBigMessage;
-					// NOSONAR }
+					
 					attachmentTextList.add(partHeaders.toString() + ", " + convertBytesToString(inputstream));
 					closeInputStreamIfRequired(inputstream);
-					// NOSONAR IOUtils.closeQuietly(partTooBigMessage);
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
