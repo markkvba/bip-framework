@@ -15,8 +15,8 @@ public class OcpExceptionConstantsTest {
 		try {
 			Constructor<OcpExceptionConstants> constructor = OcpExceptionConstants.class.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			OcpExceptionConstants foo = constructor.newInstance();
-			assertNotNull(foo);
+			OcpExceptionConstants ocpExceptionConstants = constructor.newInstance();
+			assertNotNull(ocpExceptionConstants);
 		} catch (NoSuchMethodException e) {
 			fail("Exception not expected");
 		} catch (SecurityException e) {
