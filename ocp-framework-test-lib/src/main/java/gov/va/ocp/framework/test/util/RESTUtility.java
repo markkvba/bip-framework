@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -17,10 +19,15 @@ import javax.net.ssl.SSLContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +35,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
@@ -171,11 +179,12 @@ public class RESTUtility {
 		}		
 	}
 	
+	
+	
 	private RestTemplate getRestTemplate() {
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		if (StringUtils.isBlank(pathToKeyStore)) {
-			return new RestTemplate();
-		} else {
+		RestTemplate restTemplate = new RestTemplate();
+		if (StringUtils.isNotBlank(pathToKeyStore)) {
 			KeyStore keyStore = null;
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
 
@@ -188,14 +197,55 @@ public class RESTUtility {
 			    SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 			    HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
 			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-			    return new RestTemplate(requestFactory);				
+			    restTemplate = new RestTemplate(requestFactory);				
 			} catch (Exception e) {
 				LOGGER.error("Issue with the certificate or password", e);
 			}			
 		}
-		return null;
+		restTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
+		restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+		return restTemplate;
 	}
 		
+	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
+		int connectionTimeout = 20000;
+		String connectionBufferSize = "4128";
+		String maxTotalPool = "10";
+		String defaultMaxPerRoutePool = "5";
+		String validateAfterInactivityPool = "10000";
+		String readTimeout = "30000";
+		ConnectionConfig connectionConfig = ConnectionConfig.custom()
+				.setBufferSize(Integer.valueOf(connectionBufferSize))
+				.build();
+		HttpClientBuilder clientBuilder = HttpClients.custom();
+		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
+		                                                                                                        // shut down the connection pool only if exclusively owned by the client
+		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
+		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
+		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
+
+		clientBuilder.setConnectionManager(poolingConnectionManager);
+		clientBuilder.setDefaultConnectionConfig(connectionConfig);
+		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
+			@Override
+			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
+				if (exception instanceof org.apache.http.NoHttpResponseException) {
+					LOGGER.warn("No response from server on " + executionCount + " call");
+					return true;
+				}
+				return super.retryRequest(exception, executionCount, context);
+			}
+
+		});
+
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
+				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
+		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
+		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
+		return clientHttpRequestFactory;
+	}
 	
 	/**
 	 * Loads the expected results from source folder and returns as string.
@@ -241,7 +291,7 @@ public class RESTUtility {
 	 * @param intStatusCode
 	 */
 	public void validateStatusCode(final int intStatusCode) {
-		assertThat(httpResponseCode, equalTo(intStatusCode));
+	   assertThat(httpResponseCode, equalTo(intStatusCode));
 		
 	}
 
