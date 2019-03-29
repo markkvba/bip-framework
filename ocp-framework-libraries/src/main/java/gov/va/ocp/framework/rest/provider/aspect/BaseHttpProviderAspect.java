@@ -175,9 +175,7 @@ public class BaseHttpProviderAspect {
 					// NOSONAR inputstream = partTooBigMessage;
 					// NOSONAR }
 					attachmentTextList.add(partHeaders.toString() + ", " + convertBytesToString(inputstream));
-					if (inputstream != null) {
-						inputstream.close();
-					}
+					closeInputStreamIfRequired(inputstream);
 					// NOSONAR IOUtils.closeQuietly(partTooBigMessage);
 				}
 			} catch (final Exception ex) {
@@ -196,6 +194,12 @@ public class BaseHttpProviderAspect {
 			}
 			requestAuditData.setAttachmentTextList(attachmentTextList);
 			requestAuditData.setRequest(null);
+		}
+	}
+
+	private void closeInputStreamIfRequired(InputStream inputstream) throws IOException {
+		if (inputstream != null) {
+			inputstream.close();
 		}
 	}
 
