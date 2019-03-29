@@ -21,7 +21,7 @@ public class OcpPropertySourcesPlaceholderConfigurer extends PropertySourcesPlac
 	private ConfigurableEnvironment configurableEnvironment;
 
 	/** The property source resolver wss. */
-	private final OcpPropertySourcesPropertyResolver propertySourceResolverWss = new OcpPropertySourcesPropertyResolver();
+	private final OcpPropertySourcesPropertyResolver propertySourceResolver = new OcpPropertySourcesPropertyResolver();
 
 	/**
 	 * Gets the active profiles.
@@ -47,7 +47,7 @@ public class OcpPropertySourcesPlaceholderConfigurer extends PropertySourcesPlac
 	 * @return the property info
 	 */
 	public final List<PropertyFileHolder> getPropertyInfo() {
-		return propertySourceResolverWss.getPropertyFileHolders();
+		return propertySourceResolver.getPropertyFileHolders();
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class OcpPropertySourcesPlaceholderConfigurer extends PropertySourcesPlac
 	 * @return the property source resolver wss
 	 */
 	public final OcpPropertySourcesPropertyResolver getPropertySourceResolverWss() {
-		return propertySourceResolverWss;
+		return propertySourceResolver;
 	}
 
 	/**
@@ -78,9 +78,9 @@ public class OcpPropertySourcesPlaceholderConfigurer extends PropertySourcesPlac
 	@Override
 	protected final void processProperties(final ConfigurableListableBeanFactory beanFactoryToProcess,
 			final ConfigurablePropertyResolver propertyResolver) {
-		propertySourceResolverWss.setPropertySourcesPropertyResolver(propertyResolver);
-		propertySourceResolverWss.setPropertySources(configurableEnvironment.getPropertySources());
-		super.processProperties(beanFactoryToProcess, propertySourceResolverWss);
+		propertySourceResolver.setPropertySourcesPropertyResolver(propertyResolver);
+		propertySourceResolver.setPropertySources(configurableEnvironment.getPropertySources());
+		super.processProperties(beanFactoryToProcess, propertySourceResolver);
 
 	}
 

@@ -1,6 +1,7 @@
 package gov.va.ocp.framework.cache.interceptor;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -8,6 +9,7 @@ import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheInterceptor;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.audit.AuditEventData;
@@ -43,6 +45,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	/**  */
 	private static final String ADVICE_NAME = "invokeOcpCacheInterceptor";
 	private static final String ACTIVITY = "cacheInvoke";
+
+	@Autowired
+	MessageSource messageSource;
 
 	/** The {@link AuditLogSerializer} for async logging */
 	@Autowired
@@ -96,6 +101,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 					MessageSeverity.INFO, null);
 			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
 
+			String key = "ocp.audit.cache.error";
+			String msg = messageSource.getMessage(key, new Object[] { ADVICE_NAME, ACTIVITY }, Locale.getDefault());
+			throw new OcpRuntimeException(key, msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 			throw throwable;
@@ -103,7 +111,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			LOGGER.debug(ADVICE_NAME + " finished.");
 		}
 
-		return response;
+//		return response;
 	}
 
 	/**
@@ -119,7 +127,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			final AuditEventData auditEventData, final Throwable throwable) {
 
 		try {
-			String msg = adviceName + " - Exception occured while attempting to " + attemptingTo + ".";
+			String msg = messageSource.getMessage("ocp.audit.cache.error",
+					new Object[] { adviceName, attemptingTo }, Locale.getDefault());
+//			String msg = adviceName + " - Exception occured while attempting to " + attemptingTo + ".";
 			LOGGER.error(msg, throwable);
 			final OcpRuntimeException ocpRuntimeException =
 					new OcpRuntimeException("", msg,

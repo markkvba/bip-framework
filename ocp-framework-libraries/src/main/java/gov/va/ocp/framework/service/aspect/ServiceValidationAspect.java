@@ -133,7 +133,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		// Validator programming issue - throw exception
 		String msg = "Could not find or instantiate class '" + (validatorClass != null ? validatorClass.getName()
 				: "to validate given object of type " + object.getClass().getName()
-				+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName());
+						+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName());
 		LOGGER.error(msg, e);
 		throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 	}
@@ -161,20 +161,21 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 					new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
 		}
 
-		// invoke the validator
+		// invoke the validator - null supplemental objects
 		try {
-			invokeValidator(object, messages, callingMethod, validatorClass);
+			invokeValidator(object, messages, null, callingMethod, validatorClass);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleValidatorInstantiationExceptions(validatorClass, e, object);
 		}
 	}
 
-	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
+	private void invokeValidator(final Object object, final List<ServiceMessage> messages, Object[] supplemental,
+			final Method callingMethod,
 			final Class<?> validatorClass) throws InstantiationException, IllegalAccessException {
 		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
 		validator.setCallingMethod(callingMethod);
-		validator.initValidate(object, messages);
+		validator.initValidate(object, messages, supplemental);
 	}
 
 	// private void handleExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
@@ -213,7 +214,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		// invoke the validator
 		try {
-			invokeValidator(object, messages, callingMethod, validatorClass);
+			invokeValidator(object, messages, requestObjects, callingMethod, validatorClass);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleValidatorInstantiationExceptions(validatorClass, e, object);
@@ -247,4 +248,3 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		return validatorClass;
 	}
 }
-
