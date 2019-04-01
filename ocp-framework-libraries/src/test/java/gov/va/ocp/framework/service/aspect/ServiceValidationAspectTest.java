@@ -169,7 +169,7 @@ public class ServiceValidationAspectTest {
 	public final void testInvokeValidator() {
 		try {
 			ReflectionTestUtils.invokeMethod(aspect, "invokeValidator", new DomainResponse(), new LinkedList<ServiceMessage>(),
-					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class);
+					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class, new Object[] {});
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 			fail("unable to find method named testMethod");

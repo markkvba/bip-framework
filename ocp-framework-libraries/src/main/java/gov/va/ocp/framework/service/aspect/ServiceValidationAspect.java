@@ -181,10 +181,10 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	}
 
 	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
-			final Class<?> validatorClass) throws InstantiationException, IllegalAccessException {
+			final Class<?> validatorClass, final Object... requestObjects) throws InstantiationException, IllegalAccessException {
 		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
 		validator.setCallingMethod(callingMethod);
-		validator.initValidate(object, messages);
+		validator.initValidate(object, messages, requestObjects);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 		// invoke the validator
 		try {
-			invokeValidator(object, messages, callingMethod, validatorClass);
+			invokeValidator(object, messages, callingMethod, validatorClass, requestObjects);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleValidatorInstantiationExceptions(validatorClass, e, object);

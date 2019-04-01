@@ -130,29 +130,6 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 		messages.add(new ServiceMessage(MessageSeverity.ERROR, "", msg, HttpStatus.BAD_REQUEST));
 	}
 
-	/**
-	 * Call the validate method on the validator for model object T.
-	 * <p>
-	 * This implementation pre-validates the following conditions of the {@code toValidate} parameter for you:
-	 * <ul>
-	 * <li>Stash any supplemental objects for retrieval by {@link #getSupplemental()} and {@link #getSupplemental(Class)}.<br/>
-	 * Examples of supplemental objects: while validating a response object, the request object is added as a supplemental in case it
-	 * is
-	 * needed.
-	 * <li>Stash the calling {@link Method} (if provided) for retrieval by {@link #getCallingMethod()} and
-	 * {@link #getCallingMethodName()}
-	 * <li>Null check the {@code toValidate} parameter. If the null check fails, returns with message ({@link #validate(Object, List)}
-	 * method is never called)
-	 * <li>Class of the toValidate parameter verified to be correct. If it fails, returns with message ({@link #validate(Object, List)}
-	 * method is never called)
-	 * <li>messages parameter null checked and list initialized if necessary
-	 * </ul>
-	 *
-	 * @see Validator
-	 */
-	@Override
-	public abstract void validate(T toValidate, List<ServiceMessage> messages);
-
 	/*
 	 * (non-Javadoc)
 	 * 
