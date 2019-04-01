@@ -26,7 +26,7 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see feign.codec.ErrorDecoder#decode(java.lang.String, feign.Response)
 	 */
 	@Override
@@ -60,7 +60,7 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 
 			} catch (JSONException e) {
 				LOGGER.debug(
-						"Could not, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
+						"Could not interpret response body, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
 						e);
 				return defaultErrorDecoder.decode(methodKey, response);
 			}

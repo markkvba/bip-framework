@@ -23,6 +23,7 @@ import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.messages.MessageSeverity;
+import gov.va.ocp.framework.messages.MessageKeys;
 
 /**
  * Audit cache GET operations.
@@ -101,9 +102,11 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 					MessageSeverity.INFO, null);
 			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
 
-			String key = "ocp.audit.cache.error";
-			String msg = messageSource.getMessage(key, new Object[] { ADVICE_NAME, ACTIVITY }, Locale.getDefault());
-			throw new OcpRuntimeException(key, msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+//			String key = "ocp.audit.cache.error";
+//			String msg = messageSource.getMessage(key, new Object[] { ADVICE_NAME, ACTIVITY }, Locale.getDefault());
+			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR.getKey(),
+					MessageKeys.OCP_AUDIT_CACHE_ERROR.getMessage(null), MessageSeverity.FATAL,
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 			throw throwable;
