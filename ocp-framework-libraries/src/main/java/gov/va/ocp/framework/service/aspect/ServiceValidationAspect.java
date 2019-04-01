@@ -171,18 +171,17 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 					new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
 		}
 
-		// invoke the validator - null supplemental objects
+		// invoke the validator - no supplemental objects
 		try {
-			invokeValidator(object, messages, null, callingMethod, validatorClass);
+			invokeValidator(object, messages, callingMethod, validatorClass);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleValidatorInstantiationExceptions(validatorClass, e, object);
 		}
 	}
 
-	private void invokeValidator(final Object object, final List<ServiceMessage> messages, Object[] supplemental,
-			final Method callingMethod,
-			final Class<?> validatorClass) throws InstantiationException, IllegalAccessException {
+	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
+			final Class<?> validatorClass, Object... supplemental) throws InstantiationException, IllegalAccessException {
 		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
 		validator.setCallingMethod(callingMethod);
 		validator.initValidate(object, messages, supplemental);
@@ -213,9 +212,9 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 					new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
 		}
 
-		// invoke the validator
+		// invoke the validator, sned request objects as well
 		try {
-			invokeValidator(object, messages, requestObjects, callingMethod, validatorClass);
+			invokeValidator(object, messages, callingMethod, validatorClass, requestObjects);
 
 		} catch (InstantiationException | IllegalAccessException | NullPointerException e) {
 			handleValidatorInstantiationExceptions(validatorClass, e, object);

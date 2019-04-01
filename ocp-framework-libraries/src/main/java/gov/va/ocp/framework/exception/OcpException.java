@@ -82,6 +82,6 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 
 	@Override                        //NOSONAR
 	public String getServerName() {  //NOSONAR
-		return OcpExceptionConstants.SERVER_NAME;          //NOSONAR
+		return System.getProperty("server.name");          //NOSONAR
 	}                                //NOSONAR
 }

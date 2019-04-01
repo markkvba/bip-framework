@@ -82,7 +82,7 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 
 	@Override                        //NOSONAR
 	public String getServerName() {  //NOSONAR
-		return OcpExceptionConstants.SERVER_NAME;          //NOSONAR
+		return System.getProperty("server.name");          //NOSONAR
 	}                                //NOSONAR
 
 }
