@@ -28,6 +28,7 @@ import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 
@@ -40,6 +41,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private JwtAuthenticationProperties jwtAuthenticationProperties;
 
 	private static final OcpLogger LOG = OcpLoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
+	private static final String TOKEN_TAMPERED = "Tampered Token";
+	private static final String TOKEN_MALFORMED = "Malformed Token";
 
 	/**
 	 * Create the filter.
@@ -62,22 +66,24 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws IOException, ServletException {
 		String token = request.getHeader(jwtAuthenticationProperties.getHeader());
 		if (token == null || !token.startsWith("Bearer ")) {
-			LOG.error("No JWT Token in Header");
-			throw new JwtAuthenticationException("No JWT Token in Header");
+			LOG.error(MessageKeys.OCP_SECURITY_TOKEN_BLANK.getMessage());
+			throw new JwtAuthenticationException(MessageKeys.OCP_SECURITY_TOKEN_BLANK.getMessage());
 		}
 
 		token = token.substring(7);
 
 		try {
 			return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
-		} catch (SignatureException signatureException) {
-			writeAuditForJwtTokenErrors(new StringBuffer("Tampered Token[").append(token).append("]\nSignatureException[")
-					.append(signatureException.getMessage()).append("]\n").toString(), request, signatureException);
-			throw new JwtAuthenticationException("Tampered Token");
+		} catch (SignatureException se) {
+			String msg = MessageKeys.OCP_SECURITY_TOKEN_BROKEN.getMessage(TOKEN_TAMPERED, token,
+					se.getClass().getSimpleName(), se.getMessage());
+			writeAuditForJwtTokenErrors(msg, request, se);
+			throw new JwtAuthenticationException(TOKEN_TAMPERED, se);
 		} catch (MalformedJwtException ex) {
-			writeAuditForJwtTokenErrors(new StringBuffer("Malformed Token[").append(token).append(" ]\nMalformedJwtException[")
-					.append(ex.getMessage()).append("]\n").toString(), request, ex);
-			throw new JwtAuthenticationException("Malformed Token");
+			String msg = MessageKeys.OCP_SECURITY_TOKEN_BROKEN.getMessage(TOKEN_MALFORMED, token,
+					ex.getClass().getSimpleName(), ex.getMessage());
+			writeAuditForJwtTokenErrors(msg, request, ex);
+			throw new JwtAuthenticationException(TOKEN_MALFORMED);
 		}
 	}
 
@@ -101,8 +107,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		AuditLogger.error(auditData, data, t);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#successfulAuthentication(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain, org.springframework.security.core.Authentication)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#successfulAuthentication(javax.servlet.
+	 * http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain,
+	 * org.springframework.security.core.Authentication)
 	 */
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
@@ -111,16 +122,20 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 		chain.doFilter(request, response);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.springframework.security.core.AuthenticationException)
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication(javax.servlet.
+	 * http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.springframework.security.core.AuthenticationException)
 	 */
 	@Override
 	public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-	  
+
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getLocalizedMessage()); 
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getLocalizedMessage());
 	}
 }
 

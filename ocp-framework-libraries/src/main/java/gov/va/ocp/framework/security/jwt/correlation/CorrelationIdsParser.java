@@ -5,9 +5,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.PersonTraits;
 
@@ -38,7 +40,7 @@ public class CorrelationIdsParser {
 	 * This class is not meant to be instantiated since it all it has are utility methods for parsing correlation Ids
 	 */
 	private CorrelationIdsParser() {
-		throw new IllegalStateException("Utility class for parsing correlation Ids");
+		throw new IllegalStateException(CorrelationIdsParser.class.getSimpleName() + OcpConstants.ILLEGALSTATE_STATICS);
 	}
 
 	/**
@@ -65,9 +67,9 @@ public class CorrelationIdsParser {
 	private static void processToken(final String token, final PersonTraits personTraits) {
 		// split a single correlation id into its component parts
 		if (StringUtils.isBlank(token)) {
-			String msg = "Cannot process blank correlation id";
-			LOGGER.error(msg);
-			throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+			MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_CORRELATIONID_BLANK;
+			LOGGER.error(key.getMessage(null));
+			throw new OcpRuntimeException(key.getKey(), key.getMessage(null), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 		final String[] tokens = token.split("\\^");
 
@@ -88,10 +90,10 @@ public class CorrelationIdsParser {
 			personTraits.setPnid(tokens[INDEX_ID]);
 
 		} else {
-			String msg = "Invalid number of elements {} in correlation id {}, should be " + ELEMENT_MAX_COUNT
-					+ " or " + ELEMENT_SS_COUNT + tokens.length + ", " + token;
+			MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_CORRELATIONID_INVALID;
+			String msg = key.getMessage(new Object[] { ELEMENT_SS_COUNT, ELEMENT_MAX_COUNT });
 			LOGGER.error(msg);
-			throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+			throw new OcpRuntimeException(key.getKey(), msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 	}
 
