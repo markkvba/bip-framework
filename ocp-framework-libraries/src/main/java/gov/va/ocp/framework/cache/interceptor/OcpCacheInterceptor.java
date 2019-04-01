@@ -1,7 +1,6 @@
 package gov.va.ocp.framework.cache.interceptor;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -17,13 +16,13 @@ import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.audit.ResponseAuditData;
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
-import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
  * Audit cache GET operations.
@@ -104,8 +103,8 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 //			String key = "ocp.audit.cache.error";
 //			String msg = messageSource.getMessage(key, new Object[] { ADVICE_NAME, ACTIVITY }, Locale.getDefault());
-			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR.getKey(),
-					MessageKeys.OCP_AUDIT_CACHE_ERROR.getMessage(null), MessageSeverity.FATAL,
+			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED.getKey(),
+					MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED.getMessage(null), MessageSeverity.FATAL,
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
@@ -130,14 +129,12 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			final AuditEventData auditEventData, final Throwable throwable) {
 
 		try {
-			String msg = messageSource.getMessage("ocp.audit.cache.error",
-					new Object[] { adviceName, attemptingTo }, Locale.getDefault());
-//			String msg = adviceName + " - Exception occured while attempting to " + attemptingTo + ".";
+			MessageKeys key = MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED;
+			String msg = key.getMessage(new Object[] { adviceName, attemptingTo });
+
 			LOGGER.error(msg, throwable);
-			final OcpRuntimeException ocpRuntimeException =
-					new OcpRuntimeException("", msg,
-							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
-							throwable);
+			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(key.getKey(), msg,
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 			writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
@@ -157,7 +154,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			final String adviceName, final Throwable e) {
 
 		String msg = adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.";
-		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+		LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 				msg, e);
 	}
 

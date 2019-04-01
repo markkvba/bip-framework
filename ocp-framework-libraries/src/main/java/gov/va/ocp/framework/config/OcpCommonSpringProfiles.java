@@ -1,7 +1,9 @@
 package gov.va.ocp.framework.config;
 
+import gov.va.ocp.framework.constants.OcpConstants;
+
 /**
- * Constants to store the profiles commonly used in the applications.
+ * OcpConstants to store the profiles commonly used in the applications.
  *
  */
 public final class OcpCommonSpringProfiles {
@@ -81,7 +83,10 @@ public final class OcpCommonSpringProfiles {
 	 */
 	public static final String NOT_PROFILE_EMBEDDED_AWS = "!embedded-aws";
 
-	OcpCommonSpringProfiles() {
-		throw new IllegalStateException("Utility class");
+	/**
+	 * Do not instantiate.
+	 */
+	private OcpCommonSpringProfiles() {
+		throw new IllegalStateException(OcpCommonSpringProfiles.class.getSimpleName() + OcpConstants.ILLEGALSTATE_STATICS);
 	}
 }

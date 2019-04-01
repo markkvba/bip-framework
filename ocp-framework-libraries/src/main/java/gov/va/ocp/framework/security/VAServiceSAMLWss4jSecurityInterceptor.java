@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
@@ -108,7 +108,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 				: new ByteArrayInputStream(getSamlFile().getBytes())) {
 			clientAssertion = IOUtils.toString(input, "UTF-8");
 		} catch (final Exception e) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+			LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 					"Unable to read SAML assertion from file." + getSamlFile(), e);
 			return retVal;
 		}
@@ -129,7 +129,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 			retVal = doc.getDocumentElement();
 
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
-			LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+			LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 					ERROR_SAML_ASSERTION, e);
 		}
 

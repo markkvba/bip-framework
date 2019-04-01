@@ -19,12 +19,12 @@ import org.springframework.http.ResponseEntity;
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogger;
-import gov.va.ocp.framework.constants.AnnotationConstants;
-import gov.va.ocp.framework.exception.OcpExceptionExtender;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
 
@@ -40,8 +40,14 @@ import gov.va.ocp.framework.rest.provider.ProviderResponse;
 @Order(-9998)
 public class ProviderHttpAspect extends BaseHttpProviderAspect {
 
-	/** The Constant LOGGER. */
+	/** Class logger */
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(ProviderHttpAspect.class);
+	/** Identity of the before advice */
+	private static final String BEFORE_ADVICE = "beforeAuditAdvice";
+	/** Identity of the before advice */
+	private static final String AFTER_ADVICE = "afterreturningAuditAdvice";
+	/** Identity of the before advice */
+	private static final String AFTER_THROWING_ADVICE = "afterThrowingAdvice";
 
 	/**
 	 * Perform audit logging on the request, before the operation is executed.
@@ -50,7 +56,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 	 */
 	@Before("!auditableAnnotation() && publicServiceResponseRestMethod()")
 	public void beforeAuditAdvice(final JoinPoint joinPoint) {
-		LOGGER.debug("beforeAuditAdvice joinpoint: " + joinPoint.toLongString());
+		LOGGER.debug(BEFORE_ADVICE + " joinpoint: " + joinPoint.toLongString());
 
 		List<Object> requestArgs = null;
 		AuditEventData auditEventData = null;
@@ -72,7 +78,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			writeRequestInfoAudit(requestArgs, auditEventData);
 
 		} catch (final Throwable throwable) { // NOSONAR intentionally catching throwable
-			handleInternalException("beforeAuditAdvice", "writeRequestInfoAudit", auditEventData, throwable);
+			handleInternalException(BEFORE_ADVICE, "writeRequestInfoAudit", auditEventData, throwable);
 		} finally {
 			LOGGER.debug("beforeAuditAdvice finished.");
 		}
@@ -135,20 +141,10 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 		try {
 			if (throwable == null) {
 				// null throwable almost certain not to happen, but check nonetheless
-				throwable = new Throwable("Unknown (null) exception.");
+				throwable = new Throwable("Unknown problem. Thrown exception was null.");
 			}
 
-			OcpRuntimeException ocpException = null;
-			if (!OcpExceptionExtender.class.isAssignableFrom(throwable.getClass())) {
-				ocpException = new OcpRuntimeException("", "Converting " + throwable.getClass().getSimpleName()
-						+ " to OcpRuntimeException.  Original message: " + throwable.getMessage(),
-						MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
-						throwable.getCause());
-			} else {
-				ocpException = (OcpRuntimeException) throwable;
-			}
-
-			providerResponse = writeAuditError("afterThrowingAdvice", ocpException, auditEventData);
+			providerResponse = writeAuditError("afterThrowingAdvice", throwable, auditEventData);
 
 		} catch (Throwable t) { // NOSONAR intentionally catching throwable
 			providerResponse = handleInternalException("afterThrowingAdvice", "writeResponseAudit", auditEventData, t);
@@ -171,26 +167,29 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			AuditEventData auditEventData, Throwable throwable) {
 		ResponseEntity<ProviderResponse> entity = null;
 		try {
-			final OcpRuntimeException ocpRuntimeException =
-					new OcpRuntimeException("", adviceName + " - Exception occured while attempting to " + attemptingTo + ".",
-							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
-							throwable);
+			MessageKeys key = MessageKeys.OCP_AUDIT_ASPECT_ERROR_UNEXPECTED;
+			String msg = key.getMessage(new Object[] { adviceName, attemptingTo });
+			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(key.getKey(), msg,
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 			entity = writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
-			entity = handleAnyRethrownExceptions(adviceName, e);
+			entity = handleAnyRethrownExceptions(adviceName, throwable, e);
 		}
 		return entity;
 	}
 
-	private ResponseEntity<ProviderResponse> handleAnyRethrownExceptions(String adviceName, Throwable e) {
+	private ResponseEntity<ProviderResponse> handleAnyRethrownExceptions(String adviceName, Throwable originatingThrowable,
+			Throwable e) {
 		ResponseEntity<ProviderResponse> entity;
-		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
-				adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.", e);
+		MessageKeys key = MessageKeys.OCP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT;
+		String msg = key.getMessage(new Object[] { adviceName, originatingThrowable.getClass().getSimpleName() });
+		LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+				msg, e);
+
 		ProviderResponse body = new ProviderResponse();
 		body.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.name(),
-				adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.",
-				HttpStatus.INTERNAL_SERVER_ERROR);
+				msg, HttpStatus.INTERNAL_SERVER_ERROR);
 		entity = new ResponseEntity<ProviderResponse>(body, HttpStatus.INTERNAL_SERVER_ERROR);
 		return entity;
 	}
@@ -198,19 +197,21 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 	/**
 	 * Write into Audit when exceptions occur while attempting to log audit records.
 	 *
-	 * @param ocpRuntimeException
+	 * @param adviceName
+	 * @param exception
 	 * @param auditEventData
 	 * @return
 	 */
-	private ResponseEntity<ProviderResponse> writeAuditError(final String adviceName, final OcpRuntimeException ocpRuntimeException,
+	private ResponseEntity<ProviderResponse> writeAuditError(final String adviceName, final Throwable exception,
 			final AuditEventData auditEventData) {
-		LOGGER.error(adviceName + " encountered uncaught exception.", ocpRuntimeException);
+		String msg = "Error ServiceMessage: " + exception;
+		AuditLogger.error(auditEventData, msg, exception);
+		LOGGER.error(adviceName + " auditing uncaught exception.", exception);
+
 		final ProviderResponse providerResponse = new ProviderResponse();
 		providerResponse.addMessage(MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-				ocpRuntimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		final StringBuilder sb = new StringBuilder();
-		sb.append("Error ServiceMessage: ").append(ocpRuntimeException);
-		AuditLogger.error(auditEventData, sb.toString(), ocpRuntimeException);
+				exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
 		return new ResponseEntity<>(providerResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

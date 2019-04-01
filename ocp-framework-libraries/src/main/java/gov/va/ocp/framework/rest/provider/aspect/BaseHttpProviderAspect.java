@@ -25,7 +25,7 @@ import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.RequestAuditData;
 import gov.va.ocp.framework.audit.ResponseAuditData;
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
@@ -160,7 +160,7 @@ public class BaseHttpProviderAspect {
 		LOGGER.debug("Content Type: {}", SanitizationUtil.stripXSS(contentType));
 
 		if (contentType != null && (contentType.toLowerCase(Locale.ENGLISH).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)
-				|| contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/mixed"))) {
+				|| contentType.toLowerCase(Locale.ENGLISH).startsWith(OcpConstants.MIME_MULTIPART_MIXED))) {
 			final List<String> attachmentTextList = new ArrayList<>();
 			InputStream inputstream = null;
 			// NOSONAR try (ByteArrayInputStream partTooBigMessage =
@@ -181,7 +181,7 @@ public class BaseHttpProviderAspect {
 					// NOSONAR IOUtils.closeQuietly(partTooBigMessage);
 				}
 			} catch (final Exception ex) {
-				LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+				LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
 
 			} finally {
@@ -189,7 +189,7 @@ public class BaseHttpProviderAspect {
 					try {
 						inputstream.close();
 					} catch (IOException e) {
-						LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+						LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 								"Error occurred while closing the upload file. {}", e);
 					}
 				}
