@@ -44,10 +44,15 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(ProviderHttpAspect.class);
 	/** Identity of the before advice */
 	private static final String BEFORE_ADVICE = "beforeAuditAdvice";
-	/** Identity of the before advice */
+	/** Identity of the after advice */
 	private static final String AFTER_ADVICE = "afterreturningAuditAdvice";
-	/** Identity of the before advice */
+	/** Identity of the afterThrowing advice */
 	private static final String AFTER_THROWING_ADVICE = "afterThrowingAdvice";
+
+	/** Attempting to write the request to the audit logs */
+	private static final String ATTEMPTING_WRITE_REQUEST = "writeRequestInfoAudit";
+	/** Attempting to write the response to the audit logs */
+	private static final String ATTEMPTING_WRITE_RESPONSE = "writeResponseAudit";
 
 	/**
 	 * Perform audit logging on the request, before the operation is executed.
@@ -78,9 +83,9 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			writeRequestInfoAudit(requestArgs, auditEventData);
 
 		} catch (final Throwable throwable) { // NOSONAR intentionally catching throwable
-			handleInternalException(BEFORE_ADVICE, "writeRequestInfoAudit", auditEventData, throwable);
+			handleInternalException(BEFORE_ADVICE, ATTEMPTING_WRITE_REQUEST, auditEventData, throwable);
 		} finally {
-			LOGGER.debug("beforeAuditAdvice finished.");
+			LOGGER.debug(BEFORE_ADVICE + " finished.");
 		}
 	}
 
@@ -93,10 +98,9 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 	@AfterReturning(pointcut = "!auditableAnnotation() && publicServiceResponseRestMethod()",
 			returning = "responseToConsumer")
 	public void afterreturningAuditAdvice(JoinPoint joinPoint, ProviderResponse responseToConsumer) {
-		LOGGER.debug("afterreturningAuditAdvice joinpoint: " + joinPoint.toLongString());
-		LOGGER.debug(
-				"afterreturningAuditAdvice responseToConsumer: "
-						+ ReflectionToStringBuilder.toString(responseToConsumer, null, true, true, ProviderResponse.class));
+		LOGGER.debug(AFTER_ADVICE + " joinpoint: " + joinPoint.toLongString());
+		LOGGER.debug(AFTER_ADVICE + " responseToConsumer: "
+				+ ReflectionToStringBuilder.toString(responseToConsumer, null, true, true, ProviderResponse.class));
 
 		AuditEventData auditEventData = null;
 		ProviderResponse providerResponse = null;
@@ -115,9 +119,9 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			writeResponseAudit(providerResponse, auditEventData, MessageSeverity.INFO, null);
 
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
-			handleInternalException("afterreturningAuditAdvice", "writeResponseAudit", auditEventData, throwable);
+			handleInternalException(AFTER_ADVICE, ATTEMPTING_WRITE_RESPONSE, auditEventData, throwable);
 		} finally {
-			LOGGER.debug("afterreturningAuditAdvice finished.");
+			LOGGER.debug(AFTER_ADVICE + " finished.");
 		}
 	}
 
@@ -132,8 +136,8 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 	@AfterThrowing(pointcut = "!auditableAnnotation() && publicServiceResponseRestMethod()",
 			throwing = "throwable")
 	public ResponseEntity<ProviderResponse> afterThrowingAdvice(JoinPoint joinPoint, Throwable throwable) {
-		LOGGER.debug("afterThrowingAdvice joinpoint: " + joinPoint.toLongString());
-		LOGGER.debug("afterThrowingAdvice throwable: {}" + throwable);
+		LOGGER.debug(AFTER_THROWING_ADVICE + " joinpoint: " + joinPoint.toLongString());
+		LOGGER.debug(AFTER_THROWING_ADVICE + " throwable: {}" + throwable);
 
 		AuditEventData auditEventData = null;
 		ResponseEntity<ProviderResponse> providerResponse = null;
@@ -144,12 +148,12 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 				throwable = new Throwable("Unknown problem. Thrown exception was null.");
 			}
 
-			providerResponse = writeAuditError("afterThrowingAdvice", throwable, auditEventData);
+			providerResponse = writeAuditError(AFTER_THROWING_ADVICE, throwable, auditEventData);
 
 		} catch (Throwable t) { // NOSONAR intentionally catching throwable
-			providerResponse = handleInternalException("afterThrowingAdvice", "writeResponseAudit", auditEventData, t);
+			providerResponse = handleInternalException(AFTER_THROWING_ADVICE, ATTEMPTING_WRITE_RESPONSE, auditEventData, t);
 		} finally {
-			LOGGER.debug("afterThrowingAdvice finished.");
+			LOGGER.debug(AFTER_THROWING_ADVICE + " finished.");
 		}
 		return providerResponse;
 	}

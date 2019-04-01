@@ -64,13 +64,11 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void initValidate(final Object toValidate, List<ServiceMessage> messages, final Object... supplemental) {
+	public void initValidate(final Object toValidate, final List<ServiceMessage> messages, final Object... supplemental) {
 		try {
 			this.supplemental = supplemental;
 
-			if (messages == null) {
-				messages = new ArrayList<>();
-			}
+			List<ServiceMessage> messagesToAdd = messages != null ? messages : new ArrayList<>();
 
 			this.callingMethodName = callingMethod == null ? ""
 					: callingMethod.getDeclaringClass().getSimpleName()
@@ -82,7 +80,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			// request-level null check
 			if (toValidate == null) {
 				LOGGER.debug("Request is null");
-				messages.add(new ServiceMessage(MessageSeverity.ERROR, "", callingMethodName + " Request cannot be null.",
+				messagesToAdd.add(new ServiceMessage(MessageSeverity.ERROR, "", callingMethodName + " Request cannot be null.",
 						HttpStatus.BAD_REQUEST));
 				return;
 			}
@@ -90,12 +88,12 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			setToValidateClass(toValidate);
 			// check class is correct (if correct it will not be null)
 			if (this.toValidateClass == null) { // NOSONAR : will always be false
-				handleInvalidClass(toValidate, messages);
+				handleInvalidClass(toValidate, messagesToAdd);
 				return;
 			}
 
 			// unchecked type-cast (but pre-verified above) to invoke implementation-specific validation
-			validate((T) toValidate, messages);
+			validate((T) toValidate, messagesToAdd);
 
 		} catch (Throwable t) { // NOSONAR intentionally broad catch
 			final OcpRuntimeException runtime =
