@@ -20,7 +20,6 @@ import cucumber.api.Scenario;
 import gov.va.ocp.framework.test.service.BearerTokenService;
 import gov.va.ocp.framework.test.service.RESTConfigService;
 import gov.va.ocp.framework.test.util.RESTUtil;
-import gov.va.ocp.framework.test.util.RESTUtility;
 
 /**
  * Base class for all step definition.
@@ -30,7 +29,6 @@ import gov.va.ocp.framework.test.util.RESTUtility;
 
 public class BaseStepDef {
 	protected RESTUtil resUtil = null;
-	protected RESTUtility resUtility = null;
 	protected Map<String, String> headerMap = null;
 	protected String strResponse = null;
 	protected RESTConfigService restConfig = null;
@@ -40,7 +38,6 @@ public class BaseStepDef {
 
 	public void initREST() {
 		resUtil = new RESTUtil();
-		resUtility = new RESTUtility();
 		restConfig = RESTConfigService.getInstance();
 	}
 
@@ -73,8 +70,8 @@ public class BaseStepDef {
 	 */
 
 	public void invokeAPIUsingGet(final String strURL) {
-		resUtility.setUpRequest(headerMap);
-		strResponse = resUtility.getResponse(strURL);
+		resUtil.setUpRequest(headerMap);
+		strResponse = resUtil.getResponse(strURL);
 	}
 
 	/**
@@ -96,8 +93,8 @@ public class BaseStepDef {
 	 * @param strURL
 	 */
 	public void invokeAPIUsingPut(final String strURL) {
-		resUtility.setUpRequest(headerMap);
-		strResponse = resUtility.putResponse(strURL);
+		resUtil.setUpRequest(headerMap);
+		strResponse = resUtil.putResponse(strURL);
 	}
 	/**
 	 * Sets the bearer token and delegates put API call to rest util.
@@ -118,8 +115,8 @@ public class BaseStepDef {
 	 * @param strURL
 	 */
 	public void invokeAPIUsingPost(final String strURL) {
-		resUtility.setUpRequest(headerMap);
-		strResponse = resUtility.postResponse(strURL);
+		resUtil.setUpRequest(headerMap);
+		strResponse = resUtil.postResponse(strURL);
 	}
 
 	/**
@@ -158,8 +155,8 @@ public class BaseStepDef {
 	 * @param strURL
 	 */
 	public void invokeAPIUsingDelete(final String strURL) {
-		resUtility.setUpRequest(headerMap);
-		strResponse = resUtility.deleteResponse(strURL);
+		resUtil.setUpRequest(headerMap);
+		strResponse = resUtil.deleteResponse(strURL);
 	}
 
 	/**
@@ -177,7 +174,7 @@ public class BaseStepDef {
 	 * @param intStatusCode
 	 */
 	public void validateStatusCode(final int intStatusCode) {
-		resUtility.validateStatusCode(intStatusCode);
+		resUtil.validateStatusCode(intStatusCode);
 	}
 
 	/**

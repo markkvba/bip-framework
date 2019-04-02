@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.http.entity.ContentType;
 
 import gov.va.ocp.framework.test.util.RESTUtil;
-import gov.va.ocp.framework.test.util.RESTUtility;
 /**
  * It Fetches token from the token API. The token will be used as a header while invoking actual end points.
  * @author sravi
@@ -46,7 +45,7 @@ public class BearerTokenService {
 		final Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
 		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
-		RESTUtility restUtility = new RESTUtility();
+		RESTUtil restUtility = new RESTUtil();
 		restUtility.setUpRequest(headerFile, headerMap);
 		return restUtility.postResponse(baseUrl + tokenUrl);
 	}

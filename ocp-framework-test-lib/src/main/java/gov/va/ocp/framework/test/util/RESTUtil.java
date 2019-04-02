@@ -1,6 +1,5 @@
 package gov.va.ocp.framework.test.util;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -11,22 +10,41 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
-import java.util.function.Supplier;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.client.HttpClient;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import gov.va.ocp.framework.test.service.RESTConfigService;
-import io.restassured.RestAssured;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.config.SSLConfig;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
 /**
  * It is a wrapper for rest assured API for making HTTP calls, parse JSON and
@@ -36,6 +54,7 @@ import io.restassured.specification.RequestSpecification;
  */
 
 public class RESTUtil { 
+	
 
 	private static final String DOCUMENTS_FOLDER_NAME = "documents";
 	private static final String PAYLOAD_FOLDER_NAME = "payload";
@@ -43,9 +62,10 @@ public class RESTUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTUtil.class);
 
 	// stores request headers
-	private Map<String, String> mapReqHeader = new HashMap<>(); 
+	private MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>(); 
 	String jsonText = new String();
-	Response response = null; // stores response from rest
+	ResponseEntity<String> response = null;
+	int httpResponseCode;
 
 	/**
 	 * Reads file content for a given file resource using URL object.
@@ -56,7 +76,7 @@ public class RESTUtil {
 	 */
 	public void setUpRequest(final String strRequestFile, final Map<String, String> mapHeader) {
 		try {
-			mapReqHeader = mapHeader;
+			requestHeaders.setAll(mapHeader);
 			if (strRequestFile != null) {
 				LOGGER.info("Request File {}", strRequestFile);
 				final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
@@ -80,7 +100,7 @@ public class RESTUtil {
 	 * @throws Exception
 	 */
 	public void setUpRequest(final Map<String, String> mapHeader) {
-		mapReqHeader = mapHeader;
+		requestHeaders.setAll(mapHeader);
 	}
 
 	/**
@@ -88,84 +108,78 @@ public class RESTUtil {
 	 *
 	 * @return mapHeader
 	 */
-	public Map<String, String> getRequest() {
-		return mapReqHeader;
+	public MultiValueMap<String, String> getRequest() {
+		return requestHeaders;
 	}
 	
 	/**
-	 * Invokes REST end point for a GET method using REST assured API and return
+	 * Invokes REST end point for a GET method using REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
 	 */
 	public String getResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().get(serviceURL),2);
-		return response.asString();
+		HttpHeaders headers = new HttpHeaders(requestHeaders);
+		HttpEntity<?> request = new HttpEntity<>(headers);				
+		return executeAPI(serviceURL, request, HttpMethod.GET);	
 	}
-
+	
 	/**
-	 * Invokes REST end point for a delete method using REST assured API and return
+	 * Invokes REST end point for a POST method using  REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
 	 */
-	public String deleteResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).when().delete(serviceURL),2);
-		return response.asString();
-	}
-
-	/**
-	 * Invokes REST end point for a Post method using REST assured API and return
-	 * response JSON object.
-	 *
-	 * @param serviceURL
-	 * @return
-	 */
+	
 	public String postResponse(final String serviceURL) {
-		doWithRetry(() -> given().config(getRestAssuredConfig()).log().all().headers(mapReqHeader).urlEncodingEnabled(false).body(jsonText).when().post(serviceURL), 2);
-		return response.asString();
+		HttpHeaders headers = new HttpHeaders(requestHeaders);
+		HttpEntity<?> request = new HttpEntity<>(jsonText, headers);
+		return executeAPI(serviceURL, request, HttpMethod.POST);
 	}
-
+	
 	/**
-	 * Loads the KeyStore and password in to rest assured API so all the API's are SSL enabled.
+	 * Invokes REST end point for a PUT method using  REST Template API and return
+	 * response JSON object.
+	 *
+	 * @param serviceURL
+	 * @return
 	 */
-	private RestAssuredConfig getRestAssuredConfig() {
-		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		if (StringUtils.isBlank(pathToKeyStore)) {
-			RestAssured.useRelaxedHTTPSValidation();
-		} else {
-			KeyStore keyStore = null;
-			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-
-			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
-				keyStore = KeyStore.getInstance("jks");
-				keyStore.load(instream, password.toCharArray());
-			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e);
-			}
-
-			org.apache.http.conn.ssl.SSLSocketFactory clientAuthFactory = null;
-			SSLConfig config = null;
-
-			try {
-				clientAuthFactory = new org.apache.http.conn.ssl.SSLSocketFactory(keyStore, password);
-				// set the config in rest assured
-				X509HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-				clientAuthFactory.setHostnameVerifier(hostnameVerifier);
-				config = new SSLConfig().with().sslSocketFactory(clientAuthFactory).and().allowAllHostnames();
-
-				return RestAssured.config().sslConfig(config);
-
-			} catch (Exception e) {
-				LOGGER.error("Issue while configuring certificate ", e);
-
-			}
-		}
-		return RestAssured.config();
+	
+	public String putResponse(final String serviceURL) {
+		HttpHeaders headers = new HttpHeaders(requestHeaders);
+		HttpEntity<?> request = new HttpEntity<>(headers);				
+		return executeAPI(serviceURL, request, HttpMethod.PUT);	
 	}
-
+	/**
+	 * Invokes REST end point for a DELETE method using  REST Template API and return
+	 * response JSON object.
+	 *
+	 * @param serviceURL
+	 * @return
+	 */
+	
+	public String deleteResponse(final String serviceURL) {
+		HttpHeaders headers = new HttpHeaders(requestHeaders);
+		HttpEntity<?> request = new HttpEntity<>(headers);		
+		return executeAPI(serviceURL, request, HttpMethod.DELETE);	
+	}
+	
+	private String executeAPI(final String serviceURL, HttpEntity<?> request, HttpMethod httpMethod) {
+		RestTemplate restTemplate = getRestTemplate();
+		try {
+			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
+			httpResponseCode = response.getStatusCodeValue();
+			return response.getBody();
+		}
+		catch(HttpClientErrorException clientError) {
+			LOGGER.error("Http client exception is thrown", clientError);
+			httpResponseCode = clientError.getRawStatusCode();
+			return clientError.getResponseBodyAsString();
+		}		
+	}
+	
 	/**
 	 * Invokes REST end point for a multipart method using REST assured API and
 	 * return response json object.
@@ -176,64 +190,112 @@ public class RESTUtil {
 
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
 			final String submitPayloadPath) {
-		RequestSpecification requestSpecification = given();
-		if (LOGGER.isDebugEnabled()) {
-			requestSpecification = given().log().all();
-		}
-		final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
-		final URL urlSubmitPayload = RESTUtil.class.getClassLoader()
-				.getResource(PAYLOAD_FOLDER_NAME + "/" + submitPayloadPath);
-
 		try {
+			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
+			final URL urlSubmitPayload = RESTUtil.class.getClassLoader()
+					.getResource(PAYLOAD_FOLDER_NAME + "/" + submitPayloadPath);
 			final File filePath = new File(urlFilePath.toURI());
 			final File filePathSubmitPayload = new File(urlSubmitPayload.toURI());
-			String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");
-			response = requestSpecification.contentType("multipart/form-data").urlEncodingEnabled(false)
-					.headers(mapReqHeader).when().multiPart("file", filePath)
-					.multiPart(SUBMIT_PAYLOAD, submitPayload, "application/json").post(serviceURL);			
+			String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");		
+			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+			body.add("file", filePath);
+			body.add(SUBMIT_PAYLOAD, submitPayload);
+			return executeMultipartAPI(serviceURL, body);
 		} catch (final Exception ex) {
 			LOGGER.error(ex.getMessage(), ex);
 			return null;
 		}
-		return response.asString();
 	}
-
+	
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
-			final byte[] submitPayload) {
-		RequestSpecification requestSpecification = given();
-		if (LOGGER.isDebugEnabled()) {
-			requestSpecification = given().log().all();
-		}
-		final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
-
+			final byte[] submitPayload) {		
 		try {
-			final File filePath = new File(urlFilePath.toURI());
-			response = requestSpecification.contentType("multipart/form-data").urlEncodingEnabled(false)
-					.headers(mapReqHeader).when().multiPart("file", filePath)
-					.multiPart(SUBMIT_PAYLOAD, SUBMIT_PAYLOAD, submitPayload, "application/json").post(serviceURL);
+			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
+			final File filePath = new File(urlFilePath.toURI());			
+			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+			body.add("file", filePath);
+			body.add(SUBMIT_PAYLOAD, submitPayload);
+			return executeMultipartAPI(serviceURL, body);
 		} catch (final Exception ex) {
 			LOGGER.error(ex.getMessage(), ex);
 			return null;
 		}
-		return response.asString();
 
 	}
-
-	/**
-	 * Invokes REST end point for a put method using REST assured API and return
-	 * response JSON object.
-	 *
-	 * @param serviceURL
-	 * @return
-	 */
-	public String putResponse(final String serviceURL) {
-		doWithRetry(() -> given().log().all().headers(mapReqHeader).urlEncodingEnabled(false).body(jsonText).when()
-				.put(serviceURL), 2);
-
-		return response.asString();
+	
+	private String executeMultipartAPI(String serviceURL, MultiValueMap<String, Object> body) {
+		HttpHeaders headers = new HttpHeaders(requestHeaders);
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+		return executeAPI(serviceURL, request, HttpMethod.POST);		
 	}
+	
+	private RestTemplate getRestTemplate() {
+		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		RestTemplate restTemplate = new RestTemplate();
+		if (StringUtils.isNotBlank(pathToKeyStore)) {
+			KeyStore keyStore = null;
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
 
+			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
+				keyStore = KeyStore.getInstance("jks");
+				keyStore.load(instream, password.toCharArray());
+				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray()).
+						loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+				
+			    SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+			    HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+			    restTemplate = new RestTemplate(requestFactory);				
+			} catch (Exception e) {
+				LOGGER.error("Issue with the certificate or password", e);
+			}			
+		}
+		restTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
+		restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+		return restTemplate;
+	}
+		
+	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
+		int connectionTimeout = 20000;
+		String connectionBufferSize = "4128";
+		String maxTotalPool = "10";
+		String defaultMaxPerRoutePool = "5";
+		String validateAfterInactivityPool = "10000";
+		String readTimeout = "30000";
+		ConnectionConfig connectionConfig = ConnectionConfig.custom()
+				.setBufferSize(Integer.valueOf(connectionBufferSize))
+				.build();
+		HttpClientBuilder clientBuilder = HttpClients.custom();
+		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
+		                                                                                                        // shut down the connection pool only if exclusively owned by the client
+		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
+		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
+		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
 
+		clientBuilder.setConnectionManager(poolingConnectionManager);
+		clientBuilder.setDefaultConnectionConfig(connectionConfig);
+		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
+			@Override
+			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
+				if (exception instanceof org.apache.http.NoHttpResponseException) {
+					LOGGER.warn("No response from server on " + executionCount + " call");
+					return true;
+				}
+				return super.retryRequest(exception, executionCount, context);
+			}
+
+		});
+
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
+				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
+		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
+		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
+		return clientHttpRequestFactory;
+	}
+	
 	/**
 	 * Loads the expected results from source folder and returns as string.
 	 *
@@ -278,29 +340,10 @@ public class RESTUtil {
 	 * @param intStatusCode
 	 */
 	public void validateStatusCode(final int intStatusCode) {
-		final int actStatusCode = response.getStatusCode();
-		assertThat(actStatusCode, equalTo(intStatusCode));
+	   assertThat(httpResponseCode, equalTo(intStatusCode));
 		
 	}
 
-	/**
-	 * Performs actual execution of given supplier function with retries. The
-	 * execution attempts to retry until it reaches the max attempts or successful execution.
-	 *
-	 * @param supplier
-	 * @param attempts
-	 */
-	public void doWithRetry(Supplier<Response> supplier, int attempts) {
-		boolean failed = false;
-		int retries = 0;
-		do {
-			response = supplier.get();
-			if (response.getStatusCode() == 404) {
-				LOGGER.error("Rest Assured API failed with 404 ");
-				failed = true;
-			}
-			retries++;
-		} while (failed && retries < attempts);
-		LOGGER.info(response.getBody().asString());
-	}
+	
 }
+

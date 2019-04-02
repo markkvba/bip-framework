@@ -75,7 +75,7 @@ public class RESTUtilTest {
 		mapHeader.put("authorization", "Bearer abcdef");
 		mapHeader.put("content-type", "application/json");
 		restUtil.setUpRequest(mapHeader);
-		assertThat("Bearer abcdef", equalTo(restUtil.getRequest().get("authorization")));
+		assertThat("Bearer abcdef", equalTo(restUtil.getRequest().get("authorization").get(0)));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class RESTUtilTest {
 		mapHeader.put("authorization", "Bearer abcdef");
 		mapHeader.put("content-type", "application/json");
 		restUtil.setUpRequest("janedoe.request", mapHeader);
-		assertThat("Bearer abcdef", equalTo(restUtil.getRequest().get("authorization")));
+		assertThat("Bearer abcdef", equalTo(restUtil.getRequest().get("authorization").get(0)));
 		boolean isBodyEmpty = restUtil.jsonText.isEmpty();
 		assertThat(false, equalTo(isBodyEmpty));
 	}
