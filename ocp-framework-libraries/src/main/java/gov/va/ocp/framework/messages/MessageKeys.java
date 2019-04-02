@@ -28,18 +28,30 @@ public enum MessageKeys implements MessageKey {
 	 */
 	OCP_DEV_ILLEGAL_INVOCATION("ocp.dev.illegal.invocation", "Could not find or instantiate class."),
 
+	/** Last resort, unexpected exception; {0} = exception class simple name; {1} = exception message */
+	OCP_GLOBAL_GENERAL_EXCEPTION("ocp.global.general.exception", "Unexpected exception."),
+	/** Exception handler cast failed; {0} = class name */
+	OCP_EXCEPTION_HANDLER_ERROR_VALUES("ocp.exception.handler.error.values.",
+			"Could not instantiate OcpRuntimeException."),
+	/** Exception handler cast failed; {0} = class name */
+	OCP_EXCEPTION_HANDLER_ERROR_CAST("ocp.exception.handler.error.cast",
+			"Could not cast throwable to OcpRuntimeException."),
+	/** MethodArgumentNotValidException; {0} = "field" or "object"; {1} = codes; {2} = default message */
+	OCP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID("ocp.global.validator.method.argument.not.valid", "Argument not valid."),
+	/** HttpClientErrorException; {0} = http status code; {1} = exception message */
+	OCP_GLOBAL_HTTP_CLIENT_ERROR("ocp.global.http.client.error", "Client Error."),
+	/** MethodArgumentTypeMismatchException; {0} = argument name; {1} = expected class name */
+	OCP_GLOBAL_REST_API_TYPE_MISMATCH("ocp.global.rest.api.type.mismatch", "API argument type could not be resolved."),
+	/** ConstraintViolationException; {0} = bean class name; {1} = property name; {2} = violation message */
+	OCP_GLBOAL_VALIDATOR_CONSTRAINT_VIOLATION("ocp.global.validator.constraint.violation", "Validation constraint was violated."),
+
 	/** JAXB Marshaller configuration failed; no args */
 	OCP_REST_CONFIG_JAXB_MARSHALLER_FAIL("ocp.rest.config.jaxb.marshaller.failed", "Error configuring JAXB marshaller."),
 	/** WebserviceTemplate configuration failed; no args */
 	OCP_REST_CONFIG_WEBSERVICE_TEMPLATE_FAIL("ocp.rest.config.webservice.template.failed",
 			"Unexpected exception thrown by WebServiceTemplate."),
-
-	/** Exception handler cast failed; {0} = class name */
-	OCP_EXCEPTION_HANDLER_ERROR_VALUES("ocp.exception.handler.error.values",
-			"Could not instantiate OcpRuntimeException."),
-	/** Exception handler cast failed; {0} = class name */
-	OCP_EXCEPTION_HANDLER_ERROR_CAST("ocp.exception.handler.error.cast",
-			"Could not cast throwable to OcpRuntimeException."),
+	/** Propogate message from other service; {0} = message key; {1} = message text */
+	OCP_FEIGN_MESSAGE_RECEIVED("ocp.feign.message.received", "External service returned error message."),
 
 	/** JWT token is invalid; no args */
 	OCP_SECURITY_TOKEN_INVALID("ocp.security.token.invalid", "Invalid Token."),
@@ -77,7 +89,7 @@ public enum MessageKeys implements MessageKey {
 	/** SAML insertion failed; no args */
 	OCP_SECURITY_SAML_INSERT_FAIL("ocp.security.saml.insert.failed", "SAML insertion failed."),
 	/** SSL initialization failed {0} = exception simple class name; {1} = exception message */
-	OCP_SECURITY_SSL_CONTEXT_FAIL("ocp.security.ssl.context.failed", "Could not establish SSL context"),
+	OCP_SECURITY_SSL_CONTEXT_FAIL("ocp.security.ssl.context.failed", "Could not establish SSL context."),
 
 	/** Sanitizing filename failed; no args */
 	OCP_SECURITY_SANITIZE_FAIL("ocp.security.sanitize.failed", "Unexpected error."),
@@ -99,10 +111,7 @@ public enum MessageKeys implements MessageKey {
 
 	/** Simulator could not find mock response file; {0} = XML file name; {1} = key used to construct file name */
 	OCP_REMOTE_MOCK_NOT_FOUND("ocp.remote.mock.not.found",
-			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory."),
-
-	/** Propogate message from other service; {0} = message key; {1} = message text */
-	OCP_FEIGN_MESSAGE_RECEIVED("ocp.feign.message.received", "External service returned error message");
+			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory.");
 
 	/** The key - must be identical to the key in framework-messages.properties */
 	private String key;
