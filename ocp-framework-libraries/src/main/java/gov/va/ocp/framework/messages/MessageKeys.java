@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 /**
  * The official source for framework message keys and their messages.
  * <p>
- * This class derives its values from the *messages.properties file. It
- * is added to the spring context in
+ * This class derives its values from the framework-messages.properties file.
+ * that is added to the spring context as an {@code @PropertySource}.
  *
  * @author aburkholder
  */
@@ -19,6 +19,10 @@ public enum MessageKeys implements MessageKey {
 
 	/** No key provided or specified; no args */
 	NO_KEY("NO_KEY", "Unknown, no key provided."),
+	/** Key for warning messages; {0} = warning message */
+	WARN_KEY("WARN", ""),
+	/** Key for propagating exceptions as OCPExeptionExtender; {0} = exception message */
+	PROPAGATE("PROPAGATE", ""),
 
 	/** Problem with reflection; {0} = class simple name */
 	OCP_DEV_ILLEGAL_INSTANTIATION("ocp.dev.illegal.instantiation", "Do not instantiate static classes."),
@@ -115,7 +119,15 @@ public enum MessageKeys implements MessageKey {
 
 	/** Simulator could not find mock response file; {0} = XML file name; {1} = key used to construct file name */
 	OCP_REMOTE_MOCK_NOT_FOUND("ocp.remote.mock.not.found",
-			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory.");
+			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory."),
+	/**
+	 * RemoteServiceCallMock is not set up to process a type; {0} = the RemoteServiceCallMock class; {1} = the class used in the
+	 * request
+	 */
+	OCP_REMOTE_MOCK_UNKNOWN("ocp.remote.mock.unknown.type",
+			"RemoteServiceCallMock getKeyForMockResponse(..) does not have a file naming block for request type.")
+
+	;
 
 	/** The key - must be identical to the key in framework-messages.properties */
 	private String key;
