@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -114,9 +115,10 @@ public abstract class VAServiceSignatureWss4jSecurityInterceptor extends Abstrac
 					+ ReflectionToStringBuilder.reflectionToString(soapMessage));
 
 		} catch (final WSSecurityException e) {
-			String msg = "Could not sign SOAPMessage Document.";
-			LOGGER.error(msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			MessageKeys key = MessageKeys.OCP_SECURITY_SIGN_FAIL;
+			Object param = "SOAPMessage Document";
+			LOGGER.error(key.getMessage(param), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, param);
 		}
 	}
 

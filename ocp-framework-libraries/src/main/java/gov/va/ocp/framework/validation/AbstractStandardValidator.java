@@ -10,6 +10,7 @@ import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.exception.interceptor.ExceptionHandlingUtils;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 
@@ -95,7 +96,8 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			validate((T) toValidate, messagesToAdd);
 
 		} catch (Throwable t) { // NOSONAR intentionally broad catch
-			final OcpRuntimeException runtime = ExceptionHandlingUtils.resolveRuntimeException(t);
+			final OcpRuntimeException runtime =
+					ExceptionHandlingUtils.resolveRuntimeException(MessageKeys.OCP_VALIDATOR_INITIALIZE_ERROR_UNEXPECTED, t);
 
 			if (runtime != null) {
 				throw runtime;
@@ -132,7 +134,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#getValidatedType()
 	 */
 	@Override
@@ -142,7 +144,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#setCallingMethod(java.lang.reflect.Method)
 	 */
 	@Override
@@ -152,7 +154,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#getCallingMethod()
 	 */
 	@Override

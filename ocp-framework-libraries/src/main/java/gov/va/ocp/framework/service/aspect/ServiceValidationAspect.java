@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.service.DomainResponse;
@@ -141,11 +142,11 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	 */
 	private void handleValidatorInstantiationExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
 		// Validator programming issue - throw exception
-		String msg = "Could not find or instantiate class '" + (validatorClass != null ? validatorClass.getName()
-				: "to validate given object of type " + object.getClass().getName()
-				+ "'. Ensure that it has a no-arg constructor, and implements " + Validator.class.getName());
-		LOGGER.error(msg, e);
-		throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+		MessageKeys key = MessageKeys.OCP_DEV_ILLEGAL_INVOCATION;
+		Object[] params = new Object[] { (validatorClass != null ? validatorClass.getName() : null), "validate",
+				object.getClass().getName(), Validator.class.getName() };
+		LOGGER.error(key.getMessage(params), e);
+		throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e,params);
 	}
 
 	/**
@@ -171,7 +172,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 					new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
 		}
 
-		// invoke the validator
+		// invoke the validator - no supplemental objects
 		try {
 			invokeValidator(object, messages, callingMethod, validatorClass);
 
@@ -181,10 +182,10 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	}
 
 	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
-			final Class<?> validatorClass, final Object... requestObjects) throws InstantiationException, IllegalAccessException {
+			final Class<?> validatorClass, Object... supplemental) throws InstantiationException, IllegalAccessException {
 		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
 		validator.setCallingMethod(callingMethod);
-		validator.initValidate(object, messages, requestObjects);
+		validator.initValidate(object, messages, supplemental);
 	}
 
 	/**
@@ -212,7 +213,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 					new NullPointerException("No validator available for object of type " + object.getClass().getName()), object);
 		}
 
-		// invoke the validator
+		// invoke the validator, sned request objects as well
 		try {
 			invokeValidator(object, messages, callingMethod, validatorClass, requestObjects);
 
@@ -248,4 +249,3 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		return validatorClass;
 	}
 }
-

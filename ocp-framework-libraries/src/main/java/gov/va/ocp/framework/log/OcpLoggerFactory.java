@@ -2,10 +2,8 @@ package gov.va.ocp.framework.log;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 
-import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.messages.MessageSeverity;
+import gov.va.ocp.framework.constants.OcpConstants;
 
 /**
  * This class wraps the SLF4J logger to add logging enhancements for the platform.
@@ -20,8 +18,7 @@ public final class OcpLoggerFactory {
 	 * Do not instantiate.
 	 */
 	private OcpLoggerFactory() {
-		throw new OcpRuntimeException("", "OcpLoggerFactory is a static class. Do not instantiate it.",
-				MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		throw new IllegalStateException(OcpLoggerFactory.class.getSimpleName() + OcpConstants.ILLEGALSTATE_STATICS);
 	}
 
 	/**

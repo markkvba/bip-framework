@@ -35,6 +35,7 @@ import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.exception.OcpPartnerException;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
 
@@ -75,19 +76,8 @@ public class OcpRestGlobalExceptionHandler {
 		} else {
 			return StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
 					? ex.getCause().getMessage()
-							: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
+					: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
 		}
-	}
-
-	/**
-	 * For any exception that implements {@link OcpExceptionExtender}.
-	 * If key is empty, returns the constant "NO-KEY".
-	 *
-	 * @param ex the exception that implements OcpExceptionExtender
-	 * @return String the key, or NO_KEY
-	 */
-	private String deriveKey(OcpExceptionExtender ex) {
-		return deriveKey(ex == null || StringUtils.isBlank(ex.getKey()) ? NO_KEY : ex.getKey());
 	}
 
 	/**
@@ -160,7 +150,7 @@ public class OcpRestGlobalExceptionHandler {
 		if (ex == null) {
 			return failSafeHandler();
 		}
-		return standardHandler((Exception) ex, deriveKey(ex), ex.getSeverity(), httpResponseStatus);
+		return standardHandler((Exception) ex, MessageKeys.NO_KEY, ex.getSeverity(), httpResponseStatus);
 	}
 
 	/**
@@ -172,15 +162,15 @@ public class OcpRestGlobalExceptionHandler {
 	 * @param httpResponseStatus the status to put on the HTTP Response Entity.
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> standardHandler(Exception ex, String key, MessageSeverity severity,
+	protected ResponseEntity<Object> standardHandler(Exception ex, MessageKeys key, MessageSeverity severity,
 			HttpStatus httpResponseStatus) {
 		if (ex == null) {
 			return failSafeHandler();
 		}
 		ProviderResponse apiError = new ProviderResponse();
 
-		log(ex, key, severity, httpResponseStatus);
-		apiError.addMessage(severity, deriveKey(key), deriveMessage(ex), httpResponseStatus);
+		log(ex, key.getKey(), severity, httpResponseStatus);
+		apiError.addMessage(severity, deriveKey(key.getKey()), deriveMessage(ex), httpResponseStatus);
 
 		return new ResponseEntity<>(apiError, httpResponseStatus);
 	}
@@ -223,7 +213,20 @@ public class OcpRestGlobalExceptionHandler {
 	@ExceptionHandler(value = IllegalArgumentException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleIllegalArgumentException(HttpServletRequest req, IllegalArgumentException ex) {
-		return standardHandler(ex, "", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+	}
+
+	/**
+	 * Handle illegal state exceptions - developer attempting to instantiate a class that is for statics.
+	 *
+	 * @param req the req
+	 * @param ex the ex
+	 * @return the response entity
+	 */
+	@ExceptionHandler(value = IllegalStateException.class)
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	public final ResponseEntity<Object> handleIllegalStateException(HttpServletRequest req, IllegalStateException ex) {
+		return standardHandler(ex, MessageKeys.OCP_DEV_ILLEGAL_INSTANTIATION, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 	}
 
 	/**
@@ -279,7 +282,7 @@ public class OcpRestGlobalExceptionHandler {
 			try {
 				apiError = new ObjectMapper().readValue(responseBody, ProviderResponse.class);
 			} catch (IOException e) {
-				log(e,"", MessageSeverity.ERROR, null);
+				log(e, "", MessageSeverity.ERROR, null);
 				apiError.addMessage(MessageSeverity.ERROR, httpClientErrorException.getStatusCode().name(),
 						new String(responseBody),
 						httpClientErrorException.getStatusCode());
@@ -345,7 +348,7 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleHttpMessageNotReadableException(HttpServletRequest req,
 			final HttpMessageNotReadableException httpMessageNotReadableException) {
-		return standardHandler(httpMessageNotReadableException, "", MessageSeverity.ERROR,
+		return standardHandler(httpMessageNotReadableException, MessageKeys.NO_KEY, MessageSeverity.ERROR,
 				HttpStatus.BAD_REQUEST);
 	}
 
@@ -361,7 +364,7 @@ public class OcpRestGlobalExceptionHandler {
 	@ExceptionHandler(value = NoHandlerFoundException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	public final ResponseEntity<Object> handleNoHandlerFoundException(HttpServletRequest req, final NoHandlerFoundException ex) {
-		return standardHandler(ex, "", MessageSeverity.ERROR, HttpStatus.NOT_FOUND);
+		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.NOT_FOUND);
 	}
 
 	// 405
@@ -377,7 +380,7 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED)
 	public final ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpServletRequest req,
 			final HttpRequestMethodNotSupportedException ex) {
-		return standardHandler(ex, "", MessageSeverity.ERROR, HttpStatus.METHOD_NOT_ALLOWED);
+		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	// 415
@@ -393,7 +396,7 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
 	public final ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpServletRequest req,
 			final HttpMediaTypeNotSupportedException ex) {
-		return standardHandler(ex, "", MessageSeverity.ERROR, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
 
 	// Handle all
@@ -420,6 +423,6 @@ public class OcpRestGlobalExceptionHandler {
 	@ExceptionHandler(value = Exception.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public final ResponseEntity<Object> handleAll(HttpServletRequest req, final Exception ex) {
-		return standardHandler(ex, "", MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

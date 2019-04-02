@@ -20,9 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
-import gov.va.ocp.framework.exception.interceptor.ExceptionHandlingUtils;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 @RunWith(SpringRunner.class)
@@ -101,7 +101,7 @@ public class ExceptionHandlingUtilsTest {
 
 	@Test
 	public void testResolveRuntimeExceptionWithClassCastException() {
-		ExceptionHandlingUtils.resolveRuntimeException(nullPointerException);
+		ExceptionHandlingUtils.resolveRuntimeException(MessageKeys.NO_KEY, nullPointerException);
 	}
 
 	@Test
