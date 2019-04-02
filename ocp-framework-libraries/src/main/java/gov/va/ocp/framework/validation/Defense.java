@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
 import gov.va.ocp.framework.exception.OcpValidationRuntimeException;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -35,7 +36,8 @@ public final class Defense {
 		try {
 			Assert.isInstanceOf(clazz, obj);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -51,7 +53,8 @@ public final class Defense {
 		try {
 			Assert.state(expression, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -66,7 +69,8 @@ public final class Defense {
 		try {
 			Assert.state(expression, "[Assertion failed] - this state invariant must be true");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -80,7 +84,8 @@ public final class Defense {
 		try {
 			Assert.isNull(ref, "[Assertion failed] - the object argument must be null");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -95,7 +100,8 @@ public final class Defense {
 		try {
 			Assert.isNull(ref, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -109,7 +115,8 @@ public final class Defense {
 		try {
 			Assert.notNull(ref, "[Assertion failed] - this argument is required; it must not be null");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -124,7 +131,8 @@ public final class Defense {
 		try {
 			Assert.notNull(ref, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -140,7 +148,8 @@ public final class Defense {
 		try {
 			Assert.hasText(text, "[Assertion failed] - this String argument must have text; it must not be null, empty, or blank");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -157,7 +166,8 @@ public final class Defense {
 		try {
 			Assert.hasText(text, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -173,7 +183,8 @@ public final class Defense {
 		try {
 			Assert.notEmpty(ref, "[Assertion failed] - this collection must not be empty: it must contain at least 1 element");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -190,7 +201,8 @@ public final class Defense {
 		try {
 			Assert.notEmpty(ref, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -207,7 +219,8 @@ public final class Defense {
 		try {
 			Assert.notEmpty(ref, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -225,7 +238,8 @@ public final class Defense {
 			Assert.notNull(expression, "[Assertion failed] - this argument is required; it must not be null");
 			Assert.isTrue(expression, "[Assertion failed] - this expression must be true");
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 
@@ -244,7 +258,8 @@ public final class Defense {
 			Assert.notNull(expression, message);
 			Assert.isTrue(expression, message);
 		} catch (Exception e) {
-			throw new OcpValidationRuntimeException("", e.getMessage(), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e);
+			throw new OcpValidationRuntimeException(MessageKeys.OCP_VALIDATOR_ASSERTION,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, e, e.getMessage());
 		}
 	}
 

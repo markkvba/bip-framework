@@ -32,6 +32,7 @@ import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -89,14 +90,14 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 							true, true, null));
 
 		} catch (final WSSecurityException e) {
-			String msg = "Error while attempting to insert SAML Assertion into message.";
-			LOGGER.error(msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			MessageKeys key = MessageKeys.OCP_SECURITY_SAML_INSERT_FAIL;
+			LOGGER.error(key.getMessage(), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
 	/**
-	 * Gets the sAML assertion as element.
+	 * Gets the SAML assertion as element.
 	 *
 	 * @return the sAML assertion as element
 	 */

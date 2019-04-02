@@ -101,11 +101,8 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 					MessageSeverity.INFO, null);
 			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
 
-//			String key = "ocp.audit.cache.error";
-//			String msg = messageSource.getMessage(key, new Object[] { ADVICE_NAME, ACTIVITY }, Locale.getDefault());
-			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED.getKey(),
-					MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED.getMessage(null), MessageSeverity.FATAL,
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED,
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 			throw throwable;
@@ -130,11 +127,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 
 		try {
 			MessageKeys key = MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED;
-			String msg = key.getMessage(new Object[] { adviceName, attemptingTo });
-
-			LOGGER.error(msg, throwable);
-			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(key.getKey(), msg,
-					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
+			LOGGER.error(key.getMessage(adviceName, attemptingTo), throwable);
+			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(
+					key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 			writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable

@@ -172,9 +172,8 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 		ResponseEntity<ProviderResponse> entity = null;
 		try {
 			MessageKeys key = MessageKeys.OCP_AUDIT_ASPECT_ERROR_UNEXPECTED;
-			String msg = key.getMessage(new Object[] { adviceName, attemptingTo });
-			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(key.getKey(), msg,
-					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
+			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(key,
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable, adviceName, attemptingTo);
 			entity = writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable

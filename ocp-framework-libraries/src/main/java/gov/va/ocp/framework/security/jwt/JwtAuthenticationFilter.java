@@ -28,7 +28,9 @@ import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 
@@ -66,8 +68,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws IOException, ServletException {
 		String token = request.getHeader(jwtAuthenticationProperties.getHeader());
 		if (token == null || !token.startsWith("Bearer ")) {
-			LOG.error(MessageKeys.OCP_SECURITY_TOKEN_BLANK.getMessage());
-			throw new JwtAuthenticationException(MessageKeys.OCP_SECURITY_TOKEN_BLANK.getMessage());
+			MessageKeys key = MessageKeys.OCP_SECURITY_TOKEN_BLANK;
+			LOG.error(key.getMessage());
+			throw new JwtAuthenticationException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 
 		token = token.substring(7);
@@ -75,15 +78,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		try {
 			return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
 		} catch (SignatureException se) {
-			String msg = MessageKeys.OCP_SECURITY_TOKEN_BROKEN.getMessage(TOKEN_TAMPERED, token,
-					se.getClass().getSimpleName(), se.getMessage());
-			writeAuditForJwtTokenErrors(msg, request, se);
-			throw new JwtAuthenticationException(TOKEN_TAMPERED, se);
+			MessageKey key = MessageKeys.OCP_SECURITY_TOKEN_BROKEN;
+			Object[] params = new Object[] { TOKEN_TAMPERED, token, se.getClass().getSimpleName(), se.getMessage() };
+			writeAuditForJwtTokenErrors(key.getMessage(params), request, se);
+			throw new JwtAuthenticationException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, se, params);
 		} catch (MalformedJwtException ex) {
-			String msg = MessageKeys.OCP_SECURITY_TOKEN_BROKEN.getMessage(TOKEN_MALFORMED, token,
-					ex.getClass().getSimpleName(), ex.getMessage());
-			writeAuditForJwtTokenErrors(msg, request, ex);
-			throw new JwtAuthenticationException(TOKEN_MALFORMED);
+			MessageKey key = MessageKeys.OCP_SECURITY_TOKEN_BROKEN;
+			Object[] params = new Object[] { TOKEN_MALFORMED, token, ex.getClass().getSimpleName(), ex.getMessage() };
+			writeAuditForJwtTokenErrors(key.getMessage(params), request, ex);
+			throw new JwtAuthenticationException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, ex, params);
 		}
 	}
 

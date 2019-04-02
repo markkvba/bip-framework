@@ -26,5 +26,5 @@ public interface MessageKey {
 	 *            "{2,time}" within a message), or null if none.
 	 * @return String - the resolved message, or default message
 	 */
-	public String getMessage(Object... param0);
+	public String getMessage(Object... params);
 }

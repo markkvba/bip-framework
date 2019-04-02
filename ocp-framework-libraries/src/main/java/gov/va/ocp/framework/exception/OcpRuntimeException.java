@@ -2,6 +2,7 @@ package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -18,8 +19,12 @@ import gov.va.ocp.framework.messages.MessageSeverity;
 public class OcpRuntimeException extends RuntimeException implements OcpExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
+	private static final String serverName = System.getProperty("server.name");
+
 	/** The consumer facing identity key */
-	private final String key;
+	private final MessageKey key;
+	/** Any values needed to fill in params (e.g. value for {0}) in the MessageKey message */
+	private final Object[] params;
 	/** The severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE */
 	private final MessageSeverity severity;
 	/** The best-fit HTTP Status, see <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a> */
@@ -33,16 +38,13 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 * @see RuntimeException#RuntimeException(String)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
-	 * @param message - the detail message
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpRuntimeException(final String key, final String message, final MessageSeverity severity, final HttpStatus status) {
-		super(message);
-		this.key = key;
-		this.severity = severity;
-		this.status = status;
+	public OcpRuntimeException(final MessageKey key, final MessageSeverity severity, final HttpStatus status, Object... params) {
+		this(key, severity, status, null, params);
 	}
 
 	/**
@@ -51,38 +53,48 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 * @see RuntimeException#RuntimeException(String, Throwable)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
-	 * @param message - the detail message
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
 	 * @param cause - the throwable that caused this throwable
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpRuntimeException(final String key, final String message, final MessageSeverity severity, final HttpStatus status,
-			final Throwable cause) { //NOSONAR
-		super(message, cause);       //NOSONAR
-		this.key = key;              //NOSONAR
-		this.severity = severity;    //NOSONAR
-		this.status = status;        //NOSONAR
+	public OcpRuntimeException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
+			final Throwable cause, Object... params) {
+		super(key.getMessage(params), cause);
+		this.key = key;
+		this.params = params;
+		this.severity = severity;
+		this.status = status;
 	}
 
-	@Override                        //NOSONAR
-	public String getKey() {         //NOSONAR
-		return key;                  //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public MessageKey getMessageKey() {
+		return this.key;
+	}
 
-	@Override                        //NOSONAR
-	public HttpStatus getStatus() {  //NOSONAR
-		return status;               //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public String getKey() {
+		return key.getKey();
+	}
 
-	@Override                        //NOSONAR
-	public MessageSeverity getSeverity() {     //NOSONAR
-		return severity;             //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public Object[] getParams() {
+		return this.params;
+	}
 
-	@Override                        //NOSONAR
-	public String getServerName() {  //NOSONAR
-		return System.getProperty("server.name");          //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public HttpStatus getStatus() {
+		return status;
+	}
 
+	@Override
+	public MessageSeverity getSeverity() {
+		return severity;
+	}
+
+	@Override
+	public String getServerName() {
+		return serverName;
+	}
 }

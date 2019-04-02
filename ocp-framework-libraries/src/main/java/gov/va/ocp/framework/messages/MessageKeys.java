@@ -20,6 +20,29 @@ public enum MessageKeys implements MessageKey {
 	/** No key provided or specified; no args */
 	NO_KEY("NO_KEY", "Unknown, no key provided."),
 
+	/** Problem with reflection; {0} = class simple name */
+	OCP_DEV_ILLEGAL_INSTANTIATION("ocp.dev.illegal.instantiation", "Do not instantiate static classes."),
+	/**
+	 * Problem with reflection; {0} = class being instantiated; {1} = action being taken; {2} = type being acted against; {3}
+	 * super-interface
+	 */
+	OCP_DEV_ILLEGAL_INVOCATION("ocp.dev.illegal.invocation", "Could not find or instantiate class."),
+
+	/** JAXB Marshaller configuration failed; no args */
+	OCP_REST_CONFIG_JAXB_MARSHALLER_FAIL("ocp.rest.config.jaxb.marshaller.failed", "Error configuring JAXB marshaller."),
+	/** WebserviceTemplate configuration failed; no args */
+	OCP_REST_CONFIG_WEBSERVICE_TEMPLATE_FAIL("ocp.rest.config.webservice.template.failed",
+			"Unexpected exception thrown by WebServiceTemplate."),
+
+	/** Exception handler cast failed; {0} = class name */
+	OCP_EXCEPTION_HANDLER_ERROR_VALUES("ocp.exception.handler.error.values",
+			"Could not instantiate OcpRuntimeException."),
+	/** Exception handler cast failed; {0} = class name */
+	OCP_EXCEPTION_HANDLER_ERROR_CAST("ocp.exception.handler.error.cast",
+			"Could not cast throwable to OcpRuntimeException."),
+
+	/** JWT token is invalid; no args */
+	OCP_SECURITY_TOKEN_INVALID("ocp.security.token.invalid", "Invalid Token."),
 	/** JWT token cannot be blank; no args */
 	OCP_SECURITY_TOKEN_BLANK("ocp.security.token.blank", "No JWT Token in Header."),
 	/**
@@ -45,6 +68,19 @@ public enum MessageKeys implements MessageKey {
 	/** UserStatus specified does not exist; {0} = UserStatus.[value] */
 	OCP_SECURITY_TRAITS_USERSTATUS_INVALID("ocp.security.traits.userstatus.invalid",
 			"Specified UserStatus does not exist."),
+	/** Encryption failed for some reason; {0} = kind of object that was being encrypted */
+	OCP_SECURITY_ENCRYPT_FAIL("ocp.security.encrypt.failed", "Encryption failed."),
+	/** Signing failed for some reason; {0} = kind of object that was being signed */
+	OCP_SECURITY_SIGN_FAIL("ocp.security.sign.failed", "Could not sign."),
+	/** Encryption failed for some reason; {0} = action being taken on the attribute; {1} attribute name */
+	OCP_SECURITY_ATTRIBUTE_FAIL("ocp.security.attribute.failed", "Could not modify attribute."),
+	/** SAML insertion failed; no args */
+	OCP_SECURITY_SAML_INSERT_FAIL("ocp.security.saml.insert.failed", "SAML insertion failed."),
+	/** SSL initialization failed {0} = exception simple class name; {1} = exception message */
+	OCP_SECURITY_SSL_CONTEXT_FAIL("ocp.security.ssl.context.failed", "Could not establish SSL context"),
+
+	/** Sanitizing filename failed; no args */
+	OCP_SECURITY_SANITIZE_FAIL("ocp.security.sanitize.failed", "Unexpected error."),
 
 	/** Auditing error during cache operations; {0} = advice name, {1} = operation attempted */
 	OCP_AUDIT_CACHE_ERROR_UNEXPECTED("ocp.audit.cache.error.unexpected",
@@ -59,15 +95,14 @@ public enum MessageKeys implements MessageKey {
 	/** Validator initialization; no args */
 	OCP_VALIDATOR_INITIALIZE_ERROR_UNEXPECTED("ocp.validator.initialize.error.unexpected",
 			"Could not initialize standard validator."),
+	OCP_VALIDATOR_ASSERTION("ocp.validator.assertion", "Assertion failed."),
 
-	OCP_DEV_ILLEGAL_INSTANTIATION("ocp.dev.illegal.instantiation", "Do not instantiate static classes."),
+	/** Simulator could not find mock response file; {0} = XML file name; {1} = key used to construct file name */
+	OCP_REMOTE_MOCK_NOT_FOUND("ocp.remote.mock.not.found",
+			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory."),
 
-	/** Exception handler cast failed; {0} = class name */
-	OCP_EXCEPTION_HANDLER_ERROR_VALUES("ocp.exception.handler.error.values",
-			"Could not instantiate OcpRuntimeException."),
-	/** Exception handler cast failed; {0} = class name */
-	OCP_EXCEPTION_HANDLER_ERROR_CAST("ocp.exception.handler.error.cast",
-			"Could not cast throwable to OcpRuntimeException.");
+	/** Propogate message from other service; {0} = message key; {1} = message text */
+	OCP_FEIGN_MESSAGE_RECEIVED("ocp.feign.message.received", "External service returned error message");
 
 	/** The key - must be identical to the key in framework-messages.properties */
 	private String key;
@@ -105,7 +140,7 @@ public enum MessageKeys implements MessageKey {
 	 * @see gov.va.ocp.framework.messages.MessageKey#getMessage(java.lang.Object[])
 	 */
 	@Override
-	public String getMessage(Object... param0) {
-		return messageSource.getMessage(this.key, param0, this.defaultMessage, Locale.getDefault());
+	public String getMessage(Object... params) {
+		return messageSource.getMessage(this.key, params, this.defaultMessage, Locale.getDefault());
 	}
 }

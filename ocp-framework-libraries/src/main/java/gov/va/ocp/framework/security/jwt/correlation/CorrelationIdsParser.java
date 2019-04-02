@@ -68,8 +68,8 @@ public class CorrelationIdsParser {
 		// split a single correlation id into its component parts
 		if (StringUtils.isBlank(token)) {
 			MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_CORRELATIONID_BLANK;
-			LOGGER.error(key.getMessage(null));
-			throw new OcpRuntimeException(key.getKey(), key.getMessage(null), MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+			LOGGER.error(key.getMessage());
+			throw new OcpRuntimeException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 		final String[] tokens = token.split("\\^");
 
@@ -91,9 +91,9 @@ public class CorrelationIdsParser {
 
 		} else {
 			MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_CORRELATIONID_INVALID;
-			String msg = key.getMessage(new Object[] { ELEMENT_SS_COUNT, ELEMENT_MAX_COUNT });
-			LOGGER.error(msg);
-			throw new OcpRuntimeException(key.getKey(), msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+			Object[] params = new Object[] { ELEMENT_SS_COUNT, ELEMENT_MAX_COUNT };
+			LOGGER.error(key.getMessage(params));
+			throw new OcpRuntimeException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 		}
 	}
 

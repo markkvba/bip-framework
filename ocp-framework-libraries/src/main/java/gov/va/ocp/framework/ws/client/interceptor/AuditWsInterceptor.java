@@ -15,6 +15,7 @@ import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.validation.Defense;
 import gov.va.ocp.framework.ws.client.interceptor.transport.ByteArrayTransportOutputStream;
@@ -144,7 +145,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 			rethrowMe = (WebServiceClientException) e;
 		} else {
 			rethrowMe =
-					new OcpPartnerRuntimeException("", "Unexpected exception thrown by WebServiceTemplate. Please investigate.",
+					new OcpPartnerRuntimeException(MessageKeys.OCP_REST_CONFIG_WEBSERVICE_TEMPLATE_FAIL,
 							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 		throw rethrowMe;

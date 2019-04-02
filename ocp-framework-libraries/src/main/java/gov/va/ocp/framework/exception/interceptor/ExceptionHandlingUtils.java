@@ -71,8 +71,7 @@ public final class ExceptionHandlingUtils {
 		} else {
 			// make a new OcpRuntimeException from the non-OCP throwable
 			resolvedRuntimeException =
-					new OcpRuntimeException(messageKey.getKey(), messageKey.getMessage(null), MessageSeverity.FATAL,
-							HttpStatus.INTERNAL_SERVER_ERROR, throwable);
+					new OcpRuntimeException(messageKey, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 		}
 
 		return resolvedRuntimeException;
@@ -90,9 +89,9 @@ public final class ExceptionHandlingUtils {
 		} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			MessageKeys key = MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES;
-			String msg = key.getMessage(new Object[] { e.getClass().getName() });
-			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR), msg, e);
-			throw new OcpRuntimeException(key.getKey(), msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR),
+					key.getMessage(e.getClass().getName()), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 		return resolvedRuntimeException;
 	}
@@ -103,9 +102,9 @@ public final class ExceptionHandlingUtils {
 			resolvedRuntimeException = (OcpRuntimeException) throwable;
 		} catch (ClassCastException e) {
 			MessageKeys key = MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_CAST;
-			String msg = key.getMessage(new Object[] { throwable.getClass().getName() });
-			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR), msg, e);
-			throw new OcpRuntimeException(key.getKey(), msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR),
+					key.getMessage(throwable.getClass().getName()), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 		return resolvedRuntimeException;
 	}

@@ -12,6 +12,10 @@ import java.util.UUID;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.http.HttpStatus;
+
+import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.PersonTraits;
 import gov.va.ocp.framework.security.jwt.JwtAuthenticationException;
 import gov.va.ocp.framework.security.jwt.correlation.CorrelationIdsParser;
@@ -69,11 +73,13 @@ public class GenerateToken {
 
 		} catch (Exception e) { // NOSONAR intentionally wide, errors are already logged
 			// if there is any detected issue with the correlation ids
-			throw new JwtAuthenticationException("Invalid Token");
+			throw new JwtAuthenticationException(MessageKeys.OCP_SECURITY_TOKEN_INVALID,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 
 		if (!isPersonTraitsValid(personTraits, jwtTokenRequiredParameterList)) {
-			throw new JwtAuthenticationException("Invalid Token");
+			throw new JwtAuthenticationException(MessageKeys.OCP_SECURITY_TOKEN_INVALID,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 
 		return Jwts.builder()

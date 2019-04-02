@@ -54,8 +54,8 @@ public enum IdTypes {
 			}
 		}
 		MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_IDTYPE_INVALID;
-		String msg = key.getMessage(new Object[] { stringValue });
-		LOGGER.error(msg);
-		throw new OcpRuntimeException(key.getKey(), msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		Object[] params = new Object[] { stringValue };
+		LOGGER.error(key.getMessage(params));
+		throw new OcpRuntimeException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 	}
 }
