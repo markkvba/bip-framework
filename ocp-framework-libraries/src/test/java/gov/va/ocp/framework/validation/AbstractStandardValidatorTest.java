@@ -14,7 +14,6 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.messages.ServiceMessage;
 
 public class AbstractStandardValidatorTest {
@@ -121,19 +120,6 @@ public class AbstractStandardValidatorTest {
 		ReflectionTestUtils.setField(abstractStandardValidator, "supplemental", new Object[] { "test object 1", "test object2" });
 		Object returnValue = ReflectionTestUtils.invokeMethod(abstractStandardValidator, "getSupplemental", Integer.class);
 		assertEquals(returnValue, null);
-	}
-
-	@Test
-	public void resolveRunTimeExceptionTest() {
-		AbstractStandardValidator<String> abstractStandardValidator = new AbstractStandardValidator<String>() {
-
-			@Override
-			public void validate(final String toValidate, final List<ServiceMessage> messages) {
-				// do nothing
-			}
-		};
-		assertTrue(ReflectionTestUtils.invokeMethod(abstractStandardValidator, "resolveRunTimeException",
-				new OcpRuntimeException(null, null, null, null, null)) instanceof OcpRuntimeException);
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.audit;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -28,7 +29,10 @@ import gov.va.ocp.framework.messages.MessageSeverity;
  * @author akulkarni
  */
 @Component
-public class AuditLogSerializer {
+public class AuditLogSerializer implements Serializable {
+
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 1L;
 
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(AuditLogSerializer.class);
 
@@ -56,7 +60,7 @@ public class AuditLogSerializer {
 		if (auditData != null) {
 			try {
 				mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-				mapper.setDateFormat(new SimpleDateFormat(dateFormat, Locale.getDefault()));
+				mapper.setDateFormat(new SimpleDateFormat(dateFormat, Locale.US));
 
 				mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 				mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);

@@ -2,7 +2,6 @@ package gov.va.ocp.framework.rest.provider.aspect;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,9 +22,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.ocp.framework.audit.AuditEventData;
-import gov.va.ocp.framework.audit.AuditEvents;
-import gov.va.ocp.framework.audit.RequestAuditData;
 import gov.va.ocp.framework.audit.AuditLogSerializer;
+import gov.va.ocp.framework.audit.RequestAuditData;
 import gov.va.ocp.framework.audit.ResponseAuditData;
 import gov.va.ocp.framework.constants.AnnotationConstants;
 import gov.va.ocp.framework.log.OcpBanner;
@@ -111,20 +109,6 @@ public class BaseHttpProviderAspect {
 	}
 
 	/**
-	 * Convenience method to get the default audit event data from a method.
-	 *
-	 * @param method the method
-	 * @return the auditable instance
-	 */
-	public static AuditEventData getDefaultAuditableInstance(final Method method) {
-		if (method != null) {
-			return new AuditEventData(AuditEvents.REQUEST_RESPONSE, method.getName(), method.getDeclaringClass().getName());
-		} else {
-			return new AuditEventData(AuditEvents.REQUEST_RESPONSE, "", "");
-		}
-	}
-
-	/**
 	 * Write audit for request.
 	 *
 	 * @param request the request
@@ -179,22 +163,14 @@ public class BaseHttpProviderAspect {
 				|| contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/mixed"))) {
 			final List<String> attachmentTextList = new ArrayList<>();
 			InputStream inputstream = null;
-			// NOSONAR try (ByteArrayInputStream partTooBigMessage =
-			// NOSONAR new ByteArrayInputStream("This part of the request is too big to be displayed.".getBytes())) {
 			try {
 				for (final Part part : httpServletRequest.getParts()) {
 					final Map<String, String> partHeaders = new HashMap<>();
 					populateHeadersMap(part, partHeaders, part.getHeaderNames());
 					inputstream = part.getInputStream();
-					// NOSONAR if (inputstream.available() > gov.va.ocp.framework.log.OcpBaseLogger.MAX_MSG_LENGTH) {
-					// NOSONAR inputstream.close();
-					// NOSONAR inputstream = partTooBigMessage;
-					// NOSONAR }
+					
 					attachmentTextList.add(partHeaders.toString() + ", " + convertBytesToString(inputstream));
-					if (inputstream != null) {
-						inputstream.close();
-					}
-					// NOSONAR IOUtils.closeQuietly(partTooBigMessage);
+					closeInputStreamIfRequired(inputstream);
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
@@ -212,6 +188,12 @@ public class BaseHttpProviderAspect {
 			}
 			requestAuditData.setAttachmentTextList(attachmentTextList);
 			requestAuditData.setRequest(null);
+		}
+	}
+
+	private void closeInputStreamIfRequired(InputStream inputstream) throws IOException {
+		if (inputstream != null) {
+			inputstream.close();
 		}
 	}
 

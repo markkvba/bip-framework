@@ -22,8 +22,10 @@ public enum AuditWsInterceptorConfig {
 
 	/** The class reported as being under audit */
 	private static final Class<WebServiceTemplate> AUDITED = WebServiceTemplate.class;
+
 	/** System new-line character */
 	private static final String NEW_LINE = System.getProperty("line.separator");
+
 	/** Arrow used in message prefixes */
 	private static final String ARROW = " -> ";
 
@@ -59,7 +61,7 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @author aburkholder
 	 */
-	abstract class AuditWsMetadata {
+	abstract class AuditWsMetadata { // NOSONAR The methods need to be private, hence an interface cannot be used
 		/** Get a new AuditEventData instance for the data object being audited */
 		abstract AuditEventData eventData();
 
@@ -79,13 +81,13 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Request extends AuditWsMetadata {
-		/** the ACTIVITY identifier string for the audit event */
-		private static final String ACTIVITY = "webserviceRequest";
+	class RequestMetadata extends AuditWsMetadata {
+		/** the activity identifier string for the audit event */
+		private final String activity = AuditEvents.PARTNER_SOAP_REQUEST.getDefaultActivity();
 
 		@Override
 		AuditEventData eventData() {
-			return new AuditEventData(AuditEvents.PARTNER_SOAP_REQUEST, ACTIVITY, AUDITED.getName());
+			return new AuditEventData(AuditEvents.PARTNER_SOAP_REQUEST, activity, AUDITED.getName());
 		}
 
 		@Override
@@ -95,12 +97,12 @@ public enum AuditWsInterceptorConfig {
 
 		@Override
 		String activity() {
-			return ACTIVITY;
+			return activity;
 		}
 
 		@Override
 		String messagePrefix() {
-			return ACTIVITY + ARROW + title + " : " + NEW_LINE;
+			return activity + ARROW + title + " : " + NEW_LINE;
 		}
 	}
 
@@ -109,8 +111,8 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Request - the metadata for auditing webservice request objects
 	 */
-	Request request() {
-		return new Request();
+	RequestMetadata requestMetadata() {
+		return new RequestMetadata();
 	}
 
 	/**
@@ -119,13 +121,23 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Response extends AuditWsMetadata {
-		/** the ACTIVITY identifier string for the audit event */
-		static final String ACTIVITY = "webserviceResponse";
+	class ResponseMetadata extends AuditWsMetadata {
+		/** the activity identifier string for the audit event */
+		private final String activity;
+
+		/** Instantiate default metadata */
+		public ResponseMetadata() {
+			this.activity = AuditEvents.PARTNER_SOAP_RESPONSE.getDefaultActivity();
+		}
+
+		/** Intended for subclasses to instantiate default metadata */
+		protected ResponseMetadata(AuditEvents auditEvent) {
+			this.activity = auditEvent.getDefaultActivity();
+		}
 
 		@Override
 		AuditEventData eventData() {
-			return new AuditEventData(AuditEvents.PARTNER_SOAP_RESPONSE, ACTIVITY, AUDITED.getName());
+			return new AuditEventData(AuditEvents.PARTNER_SOAP_RESPONSE, activity, AUDITED.getName());
 		}
 
 		@Override
@@ -135,12 +147,12 @@ public enum AuditWsInterceptorConfig {
 
 		@Override
 		String activity() {
-			return ACTIVITY;
+			return activity;
 		}
 
 		@Override
 		String messagePrefix() {
-			return ACTIVITY + ARROW + title + " : " + NEW_LINE;
+			return activity + ARROW + title + " : " + NEW_LINE;
 		}
 	}
 
@@ -149,8 +161,8 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Response - the metadata for auditing webservice response objects
 	 */
-	Response response() {
-		return new Response();
+	ResponseMetadata responseMetadata() {
+		return new ResponseMetadata();
 	}
 
 	/**
@@ -159,10 +171,11 @@ public enum AuditWsInterceptorConfig {
 	 * @see AuditWsMetadata
 	 * @author aburkholder
 	 */
-	class Fault extends Response {
-
-		/** the activity identifier string for the audit event */
-		static final String ACTIVITY = "webserviceResponse_SOAP-FAULT";
+	class FaultMetadata extends ResponseMetadata {
+		/** Instantiate with the activity identifier string for the audit event */
+		public FaultMetadata() {
+			super(AuditEvents.PARTNER_SOAP_FAULT);
+		}
 	}
 
 	/**
@@ -170,7 +183,7 @@ public enum AuditWsInterceptorConfig {
 	 *
 	 * @return Response - the metadata for auditing webservice response objects
 	 */
-	Fault fault() {
-		return new Fault();
+	FaultMetadata faultMetadata() {
+		return new FaultMetadata();
 	}
 }

@@ -56,7 +56,7 @@ public class AuditLogSerializerTest {
 	@InjectMocks
 	private AuditLogSerializer auditLogSerializer = new AuditLogSerializer();
 
-	AuditEventData auditEventData = new AuditEventData(AuditEvents.REQUEST_RESPONSE, "MethodName", "ClassName");
+	AuditEventData auditEventData = new AuditEventData(AuditEvents.API_REST_REQUEST, "MethodName", "ClassName");
 
 	AuditEventData auditServiceEventData = new AuditEventData(AuditEvents.SERVICE_AUDIT, "MethodName", "ClassName");
 
