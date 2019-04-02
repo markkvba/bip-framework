@@ -40,8 +40,16 @@ public class ServiceMessage extends AbstractMessage {
 
 	private String status;
 
+	/** The message key enum */
 	@JsonIgnore
+	private MessageKey messageKey;
+
+	/** The replaceable parameters for the message key */
+	@JsonIgnore
+	private Object[] messageParams;
+
 	/** The Http status enum. */
+	@JsonIgnore
 	private HttpStatus httpStatus;
 
 	/** The message severity. */
@@ -51,56 +59,36 @@ public class ServiceMessage extends AbstractMessage {
 
 	/**
 	 * Instantiates a new message.
-	 */
-	public ServiceMessage() { // NOSONAR @NotNull is a validation annotation, not a usage annotation
-		super(); // NOSONAR @NotNull is a validation annotation, not a usage annotation
-	} // NOSONAR @NotNull is a validation annotation, not a usage annotation
-
-	/**
-	 * Instantiates a new message.
 	 *
-	 * @param severity the severity for the cause of the message
-	 * @param key the key representing the "error code" for the message
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the cause of the message
+	 * @param severity - the severity for the cause of the message
+	 * @param key - the key representing the "error code" for the message
+	 * @param httpStatus - the http status associated with the cause of the message
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public ServiceMessage(final MessageSeverity severity, final String key, final String text, final HttpStatus httpStatus) {
-		super();
-		this.severity = severity;
-		this.key = key;
-		this.text = text;
-		this.httpStatus = httpStatus;
-	}
-
-	/**
-	 * Instantiates a new message providing only replaceable parameters for the message text.
-	 *
-	 * @param paramCount the number of elements in the name and value arrays
-	 * @param paramNames the names, in same order as thier respective getParamValues
-	 * @param paramValues the values, in same order as their respective getParamNames
-	 */
-	public ServiceMessage(Integer paramCount, String[] paramNames, String[] paramValues) {
-		super(paramCount, paramNames, paramValues);
+	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key, Object... params) {
+		this(severity, httpStatus, null, key, params);
 	}
 
 	/**
 	 * Instantiates a new message, populating all available fields.
 	 *
-	 * @param severity the severity for the cause of the message
-	 * @param key the key representing the "error code" for the message
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the cause of the message
-	 * @param paramCount the number of elements in the name and value arrays
-	 * @param paramNames the names, in same order as thier respective getParamValues
-	 * @param paramValues the values, in same order as their respective getParamNames
+	 * @param severity - the severity for the cause of the message
+	 * @param httpStatus - the http status associated with the cause of the message
+	 * @param constraintParams - an array of constraint parameters
+	 * @param key - the key representing the "error code" for the message
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public ServiceMessage(final MessageSeverity severity, final String key, final String text, HttpStatus httpStatus,
-			Integer paramCount, String[] paramNames, String[] paramValues) {
-		super(paramCount, paramNames, paramValues);
+	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus,
+			final ConstraintParam[] constraintParams, final MessageKey key, Object... params) {
+		super(constraintParams); // always call super() to set the timestamp
 		this.severity = severity;
-		this.key = key;
-		this.text = text;
 		this.httpStatus = httpStatus;
+		this.messageKey = key;
+		this.messageParams = params;
+
+		this.key = key.getKey();
+		this.text = key.getMessage(params);
+		this.status = Integer.toString(httpStatus.value());
 	}
 
 	/**

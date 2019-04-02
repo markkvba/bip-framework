@@ -108,6 +108,10 @@ public enum MessageKeys implements MessageKey {
 	OCP_VALIDATOR_INITIALIZE_ERROR_UNEXPECTED("ocp.validator.initialize.error.unexpected",
 			"Could not initialize standard validator."),
 	OCP_VALIDATOR_ASSERTION("ocp.validator.assertion", "Assertion failed."),
+	/** Object cannot be null; {0} the object that cannot be null */
+	OCP_VALIDATOR_NOT_NULL("ocp.validator.not.null", "Object cannot be null."),
+	/** {0} = validated object class name; {1} = expected class name */
+	OCP_VALIDATOR_TYPE_MISMATCH("ocp.validator.type.mismatch", "Validated object is not of excpected type."),
 
 	/** Simulator could not find mock response file; {0} = XML file name; {1} = key used to construct file name */
 	OCP_REMOTE_MOCK_NOT_FOUND("ocp.remote.mock.not.found",

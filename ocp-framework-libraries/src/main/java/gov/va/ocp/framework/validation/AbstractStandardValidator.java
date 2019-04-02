@@ -80,8 +80,8 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			// request-level null check
 			if (toValidate == null) {
 				LOGGER.debug("Request is null");
-				messagesToAdd.add(new ServiceMessage(MessageSeverity.ERROR, "", callingMethodName + " Request cannot be null.",
-						HttpStatus.BAD_REQUEST));
+				messagesToAdd.add(new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
+						MessageKeys.OCP_VALIDATOR_NOT_NULL, callingMethodName));
 				return;
 			}
 
@@ -126,10 +126,10 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 	}
 
 	private void handleInvalidClass(final Object toValidate, final List<ServiceMessage> messages) {
-		String msg = callingMethodName + " Validated object '" + toValidate.getClass().getName()
-				+ "' is not of type '" + getValidatedType().getName() + "'";
-		LOGGER.debug(msg);
-		messages.add(new ServiceMessage(MessageSeverity.ERROR, "", msg, HttpStatus.BAD_REQUEST));
+		MessageKeys key = MessageKeys.OCP_VALIDATOR_TYPE_MISMATCH;
+		Object[] params = new Object[] { toValidate.getClass().getName(), getValidatedType().getName() };
+		LOGGER.debug(key.getMessage(params));
+		messages.add(new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, key, params));
 	}
 
 	/*

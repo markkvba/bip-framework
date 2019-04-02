@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import gov.va.ocp.framework.messages.ConstraintParam;
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.transfer.AbstractResponseObject;
@@ -42,22 +44,17 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	 * <p>
 	 * Messages made with this constructor CANNOT be used in a JSR303 context.
 	 *
-	 * @param severity the severity of the message
-	 * @param key the key "code word" for support calls
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the message
+	 * @param severity - the severity of the message
+	 * @param httpStatus - the http status associated with the message
+	 * @param key - the key "code" for support calls
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public final void addMessage(final MessageSeverity severity, final String key, final String text,
-			final HttpStatus httpStatus) {
+	public final void addMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key,
+			final Object... params) {
 		if (serviceMessages == null) {
 			serviceMessages = new LinkedList<>();
 		}
-		final ServiceMessage serviceMessage = new ServiceMessage();
-		serviceMessage.setSeverity(severity);
-		serviceMessage.setKey(key);
-		serviceMessage.setText(text);
-		serviceMessage.setHttpStatus(httpStatus);
-		serviceMessages.add(serviceMessage);
+		serviceMessages.add(new ServiceMessage(severity, httpStatus, key, params));
 	}
 
 	/**
@@ -66,28 +63,17 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	 * Messages made with this constructor CAN be used in a JSR303 context.
 	 *
 	 * @param severity the severity of the message
-	 * @param key the key "code word" for support calls
-	 * @param text the text of the message
 	 * @param httpStatus the http status associated with the message
-	 * @param paramCount the number of replaceable parameters in the message
-	 * @param paramNames the names of the replaceable parameters in the message
-	 * @param paramValues the values of the replaceable parameters in the message
+	 * @param constraintParams - an array of constraint parameters
+	 * @param key the key "code" for support calls
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public final void addMessage(final MessageSeverity severity, final String key, final String text,
-			final HttpStatus httpStatus,
-			Integer paramCount, String[] paramNames, String[] paramValues) {
+	public final void addMessage(final MessageSeverity severity, final HttpStatus httpStatus, final ConstraintParam[] constraintParams,
+			final MessageKey key, final Object... params) {
 		if (serviceMessages == null) {
 			serviceMessages = new LinkedList<>();
 		}
-		final ServiceMessage serviceMessage = new ServiceMessage();
-		serviceMessage.setSeverity(severity);
-		serviceMessage.setKey(key);
-		serviceMessage.setText(text);
-		serviceMessage.setHttpStatus(httpStatus);
-		serviceMessage.setParamCount(paramCount);
-		serviceMessage.setParamNames(paramNames);
-		serviceMessage.setParamValues(paramValues);
-		serviceMessages.add(serviceMessage);
+		serviceMessages.add(new ServiceMessage(severity, httpStatus, constraintParams, key, params));
 	}
 
 	/**
@@ -129,6 +115,7 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	 * @param severity the severity
 	 * @return true, if successful
 	 */
+	@Override
 	protected boolean hasMessagesOfType(final MessageSeverity severity) {
 		for (final ServiceMessage serviceMessage : getMessages()) {
 			if (severity.equals(serviceMessage.getSeverity())) {

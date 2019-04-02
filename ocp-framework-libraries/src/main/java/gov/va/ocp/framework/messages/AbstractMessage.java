@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModelProperty;
-
 /**
  * ServiceMessage is a generic abstraction of a "message" or "notification" which is layer agnostic and can be used to communicate
  * status or
@@ -27,84 +25,37 @@ public abstract class AbstractMessage implements Serializable {
 	/** The Constant serialVersisonUID. */
 	private static final long serialVersionUID = -1711431368372127556L;
 
-	private Integer parameterCount = 0; // NOSONAR cannot be final
-
-	private String[] parameterNames; // NOSONsAR cannot be final
-
-	private String[] parameterValues; // NOSONAR cannot be final
+	private ConstraintParam[] constraintParameters; // NOSONsAR cannot be final
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 	private Date timestamp; // NOSONAR cannot be final
 
 	/**
-	 * Construct a message providing only replaceable parameters.
-	 *
-	 * @param paramCount
-	 * @param paramNames
-	 * @param paramValues
-	 */
-	// NOSONAR not duplicate
-	public AbstractMessage(Integer paramCount, String[] paramNames, String[] paramValues) {
-		super();
-		this.parameterCount = paramCount;
-		this.parameterNames = paramNames;
-		this.parameterValues = paramValues;
-		this.timestamp = new Date();
-	}
-
-	/**
 	 * Construct default (empty) message object.
 	 */
-	// NOSONAR not duplicate
 	public AbstractMessage() {
 		super();
 		this.timestamp = new Date();
 	}
 
 	/**
-	 * An in-order array of replaceable parameter names used in the message.
-	 * These are the literal strings between the curly braces.
+	 * Construct a message object containing an array of contraint parameters.
+	 */
+	public AbstractMessage(ConstraintParam[] constraintParams) {
+		this(); // set the timestamp
+		this.constraintParameters = constraintParams;
+	}
+
+	/**
+	 * An array of the constraint parameter names in a message.
+	 * The names are those found between the curly braces of replaceable parameters.
 	 *
-	 * @return String[] the names, in same order as thier respective getParamValues()
+	 * @return ConstraintParam the constraint parameter
 	 */
 	@JsonIgnore
-	@JsonProperty(value = "parameterNames")
-	public String[] getParamNames() {  	// NOSONAR not duplicate
-		return parameterNames;
-	}
-
-	/**
-	 * An in-order array of replaceable parameter names used in the message.
-	 * These are the literal strings between the curly braces.
-	 *
-	 * @param paramNames the names, in same order as thier respective getParamValues()
-	 */
-	@ApiModelProperty(hidden = true)
-	public void setParamNames(String[] paramNames) {  	// NOSONAR not duplicate
-		this.parameterNames = paramNames;
-	}
-
-	/**
-	 * An in-order array of replaceable parameter values used in the message.
-	 * These are the values that replace the parameters in the message.
-	 *
-	 * @return String[] the values, in same order as their respective getParamNames()
-	 */
-	@JsonIgnore
-	@JsonProperty(value = "parameterValues")
-	public String[] getParamValues() {  	// NOSONAR not duplicate
-		return parameterValues;
-	}
-
-	/**
-	 * An in-order array of replaceable parameter values used in the message.
-	 * These are the values that replace the parameters in the message.
-	 *
-	 * @param paramValues the values, in same order as their respective getParamNames()
-	 */
-	@ApiModelProperty(hidden = true)
-	public void setParamValues(String[] paramValues) { 	// NOSONAR not duplicate
-		this.parameterValues = paramValues;
+	@JsonProperty(value = "constraintParameters")
+	public ConstraintParam[] getConstraintParams() {
+		return this.constraintParameters;
 	}
 
 	/**
@@ -115,17 +66,7 @@ public abstract class AbstractMessage implements Serializable {
 	@JsonIgnore
 	@JsonProperty(value = "parameterCount")
 	public Integer getParamCount() {  	// NOSONAR not duplicate
-		return parameterCount;
-	}
-
-	/**
-	 * Number of elements in the getParamNames() and getParamValues() arrays.
-	 *
-	 * @param paramCount the number of elements in the arrays
-	 */
-	@ApiModelProperty(hidden = true)
-	public void setParamCount(Integer paramCount) {  	// NOSONAR not duplicate
-		this.parameterCount = paramCount;
+		return constraintParameters == null ? 0 : constraintParameters.length;
 	}
 
 	/**
