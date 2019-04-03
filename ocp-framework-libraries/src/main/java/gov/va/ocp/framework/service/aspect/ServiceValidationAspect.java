@@ -47,6 +47,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(ServiceValidationAspect.class);
 
+	/** Text added to end of class name to determine its validator name */
 	private static final String POSTFIX = "Validator";
 
 	/**
@@ -107,10 +108,19 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 
 	}
 
+	/**
+	 * Returns {@code true} if DomainResponse is not {@code null} and its messages list is {@code null} or empty.
+	 */
 	private boolean isDomainResponseValid(final DomainResponse domainResponse) {
-		return (domainResponse == null) || (domainResponse.getMessages() == null) || domainResponse.getMessages().isEmpty();
+		return domainResponse != null && (domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty());
 	}
 
+	/**
+	 * Validates all input args to a method.
+	 * 
+	 * @param methodParams - the method args
+	 * @param method - the method being executed
+	 */
 	private DomainResponse validateInputsToTheMethod(final List<Object> methodParams, final Method method) {
 		DomainResponse domainResponse = null;
 		if (methodParams != null) {
@@ -121,7 +131,9 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			}
 			// add any validation error messages
 			if (!messages.isEmpty()) {
-				domainResponse = new DomainResponse();
+				if(domainResponse == null) {
+					domainResponse = new DomainResponse();
+				}
 				domainResponse.addMessages(messages);
 			}
 		}
@@ -143,7 +155,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	private void handleValidatorInstantiationExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
 		// Validator programming issue - throw exception
 		MessageKeys key = MessageKeys.OCP_DEV_ILLEGAL_INVOCATION;
-		Object[] params = new Object[] { (validatorClass != null ? validatorClass.getName() : null), "validate",
+		Object[] params = new Object[] { (validatorClass != null ? validatorClass.getName() : "null"), "validate",
 				object.getClass().getName(), Validator.class.getName() };
 		LOGGER.error(key.getMessage(params), e);
 		throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e,params);

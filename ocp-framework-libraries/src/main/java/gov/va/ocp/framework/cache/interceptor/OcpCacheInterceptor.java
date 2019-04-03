@@ -101,8 +101,6 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 					MessageSeverity.INFO, null);
 			LOGGER.debug(ADVICE_NAME + " audit logging handed off to async.");
 
-			throw new OcpRuntimeException(MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED,
-					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Throwable throwable) { // NOSONAR intentionally catching throwable
 			this.handleInternalException(ADVICE_NAME, ACTIVITY, auditEventData, throwable);
 			throw throwable;
@@ -110,7 +108,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			LOGGER.debug(ADVICE_NAME + " finished.");
 		}
 
-//		return response;
+		return response;
 	}
 
 	/**
