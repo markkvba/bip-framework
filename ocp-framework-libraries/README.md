@@ -21,14 +21,14 @@ This project contains interfaces, annotations and classes consumed by the applic
 
 ## Class Diagrams
 
-##### Package for Audting
+##### Auditing Package
 gov.va.ocp.framework.audit
 
 <img src = "/images/cd-audit-package.jpg">
 
-##### Packages for Aspects Join Points and Pointcuts
-   gov.va.ocp.framework.aspect
-   gov.va.ocp.framework.rest.provider.aspect
-   gov.va.ocp.framework.service.aspect
+##### Aspects Join Points and Pointcuts Packages
+   gov.va.ocp.framework.aspect <br/>
+   gov.va.ocp.framework.rest.provider.aspect<br/>
+   gov.va.ocp.framework.service.aspect<br/>
    
 <img src = "/images/cd-aspect-packages.jpg">
