@@ -68,7 +68,7 @@ public class OcpRestGlobalExceptionHandler {
 	private String deriveMessage(Exception ex, MessageKey key, Object... params) {
 		MessageKey msgkey = deriveKey(key);
 		String msg = msgkey.getMessage(params);
-		if (StringUtils.isBlank(msg) || msg.matches("{[a-zA-Z0-9]{0,64}}")) {
+		if (StringUtils.isBlank(msg) || msg.matches("\\{[a-zA-Z0-9]{0,64}\\}")) {
 			msg = msg + " :: "
 					+ (ex != null && !StringUtils.isBlank(ex.getMessage())
 							? ex.getMessage()
