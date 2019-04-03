@@ -30,7 +30,7 @@ public class OcpCacheInterceptorTest {
 	OcpCacheInterceptor ocpCacheInterceptor = new OcpCacheInterceptor();
 
 	class TestObject {
-		public String testMethod(final String msg) {
+		public String testMethod(String msg) {
 			return "Hello";
 		}
 	}

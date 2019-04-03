@@ -41,20 +41,12 @@ public class ServiceMessageTest {
 		assertEquals(TEST_KEY_MESSAGE, serviceMessage.getText());
 	}
 
-	// @Test
-	// public void testParamsConstructor() throws Exception {
-	// ServiceMessage serviceMessage = new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, TEST_KEY,
-	// 1, new String[] { "0" }, new String[] { "1" });
-	// assertEquals(new Integer(1), serviceMessage.getParamCount());
-	// }
-
-	// @Test
-	// public void testParamsOnlyConstructor() throws Exception {
-	// ServiceMessage serviceMessage = new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, TEST_KEY, 1,
-	// new String[] { "0" }, new String[] { "1" });
-	// assertEquals(new Integer(1), serviceMessage.getParamCount());
-	// assertNull(serviceMessage.getHttpStatus());
-	// }
+	@Test
+	public void testParamsConstructor() throws Exception {
+		ServiceMessage serviceMessage = new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
+				new ConstraintParam[] { new ConstraintParam("param1", "para1Value") }, TEST_KEY, new Object[] {});
+		assertEquals(new Integer(1), serviceMessage.getParamCount());
+	}
 
 	//TODO: TO BE REVIEWED AS ITS FAILING IN DEV PIPELINE
 	//	@Test
@@ -65,7 +57,7 @@ public class ServiceMessageTest {
 	//	}
 
 	@Test
-	public void testSetAndGetStatus() throws Exception {
+	public void testGetStatus() throws Exception {
 		ServiceMessage message1 =
 				new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, TEST_KEY, "ServiceMessage text");
 		assertTrue(message1.getHttpStatus() == HttpStatus.BAD_REQUEST);
