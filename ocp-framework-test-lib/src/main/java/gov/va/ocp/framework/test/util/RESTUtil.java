@@ -47,7 +47,7 @@ import org.springframework.web.client.RestTemplate;
 import gov.va.ocp.framework.test.service.RESTConfigService;
 
 /**
- * It is a wrapper for rest assured API for making HTTP calls, parse JSON and
+ * It is a wrapper for rest Template API for making HTTP calls, parse JSON and
  * xml responses and status code check.
  *
  * @author sravi
@@ -181,7 +181,7 @@ public class RESTUtil {
 	}
 	
 	/**
-	 * Invokes REST end point for a multipart method using REST assured API and
+	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
 	 *
 	 * @param serviceURL
@@ -230,6 +230,10 @@ public class RESTUtil {
 		return executeAPI(serviceURL, request, HttpMethod.POST);		
 	}
 	
+	/**
+	 * Loads the KeyStore and password in to rest Template API so all the API's are SSL enabled.
+	 */
+
 	private RestTemplate getRestTemplate() {
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
 		RestTemplate restTemplate = new RestTemplate();

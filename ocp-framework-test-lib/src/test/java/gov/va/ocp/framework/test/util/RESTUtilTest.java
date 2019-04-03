@@ -90,6 +90,12 @@ public class RESTUtilTest {
 	}
 
 	@Test
+	public void test_getResponse_validKeyStore() {
+		String response = restUtil.getResponse("http://localhost:9999/person");
+		assertThat(true, equalTo(!response.isEmpty()));
+	}
+	
+	@Test
 	public void test_setUpRequest_WithBody_Failed() {
 		Map<String, String> mapHeader = new HashMap<String, String>();
 		restUtil.setUpRequest("nonexistsfile.request", mapHeader);
