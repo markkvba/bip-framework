@@ -2,9 +2,10 @@ package gov.va.ocp.framework.messages;
 
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import gov.va.ocp.framework.config.MessageKeysConfig;
 
 /**
  * The official source for framework message keys and their messages.
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
  *
  * @author aburkholder
  */
-@Component
 public enum MessageKeys implements MessageKey {
 
 	/** No key provided or specified; no args */
@@ -108,7 +108,8 @@ public enum MessageKeys implements MessageKey {
 	private String key;
 	/** A default message, in case the key is not found in framework-messages.properties */
 	private String defaultMessage;
-
+	/** The spring message source */
+	private MessageSource messageSource;
 	/**
 	 * Construct keys with their property file counterpart key and a default message.
 	 *
@@ -118,11 +119,11 @@ public enum MessageKeys implements MessageKey {
 	private MessageKeys(String key, String defaultMessage) {
 		this.key = key;
 		this.defaultMessage = defaultMessage;
+		AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(MessageKeysConfig.class);
+		this.messageSource = ((MessageSource) appContext.getBean("messageSource"));
+		appContext.close();
 	}
 
-	/** The spring message source */
-	@Autowired
-	private MessageSource messageSource;
 
 	/*
 	 * (non-Javadoc)

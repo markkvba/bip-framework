@@ -181,7 +181,7 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 	public void testHandleAnyRethrownExceptions() {
 		providerHttpAspect = mock(ProviderHttpAspect.class);
 		ResponseEntity<ProviderResponse> entity = ReflectionTestUtils.invokeMethod(providerHttpAspect, "handleAnyRethrownExceptions",
-				"test adviceName", new Throwable("test Message"));
+				"test adviceName", new Throwable("test Message"), new Throwable());
 		assertNotNull(entity);
 	}
 

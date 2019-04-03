@@ -3,10 +3,8 @@ package gov.va.ocp.framework.exception.interceptor;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import java.lang.reflect.Method;
 import java.util.List;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,21 +14,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.slf4j.event.Level;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
-
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { JacksonAutoConfiguration.class })
 public class ExceptionHandlingUtilsTest {
 
-	private static final String TEST_MESSAGE = "test message";
+	private static final String TEST_KEY_MESSAGE = "NO_KEY";
 
-	private static final String TEST_KEY = "test key";
+	private static final MessageKey TEST_KEY = MessageKeys.NO_KEY;
 
 	@SuppressWarnings("rawtypes")
 	@Mock
@@ -106,10 +107,10 @@ public class ExceptionHandlingUtilsTest {
 
 	@Test
 	public void testConvertFromOcpExceptionExtender() {
-		OcpRuntimeException resolvedRuntimeException = ExceptionHandlingUtils.convertFromOcpExceptionExtender(
-				new OcpRuntimeException(TEST_KEY, TEST_MESSAGE, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST));
-		assertTrue(resolvedRuntimeException.getKey().equals(TEST_KEY));
-		assertTrue(resolvedRuntimeException.getMessage().equals(TEST_MESSAGE));
+		OcpRuntimeException resolvedRuntimeException = ExceptionHandlingUtils
+				.convertFromOcpExceptionExtender(new OcpRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST));
+		assertTrue(resolvedRuntimeException.getKey().equals(TEST_KEY.getKey()));
+		assertTrue(resolvedRuntimeException.getMessage().equals(TEST_KEY_MESSAGE));
 		assertTrue(resolvedRuntimeException.getSeverity().equals(MessageSeverity.ERROR));
 		assertTrue(resolvedRuntimeException.getStatus().equals(HttpStatus.BAD_REQUEST));
 	}
@@ -119,9 +120,8 @@ public class ExceptionHandlingUtilsTest {
 		try {
 			ExceptionHandlingUtils.convertFromOcpExceptionExtender(new RuntimeException());
 		} catch (OcpRuntimeException e) {
-			assertTrue(e.getKey().equals(""));
-			String msg = "Could not instantiate OcpRuntimeException using values from throwable java.lang.RuntimeException";
-			assertTrue(e.getMessage().equals(msg));
+			assertTrue(e.getKey().equals(MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES.getKey()));
+			assertTrue(e.getMessage().equals(MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES.getMessage((Object[]) null)));
 			assertTrue(e.getSeverity().equals(MessageSeverity.FATAL));
 			assertTrue(e.getStatus().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
@@ -131,7 +131,7 @@ public class ExceptionHandlingUtilsTest {
 	public void testCastToOcpRuntimeException() {
 		try {
 			ExceptionHandlingUtils.castToOcpRuntimeException(
-					new OcpRuntimeException(TEST_KEY, TEST_MESSAGE, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST));
+					new OcpRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST));
 		} catch (OcpRuntimeException e) {
 			assertTrue(e.getKey().equals(""));
 			String msg = "Could not instantiate OcpRuntimeException using values from throwable java.lang.RuntimeException";
@@ -146,9 +146,8 @@ public class ExceptionHandlingUtilsTest {
 		try {
 			ExceptionHandlingUtils.convertFromOcpExceptionExtender(new RuntimeException());
 		} catch (OcpRuntimeException e) {
-			assertTrue(e.getKey().equals(""));
-			String msg = "Could not instantiate OcpRuntimeException using values from throwable java.lang.RuntimeException";
-			assertTrue(e.getMessage().equals(msg));
+			assertTrue(e.getKey().equals(MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES.getKey()));
+			assertTrue(e.getMessage().equals(MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES.getMessage((Object[]) null)));
 			assertTrue(e.getSeverity().equals(MessageSeverity.FATAL));
 			assertTrue(e.getStatus().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 		}

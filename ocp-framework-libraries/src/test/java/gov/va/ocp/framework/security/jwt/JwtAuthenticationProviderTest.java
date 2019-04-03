@@ -83,7 +83,7 @@ public class JwtAuthenticationProviderTest {
 			fail("Should have thrown JwtAuthenticationException.");
 		} catch (final Exception e) {
 			assertTrue(JwtAuthenticationException.class.isAssignableFrom(e.getClass()));
-			assertTrue("Invalid Token".equals(e.getMessage()));
+			assertTrue("Invalid Token.".equals(e.getMessage()));
 		}
 		assertNull(result);
 	}

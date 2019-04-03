@@ -19,8 +19,6 @@ import gov.va.ocp.framework.messages.MessageSeverity;
 public class OcpRuntimeException extends RuntimeException implements OcpExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
-	private static final String serverName = System.getProperty("server.name");
-
 	/** The consumer facing identity key */
 	private final MessageKey key;
 	/** Any values needed to fill in params (e.g. value for {0}) in the MessageKey message */
@@ -95,6 +93,6 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 
 	@Override
 	public String getServerName() {
-		return serverName;
+		return System.getProperty("server.name");
 	}
 }

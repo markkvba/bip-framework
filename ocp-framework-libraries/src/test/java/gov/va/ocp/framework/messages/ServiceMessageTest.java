@@ -82,11 +82,17 @@ public class ServiceMessageTest {
 //	}
 
 	@Test
-	public void testSetStatus() throws Exception {
+	public void testSetAndGetStatus() throws Exception {
 		ServiceMessage message1 = new ServiceMessage(MessageSeverity.INFO, "UnitTestKey", "TextMsg", null);
 		message1.setHttpStatus(HttpStatus.BAD_REQUEST);
 		assertTrue(message1.getHttpStatus() == HttpStatus.BAD_REQUEST);
 		assertNotNull(message1.getStatus());
+	}
+
+	@Test
+	public void testGetStatusWhenNull() throws Exception {
+		ServiceMessage message1 = new ServiceMessage(MessageSeverity.INFO, "UnitTestKey", "TextMsg", null);
+		assertNull(message1.getStatus());
 	}
 
 	@Test
