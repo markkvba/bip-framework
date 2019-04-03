@@ -35,6 +35,7 @@ import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.exception.OcpPartnerException;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
@@ -52,16 +53,10 @@ public class OcpRestGlobalExceptionHandler {
 	private static final Logger logger = LoggerFactory.getLogger(OcpRestGlobalExceptionHandler.class);
 
 	/**
-	 * Return value if no key has been specified.
-	 * To get default key, use {@link #deriveKey(OcpExceptionExtender)} or {@link #deriveKey(String)}.
-	 */
-	private static final String NO_KEY = "NO-KEY";
-
-	/**
 	 * Return value if no exception exists to provide a message.
 	 * To get default message text, use {@link #deriveMessage(Exception)}.
 	 */
-	private static final String NO_MESSAGE = "Source exception has no message.";
+	private static final String NO_EXCEPTION_MESSAGE = "Source exception has no message.";
 
 	/**
 	 * For java.lang.Exception and all subclasses.
@@ -70,52 +65,57 @@ public class OcpRestGlobalExceptionHandler {
 	 * @param ex the Exception
 	 * @return String the message
 	 */
-	private String deriveMessage(Exception ex) {
-		if (ex == null) {
-			return NO_MESSAGE;
-		} else {
-			return StringUtils.isBlank(ex.getMessage()) && ex.getCause() != null
-					? ex.getCause().getMessage()
-					: StringUtils.isBlank(ex.getMessage()) ? NO_MESSAGE : ex.getMessage();
+	private String deriveMessage(Exception ex, MessageKey key, Object... params) {
+		MessageKey msgkey = deriveKey(key);
+		String msg = msgkey.getMessage(params);
+		if (StringUtils.isBlank(msg) || msg.matches("{[a-zA-Z0-9]{0,64}}")) {
+			msg = msg + " :: "
+					+ (ex != null && !StringUtils.isBlank(ex.getMessage())
+							? ex.getMessage()
+							: (ex != null && ex.getCause() != null && !StringUtils.isBlank(ex.getCause().getMessage())
+									? ex.getCause().getMessage()
+									: NO_EXCEPTION_MESSAGE));
 		}
+		return msg;
 	}
 
 	/**
-	 * If key is empty, returns the constant "NO-KEY".
+	 * If key is null, returns the "NO-KEY" key.
 	 *
-	 * @param key the initial string intended to represent the key
-	 * @return String the key, or NO_KEY
+	 * @param key - the initial string intended to represent the key
+	 * @return MessageKey - the key, or NO_KEY
 	 */
-	private String deriveKey(String key) {
-		return StringUtils.isBlank(key) ? NO_KEY : key;
+	private MessageKey deriveKey(MessageKey key) {
+		return key == null ? MessageKeys.NO_KEY : key;
 	}
 
 	/**
 	 * INFO logs the exception and its details.
 	 *
-	 * @param ex the exception
-	 * @param key the key to use for reporting to support/maintenance
-	 * @param severity the MessageSeverity to report for the exception
-	 * @param status the status to report for the exception
+	 * @param ex - the exception
+	 * @param key - the key to use for reporting to support/maintenance
+	 * @param severity - the MessageSeverity to report for the exception
+	 * @param status - the status to report for the exception
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(Exception ex, String key, MessageSeverity severity, HttpStatus status) {
-		log(Level.INFO, ex, key, deriveMessage(ex), severity, status);
+	private void log(Exception ex, MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+		log(Level.INFO, ex, key, severity, status, params);
 	}
 
 	/**
 	 * Logs the exception and its details.
 	 *
-	 * @param level the Log Level to log at
-	 * @param ex the exception
-	 * @param key the key to use for reporting to support/maintenance
-	 * @param message the message
-	 * @param severity the MessageSeverity to report for the exception
-	 * @param status the status to report for the exception
+	 * @param level - the Log Level to log at
+	 * @param ex - the exception
+	 * @param key - the key to use for reporting to support/maintenance
+	 * @param severity - the MessageSeverity to report for the exception
+	 * @param status - the status to report for the exception
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(Level level, Exception ex, String key, String message, MessageSeverity severity, HttpStatus status) {
+	private void log(Level level, Exception ex, MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
 		String msg = status + "-" + severity + " "
 				+ (ex == null ? "null" : ex.getClass().getName()) + " "
-				+ deriveKey(key) + ":" + message;
+				+ deriveKey(key) + ":" + key.getMessage(params);
 		if (Level.ERROR.equals(level)) {
 			logger.error(msg, ex);
 		} else if (Level.WARN.equals(level)) {
@@ -132,45 +132,48 @@ public class OcpRestGlobalExceptionHandler {
 	 *
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> failSafeHandler() {
-		log(Level.ERROR, null, NO_KEY, NO_MESSAGE, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+	protected ResponseEntity<Object> failsafeHandler() {
+		log(Level.ERROR, null, MessageKeys.NO_KEY, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		ProviderResponse apiError = new ProviderResponse();
-		apiError.addMessage(MessageSeverity.FATAL, NO_KEY, NO_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+		apiError.addMessage(MessageSeverity.FATAL, MessageKeys.NO_KEY.getKey(), MessageKeys.NO_KEY.getMessage(),
+				HttpStatus.INTERNAL_SERVER_ERROR);
 		return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	/**
 	 * Standard exception handler for any exception that implements {@link OcpExceptionExtender}.
 	 *
-	 * @param ex the exception that implements OcpExceptionExtender
-	 * @param httpResponseStatus the status to put on the HTTP Response Entity.
-	 * @return ResponseEntity the HTTP Response Entity
+	 * @param ex - the exception that implements OcpExceptionExtender
+	 * @param httpResponseStatus - the status to put on the HTTP Response Entity.
+	 * @return ResponseEntity - the HTTP Response Entity
 	 */
 	protected ResponseEntity<Object> standardHandler(OcpExceptionExtender ex, HttpStatus httpResponseStatus) {
-		if (ex == null) {
-			return failSafeHandler();
+		if (ex == null || ex.getMessageKey() == null) {
+			return failsafeHandler();
 		}
-		return standardHandler((Exception) ex, MessageKeys.NO_KEY, ex.getSeverity(), httpResponseStatus);
+		return standardHandler((Exception) ex, ex.getMessageKey(), ex.getSeverity(), httpResponseStatus);
 	}
 
 	/**
 	 * Standard exception handler for any Exception.
 	 *
-	 * @param ex the Exception
-	 * @param key the key to use for reporting to support/maintenance
-	 * @param severity the MessageSeverity to report for the exception
-	 * @param httpResponseStatus the status to put on the HTTP Response Entity.
+	 * @param ex - the Exception
+	 * @param key - the key to use for reporting to support/maintenance
+	 * @param severity - the MessageSeverity to report for the exception
+	 * @param httpResponseStatus - the status to put on the HTTP Response Entity.
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> standardHandler(Exception ex, MessageKeys key, MessageSeverity severity,
-			HttpStatus httpResponseStatus) {
+	protected ResponseEntity<Object> standardHandler(Exception ex, MessageKey key, MessageSeverity severity,
+			HttpStatus httpResponseStatus, Object... params) {
 		if (ex == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		}
 		ProviderResponse apiError = new ProviderResponse();
 
-		log(ex, key.getKey(), severity, httpResponseStatus);
-		apiError.addMessage(severity, deriveKey(key.getKey()), deriveMessage(ex), httpResponseStatus);
+		MessageKey msgkey = deriveKey(key);
+		log(ex, msgkey, severity, httpResponseStatus, params);
+		apiError.addMessage(severity, msgkey.getKey(), deriveMessage(ex, msgkey, params), httpResponseStatus);
 
 		return new ResponseEntity<>(apiError, httpResponseStatus);
 	}
@@ -230,7 +233,7 @@ public class OcpRestGlobalExceptionHandler {
 	}
 
 	/**
-	 * Handle method argument not valid exception.
+	 * Handle {@code @Valid} failures when method argument is not valid.
 	 *
 	 * @param req the req
 	 * @param ex the ex
@@ -240,28 +243,32 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleMethodArgumentNotValidException(HttpServletRequest req,
 			MethodArgumentNotValidException ex) {
-		log(ex, "", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 		final ProviderResponse apiError = new ProviderResponse();
 		if (ex == null || ex.getBindingResult() == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
+			MessageKey key = MessageKeys.OCP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID;
 			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-				apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
-						error.getDefaultMessage(),
-						HttpStatus.BAD_REQUEST);
+				String errorCodes = String.join(", ", error.getCodes());
+				Object[] params = new Object[] { "field", errorCodes, error.getDefaultMessage() };
+				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
+				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
+						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
 			}
 			for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-				apiError.addMessage(MessageSeverity.ERROR, error.getCodes()[0],
-						error.getDefaultMessage(),
-						HttpStatus.BAD_REQUEST);
+				String errorCodes = String.join(", ", error.getCodes());
+				Object[] params = new Object[] { "object", errorCodes, error.getDefaultMessage() };
+				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
+				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
+						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
 			}
 		}
 		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
 	}
 
 	/**
-	 * Handle http client error exception.
+	 * Handle HTTP 4xx response in http client.
 	 *
 	 * @param req the req
 	 * @param httpClientErrorException the http client error exception
@@ -271,19 +278,26 @@ public class OcpRestGlobalExceptionHandler {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleHttpClientErrorException(HttpServletRequest req,
 			final HttpClientErrorException httpClientErrorException) {
-		log(httpClientErrorException, "", null, null);
 
 		ProviderResponse apiError = new ProviderResponse();
 		if (httpClientErrorException == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
+			MessageKey key = MessageKeys.OCP_GLOBAL_HTTP_CLIENT_ERROR;
+			HttpStatus status = httpClientErrorException.getStatusCode();
+			String statusReason = httpClientErrorException.getStatusCode().getReasonPhrase();
+			Object[] params = new Object[] { statusReason, httpClientErrorException.getMessage() };
+
+			log(httpClientErrorException, key, MessageSeverity.ERROR, status, params);
+
 			byte[] responseBody = httpClientErrorException.getResponseBodyAsByteArray();
 
 			try {
 				apiError = new ObjectMapper().readValue(responseBody, ProviderResponse.class);
 			} catch (IOException e) {
-				log(e, "", MessageSeverity.ERROR, null);
-				apiError.addMessage(MessageSeverity.ERROR, httpClientErrorException.getStatusCode().name(),
+				log(e, MessageKeys.OCP_GLOBAL_GENERAL_EXCEPTION, MessageSeverity.ERROR, status,
+						params);
+				apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
 						new String(responseBody),
 						httpClientErrorException.getStatusCode());
 			}
@@ -304,12 +318,14 @@ public class OcpRestGlobalExceptionHandler {
 	public final ResponseEntity<Object> handleMethodArgumentTypeMismatch(HttpServletRequest req,
 			final MethodArgumentTypeMismatchException ex) {
 
-		final String message = ex.getName() + " should be of type " + ex.getRequiredType().getName();
-		log(Level.INFO, ex, "", message, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		MessageKey key = MessageKeys.OCP_GLOBAL_REST_API_TYPE_MISMATCH;
+		Object[] params = new Object[] { ex.getName(), ex.getRequiredType().getName() };
+
+		log(Level.INFO, ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 
 		final ProviderResponse apiError = new ProviderResponse();
-		apiError.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST.name(),
-				message, HttpStatus.BAD_REQUEST);
+		apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
+				key.getMessage(params), HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
 	}
 
@@ -323,15 +339,18 @@ public class OcpRestGlobalExceptionHandler {
 	@ExceptionHandler(value = ConstraintViolationException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	public final ResponseEntity<Object> handleConstraintViolation(HttpServletRequest req, final ConstraintViolationException ex) {
-		log(ex, "", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+
 		final ProviderResponse apiError = new ProviderResponse();
 		if (ex == null || ex.getConstraintViolations() == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
+			MessageKey key = MessageKeys.OCP_GLBOAL_VALIDATOR_CONSTRAINT_VIOLATION;
 			for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-				apiError.addMessage(MessageSeverity.ERROR, violation.getRootBeanClass().getName() + " " + violation.getPropertyPath(),
-						violation.getMessage(),
-						HttpStatus.BAD_REQUEST);
+				Object[] params =
+						new Object[] { violation.getRootBeanClass().getName(), violation.getPropertyPath(), violation.getMessage() };
+				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
+				apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
+						key.getMessage(params), HttpStatus.BAD_REQUEST);
 			}
 		}
 		return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);

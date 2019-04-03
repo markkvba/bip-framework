@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.service.DomainRequest;
 import gov.va.ocp.framework.service.DomainResponse;
@@ -45,7 +46,7 @@ class TestAuditableService implements AuditableService {
 	@Auditable(event = AuditEvents.API_REST_REQUEST, activity = "testActivity")
 	public DomainResponse annotatedMethod(DomainRequest request) {
 		DomainResponse response = new DomainResponse();
-		response.addMessage(MessageSeverity.INFO, "key", "value", null);
+		response.addMessage(MessageSeverity.INFO, null, MessageKeys.NO_KEY);
 		return response;
 	}
 }

@@ -3,21 +3,24 @@ package gov.va.ocp.framework.messages;
 /**
  * The interface for OCP message keys and their messages.
  * <p>
- * Implementations of this interface should use the spring MessageSource to retrieve message values.
+ * Implementations of this interface should use the spring MessageSource or similar
+ * spring mechanism to retrieve message values from the spring context.
  *
  * @author aburkholder
  */
 public interface MessageKey {
 
 	/**
-	 * Get the key for this enumeration.
+	 * Get the property key for this enumeration.
 	 *
 	 * @return String - the key
 	 */
 	public String getKey();
 
 	/**
-	 * Get the message resolved from the properties file, using the supplied params.
+	 * Get the message for this property, as resolved from the properties file.
+	 * The supplied params are values to replace params in the message stored in the properties file,
+	 * e.g. the value for {0}.
 	 * <p>
 	 * If the key for this enumeration is not found in the properties file,
 	 * the default message is returned.
