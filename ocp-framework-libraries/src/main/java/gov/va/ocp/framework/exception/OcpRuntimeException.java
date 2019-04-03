@@ -59,7 +59,7 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 */
 	public OcpRuntimeException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, Object... params) {
-		super(key.getMessage(params), cause);
+		super((key == null ? "" : key.getMessage(params)), cause);
 		this.key = key;
 		this.params = params;
 		this.severity = severity;

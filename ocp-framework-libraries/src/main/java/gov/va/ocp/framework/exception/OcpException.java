@@ -61,7 +61,7 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	 */
 	public OcpException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, final Object... params) {
-		super(key.getMessage(params), cause);
+		super((key == null ? "" : key.getMessage(params)), cause);
 		this.key = key;
 		this.params = params;
 		this.severity = severity;
