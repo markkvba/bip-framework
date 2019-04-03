@@ -42,7 +42,7 @@ public class TestRequestValidator extends AbstractStandardValidator<TestRequest>
 	}
 
 	@Override
-	public void setCallingMethod(final Method callingMethod) {
+	public void setCallingMethod(Method callingMethod) {
 		this.callingMethod = callingMethod;
 	}
 
