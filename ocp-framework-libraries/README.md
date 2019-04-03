@@ -11,7 +11,7 @@ This project contains interfaces, annotations and classes consumed by the applic
 * Security JWT base classes, properties and exceptions
 * Service Domain Message classes, timer and validation aspects
 
-## How to add dependency in your project? ##
+## How to add dependency in your project?
 
     <dependency>
         <groupId>gov.va.ocp.framework</groupId>
@@ -19,3 +19,22 @@ This project contains interfaces, annotations and classes consumed by the applic
         <version><!-- add the appropriate version --></version>
     </dependency>
 
+## Class Diagrams
+
+##### Auditing Package
+gov.va.ocp.framework.audit
+
+<img src = "/images/cd-audit-package.jpg">
+
+##### Aspects Join Points and Pointcuts Packages
+   gov.va.ocp.framework.aspect <br/>
+   gov.va.ocp.framework.rest.provider.aspect<br/>
+   gov.va.ocp.framework.service.aspect<br/>
+   
+<img src = "/images/cd-aspect-packages.jpg">
+
+##### Exception Packages
+   gov.va.ocp.framework.exception <br/>
+   gov.va.ocp.framework.rest.exception<br/>
+   
+<img src = "/images/cd-exception-packages.jpg">
