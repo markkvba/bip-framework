@@ -65,7 +65,7 @@ public class ServiceMessage extends AbstractMessage {
 	 * @param httpStatus - the http status associated with the cause of the message
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key, Object... params) {
+	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key, final Object... params) {
 		this(severity, httpStatus, null, key, params);
 	}
 
@@ -79,16 +79,16 @@ public class ServiceMessage extends AbstractMessage {
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
 	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus,
-			final ConstraintParam[] constraintParams, final MessageKey key, Object... params) {
+			final ConstraintParam[] constraintParams, final MessageKey key, final Object... params) {
 		super(constraintParams); // always call super() to set the timestamp
 		this.severity = severity;
 		this.httpStatus = httpStatus;
 		this.messageKey = key;
 		this.messageParams = params;
 
-		this.key = key.getKey();
-		this.text = key.getMessage(params);
-		this.status = Integer.toString(httpStatus.value());
+		this.key = key == null ? null : key.getKey();
+		this.text = key == null ? null : key.getMessage(params);
+		this.status = httpStatus == null ? null : Integer.toString(httpStatus.value());
 	}
 
 	/**

@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.event.Level;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -29,6 +30,7 @@ import gov.va.ocp.framework.AbstractBaseLogTester;
 import gov.va.ocp.framework.aspect.AuditAnnotationAspect;
 import gov.va.ocp.framework.audit.AuditEventData;
 import gov.va.ocp.framework.log.OcpLogger;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.rest.provider.ProviderResponse;
@@ -81,7 +83,8 @@ public class ProviderHttpAspectTest extends AbstractBaseLogTester {
 			Mockito.lenient().when(joinPoint.getSignature()).thenReturn(mockSignature);
 			Mockito.lenient().when(mockSignature.getMethod()).thenReturn(myMethod());
 
-			final ServiceMessage msg = new ServiceMessage(MessageSeverity.FATAL, "FatalKey", "Fatal ServiceMessage", null);
+			final ServiceMessage msg =
+					new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, "ServiceMessage text");
 			detailedMsg.add(msg);
 			Mockito.lenient().when(responseEntity.getBody()).thenReturn(domainResponse);
 			Mockito.lenient().when(domainResponse.getMessages()).thenReturn(detailedMsg);

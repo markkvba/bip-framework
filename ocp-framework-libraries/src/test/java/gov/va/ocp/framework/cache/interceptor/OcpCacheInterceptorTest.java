@@ -18,7 +18,6 @@ import org.slf4j.event.Level;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import gov.va.ocp.framework.audit.AuditLogSerializer;
-import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.service.DomainResponse;
 
@@ -31,7 +30,7 @@ public class OcpCacheInterceptorTest {
 	OcpCacheInterceptor ocpCacheInterceptor = new OcpCacheInterceptor();
 
 	class TestObject {
-		public String testMethod(String msg) {
+		public String testMethod(final String msg) {
 			return "Hello";
 		}
 	}
@@ -97,7 +96,7 @@ public class OcpCacheInterceptorTest {
 		assertNotNull(new OcpCacheInterceptor());
 	}
 
-	@Test(expected = OcpRuntimeException.class)
+	@Test
 	public final void testInvokeMethodInvocation() throws Throwable {
 		TestInvocation testInvocation = new TestInvocation();
 
@@ -115,7 +114,7 @@ public class OcpCacheInterceptorTest {
 		ocpCacheInterceptor.invoke(testInvocation);
 	}
 
-	@Test(expected = OcpRuntimeException.class)
+	@Test
 	public final void testInvokeMethodInvocationWithDebugDisabled() throws Throwable {
 		TestInvocation testInvocation = new TestInvocation();
 

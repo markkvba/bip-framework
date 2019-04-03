@@ -140,7 +140,7 @@ public class ServiceValidationAspectTest {
 		assertTrue(returned.getMessages().size() == 1);
 		assertTrue(TestRequestValidator.SEVERITY.equals(
 				returned.getMessages().get(0).getSeverity()));
-		assertTrue(TestRequestValidator.KEY.equals(
+		assertTrue(TestRequestValidator.KEY.getKey().equals(
 				returned.getMessages().get(0).getKey()));
 		assertTrue(TestRequestValidator.TEXT.equals(
 				returned.getMessages().get(0).getText()));
