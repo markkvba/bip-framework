@@ -7,10 +7,15 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 /**
- * The official source for framework message keys and their messages.
+ * A message @PropertySource for Service Ocp*Exception and *Message list.
  * <p>
  * This class derives its values from the framework-messages.properties file.
  * that is added to the spring context as an {@code @PropertySource}.
+ * Primarily used by
+ * <p>
+ * <u>Usage and Maintenance</u><br/>
+ * Any change in framework-messages.properties must be reflected in this class.<br/>
+ * Any change in this class must be reflected in framework-messages.properties.
  *
  * @author aburkholder
  */

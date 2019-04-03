@@ -21,23 +21,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ServiceMessage extends AbstractMessage {
 
-	/** The Constant serialVersionUID. */
+	/** The Constant serialVersionUID */
 	private static final long serialVersionUID = -1711431368372127555L;
 
 	/**
 	 * The text is excluded from equals and hash as the key+severity are to jointly indicate a unique message. The text is supplemental
-	 * information.
+	 * information
 	 */
 	private static final String[] EQUALS_HASH_EXCLUDE_FIELDS = new String[] { "text" };
 
-	/** The key. */
+	/** The key */
 	@XmlElement(required = true)
 	@NotNull
 	private String key;
 
-	/** The message. */
+	/** The message, with values already replaced for any replaceable parameters */
 	private String text;
-
+	/** String representation of the {@link HttpStatus#value()} */
 	private String status;
 
 	/** The message key enum */
@@ -48,11 +48,11 @@ public class ServiceMessage extends AbstractMessage {
 	@JsonIgnore
 	private Object[] messageParams;
 
-	/** The Http status enum. */
+	/** The Http status enum */
 	@JsonIgnore
 	private HttpStatus httpStatus;
 
-	/** The message severity. */
+	/** The message severity enum */
 	@XmlElement(required = true)
 	@NotNull
 	private MessageSeverity severity;
@@ -92,7 +92,7 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Gets the key.
+	 * The property key as a String.
 	 *
 	 * @return the key
 	 */
@@ -101,18 +101,9 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Sets the key.
+	 * The HttpStatus code as a String.
 	 *
-	 * @param key the new key
-	 */
-	public final void setKey(final String key) {
-		this.key = key;
-	}
-
-	/**
-	 * Gets the HttpStatus.
-	 *
-	 * @return the HttpStatus
+	 * @return String - the http status code
 	 */
 	@JsonProperty("status")
 	@JsonCreator
@@ -124,9 +115,9 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Gets the HttpStatus.
+	 * The HttpStatus enum for the message.
 	 *
-	 * @return the HttpStatus
+	 * @return HttpStatus
 	 */
 	@JsonIgnore
 	@JsonProperty(value = "httpStatus")
@@ -135,30 +126,12 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Sets the HttpStatus.
-	 *
-	 * @param httpStatus the new http status
-	 */
-	public void setHttpStatus(final HttpStatus httpStatus) {
-		this.httpStatus = httpStatus;
-	}
-
-	/**
-	 * Gets the text.
+	 * Gets the text of the message.
 	 *
 	 * @return the text
 	 */
 	public final String getText() {
 		return this.text;
-	}
-
-	/**
-	 * Sets the text.
-	 *
-	 * @param text the new text
-	 */
-	public final void setText(final String text) {
-		this.text = text;
 	}
 
 	/**
@@ -168,15 +141,6 @@ public class ServiceMessage extends AbstractMessage {
 	 */
 	public final MessageSeverity getSeverity() {
 		return this.severity;
-	}
-
-	/**
-	 * Sets the message severity.
-	 *
-	 * @param severity the new message severity
-	 */
-	public final void setSeverity(final MessageSeverity severity) {
-		this.severity = severity;
 	}
 
 	/*

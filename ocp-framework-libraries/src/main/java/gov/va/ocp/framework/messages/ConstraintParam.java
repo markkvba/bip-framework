@@ -1,17 +1,25 @@
 package gov.va.ocp.framework.messages;
 
+/**
+ * A class for Replaceable Parameter tuples for Constraint messages, to simplify passing
+ * replaceable parameter names and values in subclasses of {@link AbstractMessage}.
+ *
+ * @author aburkholder
+ */
 public class ConstraintParam {
 
+	/** The name of the replaceable parameter in the message */
 	private String name;
+	/** The value to replace the parameter name in the message */
 	private String value;
 
 	/**
-	 * Construct a constraint parameter.
+	 * Construct a Replaceable Parameter tuple for one Constraint message parameter.
 	 * <p>
-	 * Typically useful with passing message that need to include violation constraint paramters and the like.
-	 * 
-	 * @param name - the name of the parameter
-	 * @param value - the value of the parameter
+	 * Typically useful with passing message that need to include violation constraint parameters and the like.
+	 *
+	 * @param name - the name of the replaceable parameter in the message, as found between the curly braces in a constraint message
+	 * @param value - the value to replace the parameter name in the message
 	 */
 	public ConstraintParam(String name, String value) {
 		this.name = name;
@@ -19,8 +27,9 @@ public class ConstraintParam {
 	}
 
 	/**
-	 * The name for the constraint.
-	 * 
+	 * The name of the replaceable parameter in the message,
+	 * as found between the curly braces of replaceable parameters in a constraint message.
+	 *
 	 * @return name
 	 */
 	public String getName() {
@@ -28,8 +37,9 @@ public class ConstraintParam {
 	}
 
 	/**
-	 * The name for the constraint.
-	 * 
+	 * The name of the replaceable parameter in the message,
+	 * as found between the curly braces of replaceable parameters in a constraint message.
+	 *
 	 * @param name - the name to set
 	 */
 	public void setName(String name) {
@@ -37,8 +47,8 @@ public class ConstraintParam {
 	}
 
 	/**
-	 * The value for the constraint.
-	 * 
+	 * The value to replace the parameter name in the message.
+	 *
 	 * @return value
 	 */
 	public String getValue() {
@@ -46,8 +56,8 @@ public class ConstraintParam {
 	}
 
 	/**
-	 * The value for the constraint.
-	 * 
+	 * The value to replace the parameter name in the message.
+	 *
 	 * @param value - the value to set
 	 */
 	public void setValue(String value) {

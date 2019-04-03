@@ -66,16 +66,15 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return String the message
 	 */
 	private String deriveMessage(Exception ex, MessageKey key, Object... params) {
-		if (key == null) {
-			return MessageKeys.NO_KEY.getMessage();
-		}
-		String msg = key.getMessage(params);
-		if (StringUtils.isBlank(msg) || msg.contains("{")) {
-			msg = msg + " :: " + (ex != null && !StringUtils.isBlank(ex.getMessage())
-					? ex.getMessage()
-					: (ex != null && ex.getCause() != null && !StringUtils.isBlank(ex.getCause().getMessage())
-							? ex.getCause().getMessage()
-							: NO_EXCEPTION_MESSAGE));
+		MessageKey msgkey = deriveKey(key);
+		String msg = msgkey.getMessage(params);
+		if (StringUtils.isBlank(msg) || msg.matches("{[a-zA-Z0-9]{0,64}}")) {
+			msg = msg + " :: "
+					+ (ex != null && !StringUtils.isBlank(ex.getMessage())
+							? ex.getMessage()
+							: (ex != null && ex.getCause() != null && !StringUtils.isBlank(ex.getCause().getMessage())
+									? ex.getCause().getMessage()
+									: NO_EXCEPTION_MESSAGE));
 		}
 		return msg;
 	}
@@ -133,7 +132,7 @@ public class OcpRestGlobalExceptionHandler {
 	 *
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> failSafeHandler() {
+	protected ResponseEntity<Object> failsafeHandler() {
 		log(Level.ERROR, null, MessageKeys.NO_KEY, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 		ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.FATAL, MessageKeys.NO_KEY.getKey(), MessageKeys.NO_KEY.getMessage(),
@@ -150,7 +149,7 @@ public class OcpRestGlobalExceptionHandler {
 	 */
 	protected ResponseEntity<Object> standardHandler(OcpExceptionExtender ex, HttpStatus httpResponseStatus) {
 		if (ex == null || ex.getMessageKey() == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		}
 		return standardHandler((Exception) ex, ex.getMessageKey(), ex.getSeverity(), httpResponseStatus);
 	}
@@ -168,7 +167,7 @@ public class OcpRestGlobalExceptionHandler {
 	protected ResponseEntity<Object> standardHandler(Exception ex, MessageKey key, MessageSeverity severity,
 			HttpStatus httpResponseStatus, Object... params) {
 		if (ex == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		}
 		ProviderResponse apiError = new ProviderResponse();
 
@@ -247,7 +246,7 @@ public class OcpRestGlobalExceptionHandler {
 
 		final ProviderResponse apiError = new ProviderResponse();
 		if (ex == null || ex.getBindingResult() == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
 			MessageKey key = MessageKeys.OCP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID;
 			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -282,7 +281,7 @@ public class OcpRestGlobalExceptionHandler {
 
 		ProviderResponse apiError = new ProviderResponse();
 		if (httpClientErrorException == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
 			MessageKey key = MessageKeys.OCP_GLOBAL_HTTP_CLIENT_ERROR;
 			HttpStatus status = httpClientErrorException.getStatusCode();
@@ -343,7 +342,7 @@ public class OcpRestGlobalExceptionHandler {
 
 		final ProviderResponse apiError = new ProviderResponse();
 		if (ex == null || ex.getConstraintViolations() == null) {
-			return failSafeHandler();
+			return failsafeHandler();
 		} else {
 			MessageKey key = MessageKeys.OCP_GLBOAL_VALIDATOR_CONSTRAINT_VIOLATION;
 			for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {

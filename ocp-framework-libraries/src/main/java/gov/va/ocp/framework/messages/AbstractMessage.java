@@ -21,17 +21,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author vanapalliv
  */
 public abstract class AbstractMessage implements Serializable {
-
-	/** The Constant serialVersisonUID. */
+	/** The serialization version UID. */
 	private static final long serialVersionUID = -1711431368372127556L;
 
-	private ConstraintParam[] constraintParameters; // NOSONsAR cannot be final
+	/** Array of replaceable parameter tuples for constraint messages */
+	private ConstraintParam[] constraintParameters; // NOSONAR cannot be final
 
+	/** Timestamp for the creation of the message */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 	private Date timestamp; // NOSONAR cannot be final
 
 	/**
 	 * Construct default (empty) message object.
+	 * Sets the timestamp.
 	 */
 	public AbstractMessage() {
 		super();
@@ -40,6 +42,7 @@ public abstract class AbstractMessage implements Serializable {
 
 	/**
 	 * Construct a message object containing an array of contraint parameters.
+	 * Also sets the timestamp.
 	 */
 	public AbstractMessage(ConstraintParam[] constraintParams) {
 		this(); // set the timestamp
@@ -47,8 +50,11 @@ public abstract class AbstractMessage implements Serializable {
 	}
 
 	/**
-	 * An array of the constraint parameter names in a message.
-	 * The names are those found between the curly braces of replaceable parameters.
+	 * An in-order array of the constraint parameters in a message.
+	 * <p>
+	 * The {@link ConstraintParam#getName()} is the name found between
+	 * the curly braces of replaceable parameters
+	 * in a constraint message.
 	 *
 	 * @return ConstraintParam the constraint parameter
 	 */

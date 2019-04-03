@@ -24,16 +24,12 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	/** The serviceMessages. */
 	private List<ServiceMessage> serviceMessages;
 
-	/*
-	 * cacheResponse
-	 *
-	 * Must be ignored in the serialization and de-serialization
-	 */
-	@JsonIgnore
+	/** Whether the response should be cached or not */
+	@JsonIgnore // don't serialize into the response entity
 	private boolean doNotCacheResponse = false;
 
 	/**
-	 * Instantiates a new rest response.
+	 * Instantiates a new service response.
 	 */
 	public DomainResponse() {
 		super();
@@ -42,7 +38,9 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	/**
 	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
-	 * Messages made with this constructor CANNOT be used in a JSR303 context.
+	 * Messages made with this constructor CANNOT be used in a JSR303 context
+	 * because there is no way to communicate constraint message parameters to a
+	 * JSR303 implementation.
 	 *
 	 * @param severity - the severity of the message
 	 * @param httpStatus - the http status associated with the message
@@ -60,7 +58,10 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	/**
 	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
-	 * Messages made with this constructor CAN be used in a JSR303 context.
+	 * Messages made with this constructor CAN be used in a JSR303 context
+	 * due to the inclusion of the {@link ConstraintParam} array. The array
+	 * is the means of communicating constraint message parameters to the
+	 * JSR303 implementation.
 	 *
 	 * @param severity the severity of the message
 	 * @param httpStatus the http status associated with the message
@@ -89,7 +90,7 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	}
 
 	/**
-	 * Gets the serviceMessages.
+	 * Gets the list of ServiceMessages.
 	 *
 	 * @return the serviceMessages
 	 */
@@ -101,16 +102,7 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	}
 
 	/**
-	 * Sets the serviceMessages.
-	 *
-	 * @param serviceMessages the new serviceMessages
-	 */
-	public final void setMessages(final List<ServiceMessage> serviceMessages) {
-		this.serviceMessages = serviceMessages;
-	}
-
-	/**
-	 * Checks for serviceMessages of type.
+	 * Checks for serviceMessages of severity type.
 	 *
 	 * @param severity the severity
 	 * @return true, if successful
