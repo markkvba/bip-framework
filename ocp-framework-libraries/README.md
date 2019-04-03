@@ -32,3 +32,9 @@ gov.va.ocp.framework.audit
    gov.va.ocp.framework.service.aspect<br/>
    
 <img src = "/images/cd-aspect-packages.jpg">
+
+##### Exception Packages
+   gov.va.ocp.framework.exception <br/>
+   gov.va.ocp.framework.rest.exception<br/>
+   
+<img src = "/images/cd-exception-packages.jpg">
