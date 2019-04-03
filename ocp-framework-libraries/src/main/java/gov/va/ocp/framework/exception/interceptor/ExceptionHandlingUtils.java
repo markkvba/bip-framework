@@ -82,10 +82,11 @@ public final class ExceptionHandlingUtils {
 		try {
 			// cast "Throwable throwable" variable to the OCP exception interface
 			OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
+			Object[] objectArray = new Object[] {};
 			// instantiate the Runtime version of the interface
 			resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
-					.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
-					.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
+					.getConstructor(MessageKey.class, MessageSeverity.class, HttpStatus.class, Throwable.class, objectArray.getClass())
+					.newInstance(ocp.getMessageKey(), ocp.getSeverity(), ocp.getStatus(), throwable, objectArray);
 		} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			MessageKeys key = MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES;

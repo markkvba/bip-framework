@@ -23,16 +23,16 @@ package gov.va.ocp.framework.hystrix.autoconfigure;
 
 import java.util.concurrent.Callable;
 
-public interface HystrixCallableWrapper { // NOSONAR so that Sonar does not complain not having the @FunctionalInterface annotation on
-											// this Interface
+@FunctionalInterface
+public interface HystrixCallableWrapper {
 
 	/**
-     * Wraps the passed callable instance.
-     *
-     * @param callable the callable to wrap
-     * @param <T>      the result type
-     * @return the wrapped callable
-     */
-    <T> Callable<T> wrapCallable(Callable<T> callable);
+	 * Wraps the passed callable instance.
+	 *
+	 * @param callable the callable to wrap
+	 * @param <T>      the result type
+	 * @return the wrapped callable
+	 */
+	<T> Callable<T> wrapCallable(Callable<T> callable);
 
 }

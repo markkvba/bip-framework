@@ -14,8 +14,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.event.Level;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import gov.va.ocp.framework.audit.AuditLogSerializer;
+import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.service.DomainResponse;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,7 +30,7 @@ public class OcpCacheInterceptorTest {
 	OcpCacheInterceptor ocpCacheInterceptor = new OcpCacheInterceptor();
 
 	class TestObject {
-		public String testMethod(String msg) {
+		public String testMethod(final String msg) {
 			return "Hello";
 		}
 	}
@@ -109,5 +112,19 @@ public class OcpCacheInterceptorTest {
 		BrokenTestInvocation testInvocation = new BrokenTestInvocation();
 
 		ocpCacheInterceptor.invoke(testInvocation);
+	}
+
+	@Test
+	public final void testInvokeMethodInvocationWithDebugDisabled() throws Throwable {
+		TestInvocation testInvocation = new TestInvocation();
+
+		testInvocation = new TestInvocation();
+		OcpLogger logger = (OcpLogger) ReflectionTestUtils.getField(ocpCacheInterceptor, "LOGGER");
+		logger.setLevel(Level.INFO);
+		Object ret = ocpCacheInterceptor.invoke(testInvocation);
+		assertNotNull(ret);
+		assertTrue(DomainResponse.class.isAssignableFrom(ret.getClass()));
+		assertTrue(((DomainResponse) ret).getMessages().isEmpty());
+		logger.setLevel(Level.DEBUG);
 	}
 }

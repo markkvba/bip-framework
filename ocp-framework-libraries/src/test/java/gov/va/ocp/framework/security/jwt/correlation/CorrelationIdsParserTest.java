@@ -95,14 +95,12 @@ public class CorrelationIdsParserTest {
 		/* null list correlation ids */
 		List<String> correlationIdList = new LinkedList<String>();
 		correlationIdList.add("string");
-		String token = correlationIdList.get(0);
-		String[] tokens = token.split("\\^");
 		try {
 			CorrelationIdsParser.parseCorrelationIds(correlationIdList, personTraits);
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
-			String msg = "Invalid number of elements {} in correlation id {}, should be " + ELEMENT_MAX_COUNT + " or "
-					+ ELEMENT_SS_COUNT + tokens.length + ", " + token;
+			String msg = "Invalid number of elements in correlation id, should be between " + ELEMENT_SS_COUNT + " and "
+					+ ELEMENT_MAX_COUNT + " elements.";
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
 			assertTrue(e.getMessage().equals(msg));
 		}
@@ -116,7 +114,7 @@ public class CorrelationIdsParserTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().equals("Cannot process blank correlation id"));
+			assertTrue(e.getMessage().equals("Cannot process blank correlation id."));
 		}
 
 		/* Invalid number of elements inside a correlation id */
@@ -129,7 +127,9 @@ public class CorrelationIdsParserTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().startsWith("Invalid number of elements {} in correlation id"));
+			String msg = "Invalid number of elements in correlation id, should be between " + ELEMENT_SS_COUNT + " and "
+					+ ELEMENT_MAX_COUNT + " elements.";
+			assertTrue(e.getMessage().startsWith(msg));
 		}
 	}
 

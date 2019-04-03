@@ -11,7 +11,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 
@@ -27,10 +29,10 @@ public class DomainResponseTest {
 	@Before
 	public void setUp() throws Exception {
 		mockServiceResponse = new DomainResponse();
-		infoMessage = new ServiceMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null);
-		warnMessage = new ServiceMessage(MessageSeverity.WARN, "WarnKey", "Dummy warning text", null);
-		errorMessage = new ServiceMessage(MessageSeverity.ERROR, "ErrorKey", "Dummy error text", null);
-		fatalMessage = new ServiceMessage(MessageSeverity.FATAL, "FatalKey", "Dummy fatal text", null);
+		infoMessage = new ServiceMessage(MessageSeverity.INFO, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, "ServiceMessage text");
+		warnMessage = new ServiceMessage(MessageSeverity.WARN, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, "ServiceMessage text");
+		errorMessage = new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, "ServiceMessage text");
+		fatalMessage = new ServiceMessage(MessageSeverity.FATAL, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, "ServiceMessage text");
 		addTestMessages();
 	}
 
@@ -44,9 +46,8 @@ public class DomainResponseTest {
 	@Test
 	public void testAddMessageWithNullMessages() {
 
-		mockServiceResponse.setMessages(null);
-		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null,
-				1, new String[] { "pName" }, new String[] { "pValue" });
+		mockServiceResponse.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, 1, new String[] { "pName" },
+				new String[] { "pValue" });
 
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
@@ -55,7 +56,7 @@ public class DomainResponseTest {
 
 	@Test
 	public void testAddMessageWithParams() {
-		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null,
+		mockServiceResponse.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY,
 				1, new String[] { "pName" }, new String[] { "pValue" });
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
@@ -69,7 +70,7 @@ public class DomainResponseTest {
 
 	@Test
 	public void testAddMessage() {
-		mockServiceResponse.addMessage(MessageSeverity.INFO, "InfoKey", "Dummy info text", null);
+		mockServiceResponse.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, new Object[] {});
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(1, mockServiceResponse.getMessages().size());
 
@@ -84,10 +85,9 @@ public class DomainResponseTest {
 
 	@Test
 	public void testSetMessages() {
-		mockServiceResponse.setMessages(testMessages);
+		mockServiceResponse.addMessages(testMessages);
 		DomainResponse serviceResponseForEqualsTest = new DomainResponse();
 		assertFalse(mockServiceResponse.getMessages().equals(serviceResponseForEqualsTest.getMessages()));
-		serviceResponseForEqualsTest.setMessages(testMessages);
 		assertNotNull(mockServiceResponse.getMessages().equals(serviceResponseForEqualsTest.getMessages()));
 		assertNotNull(mockServiceResponse.getMessages());
 		assertEquals(4, mockServiceResponse.getMessages().size());
@@ -95,25 +95,25 @@ public class DomainResponseTest {
 
 	@Test
 	public void testHasFatals() {
-		mockServiceResponse.setMessages(testMessages);
+		mockServiceResponse.addMessages(testMessages);
 		assertTrue(mockServiceResponse.hasFatals());
 	}
 
 	@Test
 	public void testHasErrors() {
-		mockServiceResponse.setMessages(testMessages);
+		mockServiceResponse.addMessages(testMessages);
 		assertTrue(mockServiceResponse.hasErrors());
 	}
 
 	@Test
 	public void testHasWarnings() {
-		mockServiceResponse.setMessages(testMessages);
+		mockServiceResponse.addMessages(testMessages);
 		assertTrue(mockServiceResponse.hasWarnings());
 	}
 
 	@Test
 	public void testHasInfos() {
-		mockServiceResponse.setMessages(testMessages);
+		mockServiceResponse.addMessages(testMessages);
 		assertTrue(mockServiceResponse.hasInfos());
 	}
 

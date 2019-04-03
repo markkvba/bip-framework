@@ -9,7 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.Test;
 import org.slf4j.ILoggerFactory;
 
-import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 
@@ -23,7 +22,6 @@ public class OcpLoggerFactoryTest {
 			constructor.newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			assertTrue(InvocationTargetException.class.equals(e.getClass()));
-			assertTrue(OcpRuntimeException.class.equals(e.getCause().getClass()));
 		}
 	}
 

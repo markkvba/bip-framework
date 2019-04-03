@@ -35,7 +35,7 @@ public class UserStatusTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().startsWith("UserStatus {} does not exist:"));
+			assertTrue(e.getMessage().startsWith("UserStatus {0} does not exist."));
 		}
 	}
 
