@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,8 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return String the message
 	 */
 	private String deriveMessage(Exception ex, MessageKey key, Object... params) {
-		MessageKey msgkey = deriveKey(key);
-		String msg = msgkey.getMessage(params);
+		MessageKey derivedKey = deriveKey(key);
+		String msg = derivedKey.getMessage(params);
 		if (StringUtils.isBlank(msg) || msg.matches("\\{[a-zA-Z0-9]{0,64}\\}")) {
 			msg = msg + " :: "
 					+ (ex != null && !StringUtils.isBlank(ex.getMessage())
@@ -86,7 +87,7 @@ public class OcpRestGlobalExceptionHandler {
 	 * @return MessageKey - the key, or NO_KEY
 	 */
 	private MessageKey deriveKey(MessageKey key) {
-		return key == null ? MessageKeys.NO_KEY : key;
+		return ObjectUtils.defaultIfNull(key, MessageKeys.NO_KEY);
 	}
 
 	/**
@@ -113,9 +114,10 @@ public class OcpRestGlobalExceptionHandler {
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
 	private void log(Level level, Exception ex, MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+		MessageKey derivedKey = deriveKey(key);
 		String msg = status + "-" + severity + " "
 				+ (ex == null ? "null" : ex.getClass().getName()) + " "
-				+ deriveKey(key) + ":" + key.getMessage(params);
+				+ derivedKey + ":" + derivedKey.getMessage(params);
 		if (Level.ERROR.equals(level)) {
 			logger.error(msg, ex);
 		} else if (Level.WARN.equals(level)) {
@@ -171,9 +173,9 @@ public class OcpRestGlobalExceptionHandler {
 		}
 		ProviderResponse apiError = new ProviderResponse();
 
-		MessageKey msgkey = deriveKey(key);
-		log(ex, msgkey, severity, httpResponseStatus, params);
-		apiError.addMessage(severity, msgkey.getKey(), deriveMessage(ex, msgkey, params), httpResponseStatus);
+		MessageKey derivedKey = deriveKey(key);
+		log(ex, derivedKey, severity, httpResponseStatus, params);
+		apiError.addMessage(severity, derivedKey.getKey(), deriveMessage(ex, derivedKey, params), httpResponseStatus);
 
 		return new ResponseEntity<>(apiError, httpResponseStatus);
 	}
