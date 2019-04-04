@@ -23,18 +23,24 @@
  */
 package gov.va.ocp.framework.hystrix.autoconfigure;
 
-import com.netflix.hystrix.strategy.HystrixPlugins;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
+import com.netflix.hystrix.strategy.HystrixPlugins;
+import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
+import com.netflix.hystrix.strategy.executionhook.HystrixCommandExecutionHook;
+import com.netflix.hystrix.strategy.metrics.HystrixMetricsPublisher;
+import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 
 /**
  * Performs configuration of the Hystrix concurency strategy registering {@link HystrixCallableWrapper} instances that
@@ -49,10 +55,10 @@ import java.util.List;
 @ConditionalOnProperty(value = "hystrix.wrappers.enabled", matchIfMissing = true)
 public class HystrixContextAutoConfiguration {
 
-    @Autowired(required = false)
-    private List<HystrixCallableWrapper> wrappers = new ArrayList<>();
-    
-    /**
+	@Autowired(required = false)
+	private List<HystrixCallableWrapper> wrappers = new ArrayList<>();
+
+	/**
 	 * A bean for registering RequestAttributeAwareCallableWrapper
 	 *
 	 * @return RequestAttributeAwareCallableWrapper
@@ -62,17 +68,27 @@ public class HystrixContextAutoConfiguration {
 	public RequestAttributeAwareCallableWrapper requestAttributeAwareCallableWrapper() {
 		return new RequestAttributeAwareCallableWrapper();
 	}
-    
-    /**
-     * Configure hystrix concurency strategy.
-     */
-    @PostConstruct
-    public void configureHystrixConcurencyStrategy() {
-        if (!wrappers.isEmpty()) {
-        	HystrixPlugins.reset();
-            HystrixPlugins.getInstance().registerConcurrencyStrategy(
-                    new HystrixContextAwareConcurrencyStrategy(wrappers)
-            );
-        }
-    }
+
+	/**
+	 * Configure hystrix concurency strategy.
+	 */
+	@PostConstruct
+	public void configureHystrixConcurencyStrategy() {
+		if (!wrappers.isEmpty()) {
+			// Keeps references of existing Hystrix plugins
+			HystrixMetricsPublisher existingMetricsPublisher = HystrixPlugins.getInstance().getMetricsPublisher();
+			HystrixEventNotifier eventNotifier = HystrixPlugins.getInstance().getEventNotifier();
+			HystrixPropertiesStrategy propertiesStrategy = HystrixPlugins.getInstance().getPropertiesStrategy();
+			HystrixCommandExecutionHook commandExecutionHook = HystrixPlugins.getInstance().getCommandExecutionHook();
+
+			HystrixPlugins.reset();
+			HystrixPlugins.getInstance().registerConcurrencyStrategy(
+					new HystrixContextAwareConcurrencyStrategy(wrappers)
+					);
+			HystrixPlugins.getInstance().registerMetricsPublisher(existingMetricsPublisher);
+			HystrixPlugins.getInstance().registerEventNotifier(eventNotifier);
+			HystrixPlugins.getInstance().registerPropertiesStrategy(propertiesStrategy);
+			HystrixPlugins.getInstance().registerCommandExecutionHook(commandExecutionHook);
+		}
+	}
 }
