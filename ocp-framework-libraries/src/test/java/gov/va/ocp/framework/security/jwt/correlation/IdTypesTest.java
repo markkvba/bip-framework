@@ -35,7 +35,7 @@ public class IdTypesTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().startsWith("IdType {0} does not exist."));
+			assertTrue(e.getMessage().startsWith("IdType XX does not exist."));
 		}
 	}
 

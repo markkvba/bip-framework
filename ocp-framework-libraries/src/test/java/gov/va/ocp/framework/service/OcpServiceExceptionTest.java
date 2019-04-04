@@ -11,13 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import gov.va.ocp.framework.config.MessageKeysConfig;
 import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { MessageKeysConfig.class })
 public class OcpServiceExceptionTest {
 
 	private static final String TEST_KEY_MESSAGE = "NO_KEY";

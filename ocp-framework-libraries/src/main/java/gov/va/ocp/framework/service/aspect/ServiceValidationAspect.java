@@ -90,7 +90,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			validateInputsToTheMethod(domainResponse, methodParams, method);
 
 			// if there were no errors from validation, proceed with the actual method
-			if (!didValidationPass(domainResponse)) {
+			if (!didValidationPass(domainResponse)) { // NOSONAR didValidationPass is not always true, unlike what sonar believes
 				LOGGER.debug("Service interface request validation failed. >>> Skipping execution of "
 						+ joinPoint.getSignature().toShortString() + " and returning immediately.");
 			} else {
@@ -116,7 +116,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	 * Returns {@code true} if DomainResponse is not {@code null} and its messages list is {@code null} or empty.
 	 */
 	private boolean didValidationPass(final DomainResponse domainResponse) {
-		return domainResponse == null || (domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty());
+		return (domainResponse == null) || ((domainResponse.getMessages() == null) || domainResponse.getMessages().isEmpty());
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	}
 
 	private void invokeValidator(final Object object, final List<ServiceMessage> messages, final Method callingMethod,
-			final Class<?> validatorClass, Object... supplemental) throws InstantiationException, IllegalAccessException {
+			final Class<?> validatorClass, final Object... supplemental) throws InstantiationException, IllegalAccessException {
 		Validator<?> validator = (Validator<?>) validatorClass.newInstance();
 		validator.setCallingMethod(callingMethod);
 		validator.initValidate(object, messages, supplemental);
