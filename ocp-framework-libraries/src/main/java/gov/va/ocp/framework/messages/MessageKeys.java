@@ -2,10 +2,7 @@ package gov.va.ocp.framework.messages;
 
 import java.util.Locale;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import gov.va.ocp.framework.config.MessageKeysConfig;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 /**
  * A message @PropertySource for Service Ocp*Exception and *Message list.
@@ -124,7 +121,7 @@ public enum MessageKeys implements MessageKey {
 
 	/** Simulator could not find mock response file; {0} = XML file name; {1} = key used to construct file name */
 	OCP_REMOTE_MOCK_NOT_FOUND("ocp.remote.mock.not.found",
-			"Could not read mock XML file '{0}' using key '{1}'. Please make sure this response file exists in the main/resources directory."),
+			"Could not read mock XML file. Please make sure the correct response file exists in the main/resources directory."),
 	/**
 	 * RemoteServiceCallMock is not set up to process a type; {0} = the RemoteServiceCallMock class; {1} = the class used in the
 	 * request
@@ -134,12 +131,21 @@ public enum MessageKeys implements MessageKey {
 
 	;
 
+	/** The filename "name" part of the properties file to get from the classpath */
+	private static final String propertiesFile = "framework-messages";
+	/** The spring message source */
+	private static ReloadableResourceBundleMessageSource messageSource;
+	/* Populate the message source from the properties file */
+	static {
+		messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:" + propertiesFile);
+		messageSource.setDefaultEncoding("UTF-8");
+	}
+
 	/** The key - must be identical to the key in framework-messages.properties */
 	private String key;
 	/** A default message, in case the key is not found in framework-messages.properties */
 	private String defaultMessage;
-	/** The spring message source */
-	private MessageSource messageSource;
 
 	/**
 	 * Construct keys with their property file counterpart key and a default message.
@@ -150,10 +156,6 @@ public enum MessageKeys implements MessageKey {
 	private MessageKeys(String key, String defaultMessage) {
 		this.key = key;
 		this.defaultMessage = defaultMessage;
-		// Each enumeration must manually get spring bean
-		AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(MessageKeysConfig.class);
-		this.messageSource = ((MessageSource) appContext.getBean("messageSource"));
-		appContext.close();
 	}
 
 	/*

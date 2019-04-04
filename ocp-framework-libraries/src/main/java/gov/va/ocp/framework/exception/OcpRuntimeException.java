@@ -3,6 +3,7 @@ package gov.va.ocp.framework.exception;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -59,8 +60,8 @@ public class OcpRuntimeException extends RuntimeException implements OcpExceptio
 	 */
 	public OcpRuntimeException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, Object... params) {
-		super((key == null ? "" : key.getMessage(params)), cause);
-		this.key = key;
+		super((key == null ? MessageKeys.NO_KEY.toString() : key.getMessage(params)), cause);
+		this.key = (key == null ? MessageKeys.NO_KEY : key);
 		this.params = params;
 		this.severity = severity;
 		this.status = status;
