@@ -5,6 +5,7 @@ import org.springframework.security.core.AuthenticationException;
 
 import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -57,8 +58,8 @@ public class JwtAuthenticationException extends AuthenticationException implemen
 	 */
 	public JwtAuthenticationException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, Object... params) {
-		super(key.getMessage(params), cause);
-		this.key = key;
+		super((key == null ? MessageKeys.NO_KEY.toString() : key.getMessage(params)), cause);
+		this.key = (key == null ? MessageKeys.NO_KEY : key);
 		this.params = params;
 		this.severity = severity;
 		this.status = status;

@@ -6,16 +6,12 @@ import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfigura
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import gov.va.ocp.framework.config.MessageKeysConfig;
 
 /**
  * Configuration for JSR303 validation (and other validation) message sources.
  */
 @Configuration
-@Import(value = MessageKeysConfig.class)
 @AutoConfigureBefore(MessageSourceAutoConfiguration.class)
 public class OcpValidatorAutoConfiguration {
 

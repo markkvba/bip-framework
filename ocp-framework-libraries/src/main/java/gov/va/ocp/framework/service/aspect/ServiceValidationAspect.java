@@ -67,12 +67,11 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	@Around("publicStandardServiceMethod() && serviceImpl()")
 	public Object aroundAdvice(final ProceedingJoinPoint joinPoint) throws Throwable {
 
+		LOGGER.debug(this.getClass().getSimpleName() + " executing around method:" + joinPoint.toLongString());
 		DomainResponse domainResponse = null;
 
 		try {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(this.getClass().getSimpleName() + " executing around method:" + joinPoint.toLongString());
-			}
+			LOGGER.debug("Validating service interface request inputs.");
 
 			// get the request and the calling method from the JoinPoint
 			List<Object> methodParams = Arrays.asList(joinPoint.getArgs());
@@ -88,15 +87,20 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			}
 
 			// attempt to validate all inputs to the method
-			domainResponse = validateInputsToTheMethod(methodParams, method);
+			validateInputsToTheMethod(domainResponse, methodParams, method);
 
-			// if there were no errors, proceed with the actual method
-			if (isDomainResponseValid(domainResponse)) {
+			// if there were no errors from validation, proceed with the actual method
+			if (!didValidationPass(domainResponse)) {
+				LOGGER.debug("Service interface request validation failed. >>> Skipping execution of "
+						+ joinPoint.getSignature().toShortString() + " and returning immediately.");
+			} else {
+				LOGGER.debug("Service interface request validation succeeded. Executing " + joinPoint.getSignature().toShortString());
 
 				domainResponse = (DomainResponse) joinPoint.proceed();
 
 				// only call post-proceed() validation if there are no errors on the response
 				if ((domainResponse != null) && !(domainResponse.hasErrors() || domainResponse.hasFatals())) {
+					LOGGER.debug("Validating service interface response outputs.");
 					validateResponse(domainResponse, domainResponse.getMessages(), method, joinPoint.getArgs());
 				}
 			}
@@ -111,18 +115,17 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	/**
 	 * Returns {@code true} if DomainResponse is not {@code null} and its messages list is {@code null} or empty.
 	 */
-	private boolean isDomainResponseValid(final DomainResponse domainResponse) {
-		return domainResponse != null && (domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty());
+	private boolean didValidationPass(final DomainResponse domainResponse) {
+		return domainResponse == null || (domainResponse.getMessages() == null || domainResponse.getMessages().isEmpty());
 	}
 
 	/**
 	 * Validates all input args to a method.
-	 * 
+	 *
 	 * @param methodParams - the method args
 	 * @param method - the method being executed
 	 */
-	private DomainResponse validateInputsToTheMethod(final List<Object> methodParams, final Method method) {
-		DomainResponse domainResponse = null;
+	private void validateInputsToTheMethod(DomainResponse response, final List<Object> methodParams, final Method method) {
 		if (methodParams != null) {
 			List<ServiceMessage> messages = new ArrayList<>();
 
@@ -131,13 +134,12 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			}
 			// add any validation error messages
 			if (!messages.isEmpty()) {
-				if(domainResponse == null) {
-					domainResponse = new DomainResponse();
+				if (response == null) {
+					response = new DomainResponse();
 				}
-				domainResponse.addMessages(messages);
+				response.addMessages(messages);
 			}
 		}
-		return domainResponse;
 	}
 
 	/**
@@ -158,7 +160,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 		Object[] params = new Object[] { (validatorClass != null ? validatorClass.getName() : "null"), "validate",
 				object.getClass().getName(), Validator.class.getName() };
 		LOGGER.error(key.getMessage(params), e);
-		throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e,params);
+		throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, params);
 	}
 
 	/**
