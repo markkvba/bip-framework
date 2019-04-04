@@ -140,6 +140,7 @@ public enum MessageKeys implements MessageKey {
 	private String defaultMessage;
 	/** The spring message source */
 	private MessageSource messageSource;
+
 	/**
 	 * Construct keys with their property file counterpart key and a default message.
 	 *
@@ -149,11 +150,11 @@ public enum MessageKeys implements MessageKey {
 	private MessageKeys(String key, String defaultMessage) {
 		this.key = key;
 		this.defaultMessage = defaultMessage;
+		// Each enumeration must manually get spring bean
 		AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(MessageKeysConfig.class);
 		this.messageSource = ((MessageSource) appContext.getBean("messageSource"));
 		appContext.close();
 	}
-
 
 	/*
 	 * (non-Javadoc)
