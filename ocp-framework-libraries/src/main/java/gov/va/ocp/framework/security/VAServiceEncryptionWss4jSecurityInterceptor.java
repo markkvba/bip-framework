@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -42,6 +43,9 @@ public abstract class VAServiceEncryptionWss4jSecurityInterceptor extends Abstra
 
 	/** The Constant LOGGER. */
 	private static final OcpLogger LOGGER = OcpLoggerFactory.getLogger(VAServiceEncryptionWss4jSecurityInterceptor.class);
+
+	/** The kind of object being encrypted */
+	private static final String ENCRYPT_OBJ = "SOAP Message";
 
 	/*
 	 * (non-Javadoc)
@@ -73,9 +77,9 @@ public abstract class VAServiceEncryptionWss4jSecurityInterceptor extends Abstra
 
 			soapMessage.setDocument(doc);
 		} catch (final WSSecurityException e) {
-			String msg = "Failed to encrypt SOAPMessage";
-			LOGGER.error(msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			MessageKeys key = MessageKeys.OCP_SECURITY_ENCRYPT_FAIL;
+			LOGGER.error(key.getMessage(ENCRYPT_OBJ), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, ENCRYPT_OBJ);
 		}
 	}
 

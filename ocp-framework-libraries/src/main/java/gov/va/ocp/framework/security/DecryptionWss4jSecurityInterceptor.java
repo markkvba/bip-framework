@@ -7,7 +7,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.slf4j.event.Level;
 import org.springframework.ws.soap.security.wss4j2.callback.KeyStoreCallbackHandler;
 
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
@@ -57,7 +57,7 @@ public abstract class DecryptionWss4jSecurityInterceptor extends AbstractWss4jSe
 	}
 
 	private static void logError(final WSSecurityException e) {
-		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
+		LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR), 
 				"Error: Decryption Validation Crypto Factory Bean" + e.getMessage(), e);
 	}
 }

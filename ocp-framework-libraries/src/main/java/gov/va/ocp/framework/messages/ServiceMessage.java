@@ -21,90 +21,78 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ServiceMessage extends AbstractMessage {
 
-	/** The Constant serialVersionUID. */
+	/** The Constant serialVersionUID */
 	private static final long serialVersionUID = -1711431368372127555L;
 
 	/**
 	 * The text is excluded from equals and hash as the key+severity are to jointly indicate a unique message. The text is supplemental
-	 * information.
+	 * information
 	 */
 	private static final String[] EQUALS_HASH_EXCLUDE_FIELDS = new String[] { "text" };
 
-	/** The key. */
+	/** The key */
 	@XmlElement(required = true)
 	@NotNull
 	private String key;
 
-	/** The message. */
+	/** The message, with values already replaced for any replaceable parameters */
 	private String text;
-
+	/** String representation of the {@link HttpStatus#value()} */
 	private String status;
 
+	/** The message key enum */
 	@JsonIgnore
-	/** The Http status enum. */
+	private MessageKey messageKey;
+
+	/** The replaceable parameters for the message key */
+	@JsonIgnore
+	private Object[] messageParams;
+
+	/** The Http status enum */
+	@JsonIgnore
 	private HttpStatus httpStatus;
 
-	/** The message severity. */
+	/** The message severity enum */
 	@XmlElement(required = true)
 	@NotNull
 	private MessageSeverity severity;
 
 	/**
 	 * Instantiates a new message.
-	 */
-	public ServiceMessage() { // NOSONAR @NotNull is a validation annotation, not a usage annotation
-		super(); // NOSONAR @NotNull is a validation annotation, not a usage annotation
-	} // NOSONAR @NotNull is a validation annotation, not a usage annotation
-
-	/**
-	 * Instantiates a new message.
 	 *
-	 * @param severity the severity for the cause of the message
-	 * @param key the key representing the "error code" for the message
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the cause of the message
+	 * @param severity - the severity for the cause of the message
+	 * @param key - the key representing the "error code" for the message
+	 * @param httpStatus - the http status associated with the cause of the message
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public ServiceMessage(final MessageSeverity severity, final String key, final String text, final HttpStatus httpStatus) {
-		super();
-		this.severity = severity;
-		this.key = key;
-		this.text = text;
-		this.httpStatus = httpStatus;
-	}
-
-	/**
-	 * Instantiates a new message providing only replaceable parameters for the message text.
-	 *
-	 * @param paramCount the number of elements in the name and value arrays
-	 * @param paramNames the names, in same order as thier respective getParamValues
-	 * @param paramValues the values, in same order as their respective getParamNames
-	 */
-	public ServiceMessage(Integer paramCount, String[] paramNames, String[] paramValues) {
-		super(paramCount, paramNames, paramValues);
+	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key, final Object... params) {
+		this(severity, httpStatus, null, key, params);
 	}
 
 	/**
 	 * Instantiates a new message, populating all available fields.
 	 *
-	 * @param severity the severity for the cause of the message
-	 * @param key the key representing the "error code" for the message
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the cause of the message
-	 * @param paramCount the number of elements in the name and value arrays
-	 * @param paramNames the names, in same order as thier respective getParamValues
-	 * @param paramValues the values, in same order as their respective getParamNames
+	 * @param severity - the severity for the cause of the message
+	 * @param httpStatus - the http status associated with the cause of the message
+	 * @param constraintParams - an array of constraint parameters
+	 * @param key - the key representing the "error code" for the message
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public ServiceMessage(final MessageSeverity severity, final String key, final String text, HttpStatus httpStatus,
-			Integer paramCount, String[] paramNames, String[] paramValues) {
-		super(paramCount, paramNames, paramValues);
+	public ServiceMessage(final MessageSeverity severity, final HttpStatus httpStatus,
+			final ConstraintParam[] constraintParams, final MessageKey key, final Object... params) {
+		super(constraintParams); // always call super() to set the timestamp
 		this.severity = severity;
-		this.key = key;
-		this.text = text;
 		this.httpStatus = httpStatus;
+		this.messageKey = key;
+		this.messageParams = params;
+
+		this.key = key == null ? null : key.getKey();
+		this.text = key == null ? null : key.getMessage(params);
+		this.status = httpStatus == null ? null : Integer.toString(httpStatus.value());
 	}
 
 	/**
-	 * Gets the key.
+	 * The property key as a String.
 	 *
 	 * @return the key
 	 */
@@ -113,18 +101,9 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Sets the key.
+	 * The HttpStatus code as a String.
 	 *
-	 * @param key the new key
-	 */
-	public final void setKey(final String key) {
-		this.key = key;
-	}
-
-	/**
-	 * Gets the HttpStatus.
-	 *
-	 * @return the HttpStatus
+	 * @return String - the http status code
 	 */
 	@JsonProperty("status")
 	@JsonCreator
@@ -136,9 +115,9 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Gets the HttpStatus.
+	 * The HttpStatus enum for the message.
 	 *
-	 * @return the HttpStatus
+	 * @return HttpStatus
 	 */
 	@JsonIgnore
 	@JsonProperty(value = "httpStatus")
@@ -147,30 +126,12 @@ public class ServiceMessage extends AbstractMessage {
 	}
 
 	/**
-	 * Sets the HttpStatus.
-	 *
-	 * @param httpStatus the new http status
-	 */
-	public void setHttpStatus(final HttpStatus httpStatus) {
-		this.httpStatus = httpStatus;
-	}
-
-	/**
-	 * Gets the text.
+	 * Gets the text of the message.
 	 *
 	 * @return the text
 	 */
 	public final String getText() {
 		return this.text;
-	}
-
-	/**
-	 * Sets the text.
-	 *
-	 * @param text the new text
-	 */
-	public final void setText(final String text) {
-		this.text = text;
 	}
 
 	/**
@@ -180,15 +141,6 @@ public class ServiceMessage extends AbstractMessage {
 	 */
 	public final MessageSeverity getSeverity() {
 		return this.severity;
-	}
-
-	/**
-	 * Sets the message severity.
-	 *
-	 * @param severity the new message severity
-	 */
-	public final void setSeverity(final MessageSeverity severity) {
-		this.severity = severity;
 	}
 
 	/*

@@ -10,6 +10,7 @@ import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.exception.interceptor.ExceptionHandlingUtils;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 
@@ -79,8 +80,8 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			// request-level null check
 			if (toValidate == null) {
 				LOGGER.debug("Request is null");
-				messagesToAdd.add(new ServiceMessage(MessageSeverity.ERROR, "", callingMethodName + " Request cannot be null.",
-						HttpStatus.BAD_REQUEST));
+				messagesToAdd.add(new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
+						MessageKeys.OCP_VALIDATOR_NOT_NULL, callingMethodName));
 				return;
 			}
 
@@ -95,7 +96,8 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 			validate((T) toValidate, messagesToAdd);
 
 		} catch (Throwable t) { // NOSONAR intentionally broad catch
-			final OcpRuntimeException runtime = ExceptionHandlingUtils.resolveRuntimeException(t);
+			final OcpRuntimeException runtime =
+					ExceptionHandlingUtils.resolveRuntimeException(MessageKeys.OCP_VALIDATOR_INITIALIZE_ERROR_UNEXPECTED, t);
 
 			if (runtime != null) {
 				throw runtime;
@@ -124,38 +126,15 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 	}
 
 	private void handleInvalidClass(final Object toValidate, final List<ServiceMessage> messages) {
-		String msg = callingMethodName + " Validated object '" + toValidate.getClass().getName()
-				+ "' is not of type '" + getValidatedType().getName() + "'";
-		LOGGER.debug(msg);
-		messages.add(new ServiceMessage(MessageSeverity.ERROR, "", msg, HttpStatus.BAD_REQUEST));
+		MessageKeys key = MessageKeys.OCP_VALIDATOR_TYPE_MISMATCH;
+		Object[] params = new Object[] { toValidate.getClass().getName(), getValidatedType().getName() };
+		LOGGER.debug(key.getMessage(params));
+		messages.add(new ServiceMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, key, params));
 	}
-
-	/**
-	 * Call the validate method on the validator for model object T.
-	 * <p>
-	 * This implementation pre-validates the following conditions of the {@code toValidate} parameter for you:
-	 * <ul>
-	 * <li>Stash any supplemental objects for retrieval by {@link #getSupplemental()} and {@link #getSupplemental(Class)}.<br/>
-	 * Examples of supplemental objects: while validating a response object, the request object is added as a supplemental in case it
-	 * is
-	 * needed.
-	 * <li>Stash the calling {@link Method} (if provided) for retrieval by {@link #getCallingMethod()} and
-	 * {@link #getCallingMethodName()}
-	 * <li>Null check the {@code toValidate} parameter. If the null check fails, returns with message ({@link #validate(Object, List)}
-	 * method is never called)
-	 * <li>Class of the toValidate parameter verified to be correct. If it fails, returns with message ({@link #validate(Object, List)}
-	 * method is never called)
-	 * <li>messages parameter null checked and list initialized if necessary
-	 * </ul>
-	 *
-	 * @see Validator
-	 */
-	@Override
-	public abstract void validate(T toValidate, List<ServiceMessage> messages);
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#getValidatedType()
 	 */
 	@Override
@@ -165,7 +144,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#setCallingMethod(java.lang.reflect.Method)
 	 */
 	@Override
@@ -175,7 +154,7 @@ public abstract class AbstractStandardValidator<T> implements Validator<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see gov.va.ocp.framework.validation.Validator#getCallingMethod()
 	 */
 	@Override

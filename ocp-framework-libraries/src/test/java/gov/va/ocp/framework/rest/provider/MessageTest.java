@@ -1,5 +1,6 @@
 package gov.va.ocp.framework.rest.provider;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
@@ -21,5 +22,11 @@ public class MessageTest {
 		assertTrue(message.getStatus().equals("400"));
 		assertTrue(message.getText().equals(TEST_TEXT));
 		assertTrue(message.getHttpStatus(400).equals(HttpStatus.resolve(400)));
+	}
+
+	@Test
+	public void testGetStatusWhenNull() throws Exception {
+		Message message1 = new Message("ERROR", "test key", TEST_TEXT, null);
+		assertNull(message1.getStatus());
 	}
 }

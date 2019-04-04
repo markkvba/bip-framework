@@ -38,7 +38,7 @@ public class SourcesTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().startsWith("Source {} does not exist:"));
+			assertTrue(e.getMessage().startsWith("Source blah does not exist."));
 		}
 	}
 

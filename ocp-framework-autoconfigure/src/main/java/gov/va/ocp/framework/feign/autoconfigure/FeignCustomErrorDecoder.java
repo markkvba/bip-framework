@@ -13,6 +13,7 @@ import feign.codec.ErrorDecoder;
 import gov.va.ocp.framework.exception.OcpFeignRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -26,7 +27,7 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see feign.codec.ErrorDecoder#decode(java.lang.String, feign.Response)
 	 */
 	@Override
@@ -54,13 +55,17 @@ public class FeignCustomErrorDecoder implements ErrorDecoder {
 				JSONObject messageObjects = new JSONObject(strBuffer.toString());
 				JSONArray jsonarray = messageObjects.getJSONArray("messages");
 				JSONObject messageObject = jsonarray.getJSONObject(0);
-				return new OcpFeignRuntimeException(messageObject.getString("key"), messageObject.getString("text"),
+
+				MessageKeys key = MessageKeys.OCP_FEIGN_MESSAGE_RECEIVED;
+				Object[] params = new Object[] { messageObject.getString("key"), messageObject.getString("text") };
+				return new OcpFeignRuntimeException(key,
 						MessageSeverity.fromValue(messageObject.getString("severity")),
-						HttpStatus.resolve(Integer.valueOf(messageObject.getString("status"))));
+						HttpStatus.resolve(Integer.valueOf(messageObject.getString("status"))),
+						params);
 
 			} catch (JSONException e) {
 				LOGGER.debug(
-						"Could not, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
+						"Could not interpret response body, trying alternate methods of error decoding as implemented in decode() method of feign.codec.ErrorDecoder.Default.Default()",
 						e);
 				return defaultErrorDecoder.decode(methodKey, response);
 			}

@@ -1,10 +1,13 @@
 package gov.va.ocp.framework.config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
-
-import gov.va.ocp.framework.config.OcpCommonSpringProfiles;
 
 public class OcpCommonSpringProfilesTest {
 
@@ -158,8 +161,16 @@ public class OcpCommonSpringProfilesTest {
 		assertEquals(TES_NOT_PROFILE_EMBEDDED_AWS, OcpCommonSpringProfiles.NOT_PROFILE_EMBEDDED_AWS);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void referenceCommonSpringProfilesConstructor() throws Exception {
-		new OcpCommonSpringProfiles();
+		Constructor<OcpCommonSpringProfiles> c = OcpCommonSpringProfiles.class.getDeclaredConstructor(null);
+		c.setAccessible(true);
+		try {
+			c.newInstance(null);
+			fail("Should have thrown exception");
+		} catch (Exception e) {
+			assertTrue(InvocationTargetException.class.equals(e.getClass()));
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
+		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 public class SanitizationUtil {
@@ -45,8 +46,8 @@ public class SanitizationUtil {
 				}
 			}
 		} catch (Exception e) {
-			throw new OcpRuntimeException("", "Uncaught exception in safeFilename(..).", MessageSeverity.FATAL,
-					HttpStatus.INTERNAL_SERVER_ERROR, e);
+			throw new OcpRuntimeException(MessageKeys.OCP_SECURITY_SANITIZE_FAIL, MessageSeverity.FATAL,
+					HttpStatus.INTERNAL_SERVER_ERROR, e, "safeFileName");
 		}
 
 		return cleanFilename.toString();
@@ -111,8 +112,8 @@ public class SanitizationUtil {
 				scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 				cleanValue = scriptPattern.matcher(cleanValue).replaceAll("");
 			} catch (Exception e) {
-				throw new OcpRuntimeException("", "Uncaught exception in stripXSS(..).", MessageSeverity.FATAL,
-						HttpStatus.INTERNAL_SERVER_ERROR, e);
+				throw new OcpRuntimeException(MessageKeys.OCP_SECURITY_SANITIZE_FAIL, MessageSeverity.FATAL,
+						HttpStatus.INTERNAL_SERVER_ERROR, e, "stripXSS");
 			}
 		}
 		return cleanValue;

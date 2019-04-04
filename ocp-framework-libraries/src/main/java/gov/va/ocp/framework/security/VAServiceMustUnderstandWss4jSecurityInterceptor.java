@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -59,9 +60,10 @@ public class VAServiceMustUnderstandWss4jSecurityInterceptor extends Wss4jSecuri
 				removeAttributeWithSOAPNS(header, MUST_UNDERSTAND_ATTR);
 			}
 		} catch (final WSSecurityException e) { // NOSONAR no action to take
-			String msg = "Could not remove '" + MUST_UNDERSTAND_ATTR + "' attribute.";
-			LOGGER.error(msg, e); // NOSONAR no action to take
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			MessageKeys key = MessageKeys.OCP_SECURITY_ATTRIBUTE_FAIL;
+			Object[] params = new Object[] { "remove", MUST_UNDERSTAND_ATTR };
+			LOGGER.error(key.getMessage(params), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, params);
 		}
 
 		soapMessage.setDocument(doc);

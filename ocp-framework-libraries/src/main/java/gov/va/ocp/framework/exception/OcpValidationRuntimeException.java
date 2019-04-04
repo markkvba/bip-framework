@@ -2,6 +2,7 @@ package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -27,9 +28,10 @@ public class OcpValidationRuntimeException extends OcpRuntimeException {
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpValidationRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status) {
-		super(key, message, severity, status);
+	public OcpValidationRuntimeException(MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+		super(key, severity, status, params);
 	}
 
 	/**
@@ -44,8 +46,10 @@ public class OcpValidationRuntimeException extends OcpRuntimeException {
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
 	 * @param cause - the throwable that caused this throwable
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpValidationRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status, Throwable cause) {
-		super(key, message, severity, status, cause);
+	public OcpValidationRuntimeException(MessageKey key, MessageSeverity severity, HttpStatus status,
+			Throwable cause, Object... params) {
+		super(key, severity, status, cause, params);
 	}
 }

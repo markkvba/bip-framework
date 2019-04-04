@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 public enum Sources {
@@ -54,8 +55,9 @@ public enum Sources {
 				return s;
 			}
 		}
-		String msg = "Source {} does not exist: " + stringValue;
-		LOGGER.error(msg);
-		throw new OcpRuntimeException("", msg, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		MessageKeys key = MessageKeys.OCP_SECURITY_TRAITS_SOURCE_INVALID;
+		Object[] params = new Object[] { stringValue };
+		LOGGER.error(key.getMessage(params));
+		throw new OcpRuntimeException(key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 	}
 }
