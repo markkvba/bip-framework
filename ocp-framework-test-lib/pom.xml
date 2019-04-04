@@ -19,17 +19,7 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>${dom4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert-core</artifactId>
-			<version>${fest-assert.version}</version>
-		</dependency>
-
+	
 		<!-- Testng Dependencies -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -37,7 +27,6 @@
 			<version>${testng.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- Cucumber Dependencies -->
 		<dependency>
 			<groupId>info.cukes</groupId>
@@ -65,28 +54,25 @@
 			<artifactId>cucumber-picocontainer</artifactId>
 			<version>${cucumber.version}</version>
 		</dependency>
-
+		<!-- Spring Web -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 		</dependency>
-          <!-- http client -->
+          <!-- Http Client -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			</dependency>
-
+		</dependency>
          <!-- json-path -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			</dependency>
-
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.maven.surefire</groupId>
 			<artifactId>surefire-junit47</artifactId>
@@ -103,18 +89,6 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
