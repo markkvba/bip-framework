@@ -33,18 +33,21 @@ import com.github.lalyos.jfiglet.FigletFont;
 
 import gov.va.ocp.framework.AbstractBaseLogTester;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 @RunWith(SpringRunner.class)
 public class OcpLoggerTest extends AbstractBaseLogTester {
 
 	private OcpLogger logger = super.getLogger(OcpLoggerTest.class);
+	private static final MessageKey TEST_KEY = MessageKeys.NO_KEY;
 
 	private final OcpBanner banner = OcpBanner.newBanner("TEST BANNER", Level.INFO);
 	private static final String MESSAGE = "Test message";
 	private static final Marker MARKER = OcpLogMarkers.TEST.getMarker();
 	private static final OcpRuntimeException EXCEPTION =
-			new OcpRuntimeException("some.message.key", "TestException", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+			new OcpRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 	/** The output capture. */
 	@Rule
@@ -197,7 +200,7 @@ public class OcpLoggerTest extends AbstractBaseLogTester {
 	@Test
 	public final void testLargeMessageWithLargeStackTrace() {
 
-		Exception e = new OcpRuntimeException("some.message.key", "TestException",
+		Exception e = new OcpRuntimeException(TEST_KEY,
 				MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ArrayList<StackTraceElement> stackTraces = new ArrayList<>();
 		for (int i = 0; i < 6; i++) {

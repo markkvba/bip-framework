@@ -45,6 +45,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import gov.va.ocp.framework.exception.OcpPartnerException;
 import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.rest.exception.OcpRestGlobalExceptionHandler;
 
@@ -53,6 +55,8 @@ public class OcpRestGlobalExceptionHandlerTest {
 	OcpRestGlobalExceptionHandler ocpRestGlobalExceptionHandler = new OcpRestGlobalExceptionHandler();
 
 	DummyObjectToBeValidated dummyObjectToBeValidated;
+
+	private static final MessageKey TEST_KEY = MessageKeys.NO_KEY;
 
 	@Test
 	public void handleIllegalArgumentExceptionTest() {
@@ -228,7 +232,7 @@ public class OcpRestGlobalExceptionHandlerTest {
 	@Test
 	public void handleOcpRuntimeExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
-		OcpRuntimeException ex = new OcpRuntimeException("test key", "test message", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		OcpRuntimeException ex = new OcpRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpRuntimeException", req, ex);
@@ -261,7 +265,7 @@ public class OcpRestGlobalExceptionHandlerTest {
 	public void handleOcpPartnerRuntimeExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		OcpPartnerRuntimeException ex =
-				new OcpPartnerRuntimeException("test key", "test message", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+				new OcpPartnerRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpPartnerRuntimeException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
@@ -270,7 +274,7 @@ public class OcpRestGlobalExceptionHandlerTest {
 	@Test
 	public void handleOcpPartnerCheckedExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
-		OcpPartnerException ex = new OcpPartnerException("test key", "test message", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		OcpPartnerException ex = new OcpPartnerException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpPartnerCheckedException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));

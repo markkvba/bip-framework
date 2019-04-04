@@ -7,11 +7,14 @@ import java.util.Arrays;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpExceptionExtender;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -48,12 +51,13 @@ public final class ExceptionHandlingUtils {
 	/**
 	 * Resolve the throwable to an {@link OcpRuntimeException} (or subclass of OcpRuntimeException).
 	 *
+	 * @param messageKey the message key to use for this type of exception
 	 * @param throwable the throwable
 	 * @return the runtime exception
 	 * @throws InstantiationException the instantiation exception
 	 * @throws IllegalAccessException the illegal access exception
 	 */
-	public static OcpRuntimeException resolveRuntimeException(final Throwable throwable) {
+	public static OcpRuntimeException resolveRuntimeException(MessageKey messageKey, final Throwable throwable) {
 		// custom exception type to represent the error
 		OcpRuntimeException resolvedRuntimeException = null;
 
@@ -67,8 +71,7 @@ public final class ExceptionHandlingUtils {
 		} else {
 			// make a new OcpRuntimeException from the non-OCP throwable
 			resolvedRuntimeException =
-					new OcpRuntimeException("", throwable.getMessage(), MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
-							throwable);
+					new OcpRuntimeException(messageKey, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 		}
 
 		return resolvedRuntimeException;
@@ -79,16 +82,17 @@ public final class ExceptionHandlingUtils {
 		try {
 			// cast "Throwable throwable" variable to the OCP exception interface
 			OcpExceptionExtender ocp = (OcpExceptionExtender) throwable;
+			Object[] objectArray = new Object[] {};
 			// instantiate the Runtime version of the interface
 			resolvedRuntimeException = (OcpRuntimeException) throwable.getClass()
-					.getConstructor(String.class, String.class, MessageSeverity.class, HttpStatus.class, Throwable.class)
-					.newInstance(ocp.getKey(), throwable.getMessage(), ocp.getSeverity(), ocp.getStatus(), throwable);
+					.getConstructor(MessageKey.class, MessageSeverity.class, HttpStatus.class, Throwable.class, objectArray.getClass())
+					.newInstance(ocp.getMessageKey(), ocp.getSeverity(), ocp.getStatus(), throwable, objectArray);
 		} catch (ClassCastException | IllegalAccessException | IllegalArgumentException | InstantiationException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			String msg = "Could not instantiate OcpRuntimeException using values from throwable "
-					+ throwable.getClass().getName();
-			LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageKeys key = MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_VALUES;
+			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR),
+					key.getMessage(e.getClass().getName()), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 		return resolvedRuntimeException;
 	}
@@ -98,9 +102,10 @@ public final class ExceptionHandlingUtils {
 		try {
 			resolvedRuntimeException = (OcpRuntimeException) throwable;
 		} catch (ClassCastException e) {
-			String msg = "Could not cast " + throwable.getClass().getName() + " to OcpRuntimeException";
-			LOGGER.error(new OcpBanner("ResolveRuntimeException Failed", Level.ERROR), msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
+			MessageKeys key = MessageKeys.OCP_EXCEPTION_HANDLER_ERROR_CAST;
+			LOGGER.error(new OcpBanner(OcpConstants.RESOLVE_EXCEPTION, Level.ERROR),
+					key.getMessage(throwable.getClass().getName()), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
 		return resolvedRuntimeException;
 	}

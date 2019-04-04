@@ -45,6 +45,7 @@ import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
 import gov.va.ocp.framework.log.PerformanceLogMethodInterceptor;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.VAServiceWss4jSecurityInterceptor;
 import gov.va.ocp.framework.validation.Defense;
@@ -474,8 +475,8 @@ public class BaseWsClientConfig {
 
 				SSLContext sslContext =
 						SSLContextBuilder.create()
-						.loadKeyMaterial(keystore, keystorePass.toCharArray())
-						.loadTrustMaterial(truststore.getURL(), truststorePass.toCharArray()).build();
+								.loadKeyMaterial(keystore, keystorePass.toCharArray())
+								.loadTrustMaterial(truststore.getURL(), truststorePass.toCharArray()).build();
 				// use NoopHostnameVerifier to turn off host name verification
 				SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 				httpClient.setSSLSocketFactory(csf);
@@ -488,9 +489,10 @@ public class BaseWsClientConfig {
 	}
 
 	private void handleExceptions(final Exception e) {
-		String msg = "Could not establish SSL context due to " + e.getClass().getSimpleName() + ": " + e.getMessage();
-		LOGGER.error(msg, e);
-		throw new OcpPartnerRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+		MessageKeys key = MessageKeys.OCP_SECURITY_SSL_CONTEXT_FAIL;
+		Object[] params = new Object[] { e.getClass().getSimpleName(), e.getMessage() };
+		LOGGER.error(key.getMessage(params), e);
+		throw new OcpPartnerRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, params);
 	}
 
 	/**
@@ -543,7 +545,7 @@ public class BaseWsClientConfig {
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));
 		} else {
 			LOGGER.debug("Adding audit interceptor only for both " + AuditWsInterceptorConfig.BEFORE.name()
-			+ " and " + AuditWsInterceptorConfig.AFTER.name());
+					+ " and " + AuditWsInterceptorConfig.AFTER.name());
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.BEFORE));
 			list.addAll(Collections.arrayToList(wsInterceptors));
 			list.add(new AuditWsInterceptor(AuditWsInterceptorConfig.AFTER));
@@ -589,8 +591,9 @@ public class BaseWsClientConfig {
 		try {
 			marshaller.afterPropertiesSet();
 		} catch (final Exception ex) {
-			throw new OcpPartnerRuntimeException("", "Error configuring JAXB marshaller", MessageSeverity.FATAL,
-					HttpStatus.INTERNAL_SERVER_ERROR, ex);
+
+			throw new OcpPartnerRuntimeException(MessageKeys.OCP_REST_CONFIG_JAXB_MARSHALLER_FAIL,
+					MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, ex);
 		}
 		return marshaller;
 	}

@@ -2,6 +2,7 @@ package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -20,12 +21,12 @@ public class OcpFeignRuntimeException extends OcpRuntimeException {
 	 * @see OcpRuntimeException#OcpRuntimeException(String, String, MessageSeverity, HttpStatus)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
-	 * @param message - the detail message
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpFeignRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status) {
-		super(key, message, severity, status);
+	public OcpFeignRuntimeException(MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+		super(key, severity, status, params);
 	}
 
 	/**
@@ -34,12 +35,12 @@ public class OcpFeignRuntimeException extends OcpRuntimeException {
 	 * @see OcpRuntimeException#OcpRuntimeException(String, String, MessageSeverity, HttpStatus, Throwable)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
-	 * @param message - the detail message
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 * @param cause - the throwable that caused this throwable
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpFeignRuntimeException(String key, String message, MessageSeverity severity, HttpStatus status, Throwable cause) {
-		super(key, message, severity, status, cause);
+	public OcpFeignRuntimeException(MessageKey key, MessageSeverity severity, HttpStatus status, Throwable cause, Object... params) {
+		super(key, severity, status, cause, params);
 	}
 }

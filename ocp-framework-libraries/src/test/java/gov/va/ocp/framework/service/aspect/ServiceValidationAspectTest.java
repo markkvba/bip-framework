@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
@@ -11,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.After;
 import org.junit.Before;
@@ -18,9 +20,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.service.DomainResponse;
 import gov.va.ocp.framework.service.aspect.validators.TestRequestValidator;
@@ -98,6 +103,15 @@ public class ServiceValidationAspectTest {
 
 		when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] {});
 		when(proceedingJoinPoint.toLongString()).thenReturn("ProceedingJoinPointLongString");
+		Signature mockSignature = mock(Signature.class);
+		when(proceedingJoinPoint.getSignature()).thenReturn(mockSignature);
+		when(mockSignature.toShortString()).thenReturn("mock method signature");
+		try {
+			when(proceedingJoinPoint.proceed()).thenReturn(null);
+		} catch (Throwable e1) {
+			e1.printStackTrace();
+			fail("exception not expected");
+		}
 
 		try {
 			returned = (DomainResponse) aspect.aroundAdvice(proceedingJoinPoint);
@@ -121,6 +135,14 @@ public class ServiceValidationAspectTest {
 
 		when(proceedingJoinPoint.getArgs()).thenReturn(args);
 		when(proceedingJoinPoint.toLongString()).thenReturn("ProceedingJoinPointLongString");
+		DomainResponse response = new DomainResponse();
+		try {
+			response.addMessage(MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, MessageKeys.NO_KEY, new Object[] {});
+			when(proceedingJoinPoint.proceed()).thenReturn(response);
+		} catch (Throwable e1) {
+			e1.printStackTrace();
+			fail("exception not expected");
+		}
 		when(proceedingJoinPoint.getSignature()).thenReturn(signature);
 		when(signature.getName()).thenReturn("testMethodSad");
 		when(signature.getDeclaringType()).thenReturn(this.getClass());
@@ -140,7 +162,7 @@ public class ServiceValidationAspectTest {
 		assertTrue(returned.getMessages().size() == 1);
 		assertTrue(TestRequestValidator.SEVERITY.equals(
 				returned.getMessages().get(0).getSeverity()));
-		assertTrue(TestRequestValidator.KEY.equals(
+		assertTrue(TestRequestValidator.KEY.getKey().equals(
 				returned.getMessages().get(0).getKey()));
 		assertTrue(TestRequestValidator.TEXT.equals(
 				returned.getMessages().get(0).getText()));
@@ -169,7 +191,7 @@ public class ServiceValidationAspectTest {
 	public final void testInvokeValidator() {
 		try {
 			ReflectionTestUtils.invokeMethod(aspect, "invokeValidator", new DomainResponse(), new LinkedList<ServiceMessage>(),
-					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class);
+					this.getClass().getMethod("testMethod", String.class), DomainResponseValidatorForTest.class, new Object[] {});
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 			fail("unable to find method named testMethod");

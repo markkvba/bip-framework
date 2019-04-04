@@ -2,6 +2,8 @@ package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -19,7 +21,9 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
 	/** The consumer facing identity key */
-	private final String key;
+	private final MessageKey key;
+	/** Any values needed to fill in params (e.g. value for {0}) in the MessageKey message */
+	private final Object[] params;
 	/** The severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE */
 	private final MessageSeverity severity;
 	/** The best-fit HTTP Status, see <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a> */
@@ -33,16 +37,14 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	 * @see Exception#Exception(String)
 	 *
 	 * @param key - the consumer-facing key that can uniquely identify the nature of the exception
-	 * @param message - the detail message
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 * @param severity - the severity of the event: FATAL (500 series), ERROR (400 series), WARN (200 series), or INFO/DEBUG/TRACE
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpException(final String key, final String message, final MessageSeverity severity, final HttpStatus status) {
-		super(message);
-		this.key = key;
-		this.severity = severity;
-		this.status = status;
+	public OcpException(final MessageKey key, final MessageSeverity severity, final HttpStatus status, Object... params) {
+		this(key, severity, status, null, params);
 	}
 
 	/**
@@ -56,32 +58,44 @@ public class OcpException extends Exception implements OcpExceptionExtender {
 	 * @param status - the HTTP Status code that applies best to the encountered problem, see
 	 *            <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
 	 * @param cause - the throwable that caused this throwable
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public OcpException(final String key, final String message, final MessageSeverity severity, final HttpStatus status,
-			final Throwable cause) { //NOSONAR
-		super(message, cause);       //NOSONAR
-		this.key = key;              //NOSONAR
-		this.severity = severity;    //NOSONAR
-		this.status = status;        //NOSONAR
+	public OcpException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
+			final Throwable cause, final Object... params) {
+		super((key == null ? MessageKeys.NO_KEY.toString() : key.getMessage(params)), cause);
+		this.key = (key == null ? MessageKeys.NO_KEY : key);
+		this.params = params;
+		this.severity = severity;
+		this.status = status;
 	}
 
-	@Override                        //NOSONAR
-	public String getKey() {         //NOSONAR
-		return key;                  //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public MessageKey getMessageKey() {
+		return key;
+	}
 
-	@Override                        //NOSONAR
-	public HttpStatus getStatus() {  //NOSONAR
-		return status;               //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public String getKey() {
+		return key.getKey();
+	}
 
-	@Override                        //NOSONAR
-	public MessageSeverity getSeverity() {     //NOSONAR
-		return severity;             //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public Object[] getParams() {
+		return params;
+	}
 
-	@Override                        //NOSONAR
-	public String getServerName() {  //NOSONAR
-		return OcpExceptionConstants.SERVER_NAME;          //NOSONAR
-	}                                //NOSONAR
+	@Override
+	public HttpStatus getStatus() {
+		return status;
+	}
+
+	@Override
+	public MessageSeverity getSeverity() {
+		return severity;
+	}
+
+	@Override
+	public String getServerName() {
+		return System.getProperty("server.name");
+	}
 }

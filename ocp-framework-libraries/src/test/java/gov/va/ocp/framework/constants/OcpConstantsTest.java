@@ -13,23 +13,23 @@ import java.lang.reflect.Constructor;
 
 import org.junit.Test;
 
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 
 /**
  *
  * @author rthota
  */
-public class AnnotationConstantsTest {
+public class OcpConstantsTest {
 	public static final String UNCHECKED = "unchecked";
 
 	@Test
 	public void annotationConstantsTest() throws Exception {
-		assertEquals(UNCHECKED, AnnotationConstants.UNCHECKED);
+		assertEquals(UNCHECKED, OcpConstants.UNCHECKED);
 	}
 
 	@Test
 	public void annotationConstantsConstructor() throws Exception {
-		Constructor<AnnotationConstants> constructor = AnnotationConstants.class.getDeclaredConstructor();
+		Constructor<OcpConstants> constructor = OcpConstants.class.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		try {
 			constructor.newInstance();

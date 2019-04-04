@@ -14,7 +14,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -100,22 +99,22 @@ public class PerformanceLoggingAspectTest extends AbstractBaseLogTester {
 	}
 
 	// TODO turned off until exception handling is decided
-	@Ignore
-	@Test
-	public void testAroundAdviceThrowError() throws Throwable {
-		super.getAppender().clear();
-		AspectLoggingLOG.setLevel(Level.ERROR);
-		AspectLoggingTestLOG.setLevel(Level.ERROR);
-
-		when(proceedingJoinPoint.proceed()).thenThrow(new Throwable("Unit Testing"));
-
-		try {
-			PerformanceLoggingAspect.aroundAdvice(proceedingJoinPoint);
-			fail("Should have thrown exception.");
-		} catch (Throwable e) {
-			assertTrue(e.getMessage().startsWith("Unit Testing"));
-		}
-	}
+	// @Ignore
+	// @Test
+	// public void testAroundAdviceThrowError() throws Throwable {
+	// super.getAppender().clear();
+	// AspectLoggingLOG.setLevel(Level.ERROR);
+	// AspectLoggingTestLOG.setLevel(Level.ERROR);
+	//
+	// when(proceedingJoinPoint.proceed()).thenThrow(new Throwable("Unit Testing"));
+	//
+	// try {
+	// PerformanceLoggingAspect.aroundAdvice(proceedingJoinPoint);
+	// fail("Should have thrown exception.");
+	// } catch (Throwable e) {
+	// assertTrue(e.getMessage().startsWith("Unit Testing"));
+	// }
+	// }
 
 	public Method myMethod() throws NoSuchMethodException {
 		return getClass().getDeclaredMethod("someMethod");

@@ -2,6 +2,7 @@ package gov.va.ocp.framework.exception;
 
 import org.springframework.http.HttpStatus;
 
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -39,11 +40,25 @@ import gov.va.ocp.framework.messages.MessageSeverity;
 public interface OcpExceptionExtender {
 
 	/**
+	 * The {@link MessageKey} enumeration for the message key.
+	 *
+	 * @return the message key
+	 */
+	public MessageKey getMessageKey();
+
+	/**
 	 * The consumer-facing key that can uniquely identify the nature of the exception
 	 *
 	 * @return the key
 	 */
 	public String getKey();
+
+	/**
+	 * Any objects that might be needed to fill in params in the message, e.g. the value for {0}.
+	 *
+	 * @return Object array
+	 */
+	public Object[] getParams();
 
 	/**
 	 * The HTTP Status code that applies best to the encountered problem, see

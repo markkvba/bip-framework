@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import gov.va.ocp.framework.messages.ConstraintParam;
+import gov.va.ocp.framework.messages.MessageKey;
 import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.messages.ServiceMessage;
 import gov.va.ocp.framework.transfer.AbstractResponseObject;
@@ -22,16 +24,12 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	/** The serviceMessages. */
 	private List<ServiceMessage> serviceMessages;
 
-	/*
-	 * cacheResponse
-	 *
-	 * Must be ignored in the serialization and de-serialization
-	 */
-	@JsonIgnore
+	/** Whether the response should be cached or not */
+	@JsonIgnore // don't serialize into the response entity
 	private boolean doNotCacheResponse = false;
 
 	/**
-	 * Instantiates a new rest response.
+	 * Instantiates a new service response.
 	 */
 	public DomainResponse() {
 		super();
@@ -40,54 +38,43 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	/**
 	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
-	 * Messages made with this constructor CANNOT be used in a JSR303 context.
+	 * Messages made with this constructor CANNOT be used in a JSR303 context
+	 * because there is no way to communicate constraint message parameters to a
+	 * JSR303 implementation.
 	 *
-	 * @param severity the severity of the message
-	 * @param key the key "code word" for support calls
-	 * @param text the text of the message
-	 * @param httpStatus the http status associated with the message
+	 * @param severity - the severity of the message
+	 * @param httpStatus - the http status associated with the message
+	 * @param key - the key "code" for support calls
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public final void addMessage(final MessageSeverity severity, final String key, final String text,
-			final HttpStatus httpStatus) {
+	public final void addMessage(final MessageSeverity severity, final HttpStatus httpStatus, final MessageKey key,
+			final Object... params) {
 		if (serviceMessages == null) {
 			serviceMessages = new LinkedList<>();
 		}
-		final ServiceMessage serviceMessage = new ServiceMessage();
-		serviceMessage.setSeverity(severity);
-		serviceMessage.setKey(key);
-		serviceMessage.setText(text);
-		serviceMessage.setHttpStatus(httpStatus);
-		serviceMessages.add(serviceMessage);
+		serviceMessages.add(new ServiceMessage(severity, httpStatus, key, params));
 	}
 
 	/**
 	 * Adds a {@link ServiceMessage} to the serviceMessages list on the response.
 	 * <p>
-	 * Messages made with this constructor CAN be used in a JSR303 context.
+	 * Messages made with this constructor CAN be used in a JSR303 context
+	 * due to the inclusion of the {@link ConstraintParam} array. The array
+	 * is the means of communicating constraint message parameters to the
+	 * JSR303 implementation.
 	 *
 	 * @param severity the severity of the message
-	 * @param key the key "code word" for support calls
-	 * @param text the text of the message
 	 * @param httpStatus the http status associated with the message
-	 * @param paramCount the number of replaceable parameters in the message
-	 * @param paramNames the names of the replaceable parameters in the message
-	 * @param paramValues the values of the replaceable parameters in the message
+	 * @param constraintParams - an array of constraint parameters
+	 * @param key the key "code" for support calls
+	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	public final void addMessage(final MessageSeverity severity, final String key, final String text,
-			final HttpStatus httpStatus,
-			Integer paramCount, String[] paramNames, String[] paramValues) {
+	public final void addMessage(final MessageSeverity severity, final HttpStatus httpStatus, final ConstraintParam[] constraintParams,
+			final MessageKey key, final Object... params) {
 		if (serviceMessages == null) {
 			serviceMessages = new LinkedList<>();
 		}
-		final ServiceMessage serviceMessage = new ServiceMessage();
-		serviceMessage.setSeverity(severity);
-		serviceMessage.setKey(key);
-		serviceMessage.setText(text);
-		serviceMessage.setHttpStatus(httpStatus);
-		serviceMessage.setParamCount(paramCount);
-		serviceMessage.setParamNames(paramNames);
-		serviceMessage.setParamValues(paramValues);
-		serviceMessages.add(serviceMessage);
+		serviceMessages.add(new ServiceMessage(severity, httpStatus, constraintParams, key, params));
 	}
 
 	/**
@@ -103,7 +90,7 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	}
 
 	/**
-	 * Gets the serviceMessages.
+	 * Gets the list of ServiceMessages.
 	 *
 	 * @return the serviceMessages
 	 */
@@ -115,20 +102,12 @@ public class DomainResponse extends AbstractResponseObject implements DomainTran
 	}
 
 	/**
-	 * Sets the serviceMessages.
-	 *
-	 * @param serviceMessages the new serviceMessages
-	 */
-	public final void setMessages(final List<ServiceMessage> serviceMessages) {
-		this.serviceMessages = serviceMessages;
-	}
-
-	/**
-	 * Checks for serviceMessages of type.
+	 * Checks for serviceMessages of severity type.
 	 *
 	 * @param severity the severity
 	 * @return true, if successful
 	 */
+	@Override
 	protected boolean hasMessagesOfType(final MessageSeverity severity) {
 		for (final ServiceMessage serviceMessage : getMessages()) {
 			if (severity.equals(serviceMessage.getSeverity())) {

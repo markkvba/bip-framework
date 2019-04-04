@@ -8,25 +8,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-
 /**
- * The Class OcpValidatorAutoConfiguration.
+ * Configuration for JSR303 validation (and other validation) message sources.
  */
 @Configuration
 @AutoConfigureBefore(MessageSourceAutoConfiguration.class)
 public class OcpValidatorAutoConfiguration {
 
 	/**
-     * Validator.
-     *
-     * @param messageSource the message source
-     * @return the local validator factory bean
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
-        LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
-        validatorFactoryBean.setValidationMessageSource(messageSource);
-        return validatorFactoryBean;
-    }
+	 * Validator.
+	 *
+	 * @param messageSource the message source
+	 * @return the local validator factory bean
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public LocalValidatorFactoryBean validator(MessageSource messageSource) {
+		LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
+		validatorFactoryBean.setValidationMessageSource(messageSource);
+		return validatorFactoryBean;
+	}
 }

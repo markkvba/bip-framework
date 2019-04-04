@@ -35,7 +35,7 @@ public class IssuersTest {
 			fail("Should have thrown OcpRuntimeException");
 		} catch (Exception e) {
 			assertTrue(OcpRuntimeException.class.isAssignableFrom(e.getClass()));
-			assertTrue(e.getMessage().startsWith("Issuer {} does not exist:"));
+			assertTrue(e.getMessage().startsWith("Issuer blah does not exist."));
 		}
 	}
 

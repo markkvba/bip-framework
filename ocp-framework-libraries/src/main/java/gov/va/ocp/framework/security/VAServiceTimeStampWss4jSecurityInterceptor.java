@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -57,9 +58,10 @@ public abstract class VAServiceTimeStampWss4jSecurityInterceptor extends Abstrac
 			soapMessage.setDocument(doc);
 
 		} catch (final WSSecurityException e) {
-			String msg = "Could not add header TTL timestamp to SOAPMessage.";
-			LOGGER.error(msg, e);
-			throw new OcpRuntimeException("", msg, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e);
+			MessageKeys key = MessageKeys.OCP_SECURITY_ATTRIBUTE_FAIL;
+			Object[] params = new Object[] { "add", "TTL timestamp" };
+			LOGGER.error(key.getMessage(params), e);
+			throw new OcpRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, params);
 		}
 	}
 

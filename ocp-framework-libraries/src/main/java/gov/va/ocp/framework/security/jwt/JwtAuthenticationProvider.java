@@ -5,12 +5,15 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
 import gov.va.ocp.framework.security.PersonTraits;
 
 /**
@@ -49,7 +52,8 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 
 		final PersonTraits person = parser.parseJwt(token);
 		if ((person == null) || !isPersonTraitsValid(person, jwtTokenRequiredParameterList)) {
-			throw new JwtAuthenticationException("Invalid Token");
+			throw new JwtAuthenticationException(MessageKeys.OCP_SECURITY_TOKEN_INVALID,
+					MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		}
 		return person;
 	}

@@ -2,19 +2,24 @@ package gov.va.ocp.framework.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class OcpServiceExceptionTest {
 
-	@Before
-	public void setUp() throws Exception {
-	}
+	private static final String TEST_KEY_MESSAGE = "NO_KEY";
+	private static final MessageKey TEST_KEY = MessageKeys.NO_KEY;
 
 	@After
 	public void tearDown() throws Exception {
@@ -22,9 +27,8 @@ public class OcpServiceExceptionTest {
 
 	@Test
 	public void testEmptyConstructor() {
-		OcpServiceException ocpServiceException = new OcpServiceException(null, null, null, null, null);
-		assertNull(ocpServiceException.getKey());
-		assertNull(ocpServiceException.getMessage());
+		OcpServiceException ocpServiceException = new OcpServiceException(TEST_KEY, null, null, null, null);
+		assertTrue(ocpServiceException.getMessage().equals(TEST_KEY_MESSAGE));
 		assertNull(ocpServiceException.getSeverity());
 		assertNull(ocpServiceException.getStatus());
 		assertNull(ocpServiceException.getCause());
@@ -33,7 +37,7 @@ public class OcpServiceExceptionTest {
 	@Test
 	public void testPopulatedConstructor() {
 		OcpServiceException ocpServiceException =
-				new OcpServiceException("some.key", "Unit Testing", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
+				new OcpServiceException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
 						new Throwable("test"));
 		assertNotNull(ocpServiceException.getKey());
 		assertNotNull(ocpServiceException.getMessage());
@@ -45,7 +49,7 @@ public class OcpServiceExceptionTest {
 	@Test
 	public void testPopulatedNoCauseConstructor() {
 		OcpServiceException ocpServiceException =
-				new OcpServiceException("some.key", "Unit Testing", MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+				new OcpServiceException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		assertNotNull(ocpServiceException.getKey());
 		assertNotNull(ocpServiceException.getMessage());
 		assertNotNull(ocpServiceException.getSeverity());

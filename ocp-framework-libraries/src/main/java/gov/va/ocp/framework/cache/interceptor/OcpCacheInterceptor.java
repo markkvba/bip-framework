@@ -8,6 +8,7 @@ import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheInterceptor;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 
 import gov.va.ocp.framework.audit.AuditEventData;
@@ -15,11 +16,12 @@ import gov.va.ocp.framework.audit.AuditEvents;
 import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.AuditLogger;
 import gov.va.ocp.framework.audit.ResponseAuditData;
-import gov.va.ocp.framework.constants.AnnotationConstants;
+import gov.va.ocp.framework.constants.OcpConstants;
 import gov.va.ocp.framework.exception.OcpRuntimeException;
 import gov.va.ocp.framework.log.OcpBanner;
 import gov.va.ocp.framework.log.OcpLogger;
 import gov.va.ocp.framework.log.OcpLoggerFactory;
+import gov.va.ocp.framework.messages.MessageKeys;
 import gov.va.ocp.framework.messages.MessageSeverity;
 
 /**
@@ -43,6 +45,9 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 	/**  */
 	private static final String ADVICE_NAME = "invokeOcpCacheInterceptor";
 	private static final String ACTIVITY = "cacheInvoke";
+
+	@Autowired
+	MessageSource messageSource;
 
 	/** The {@link AuditLogSerializer} for async logging */
 	@Autowired
@@ -119,12 +124,10 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			final AuditEventData auditEventData, final Throwable throwable) {
 
 		try {
-			String msg = adviceName + " - Exception occured while attempting to " + attemptingTo + ".";
-			LOGGER.error(msg, throwable);
-			final OcpRuntimeException ocpRuntimeException =
-					new OcpRuntimeException("", msg,
-							MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR,
-							throwable);
+			MessageKeys key = MessageKeys.OCP_AUDIT_CACHE_ERROR_UNEXPECTED;
+			LOGGER.error(key.getMessage(adviceName, attemptingTo), throwable);
+			final OcpRuntimeException ocpRuntimeException = new OcpRuntimeException(
+					key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable);
 			writeAuditError(adviceName, ocpRuntimeException, auditEventData);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
@@ -144,7 +147,7 @@ public class OcpCacheInterceptor extends CacheInterceptor {
 			final String adviceName, final Throwable e) {
 
 		String msg = adviceName + " - Throwable occured while attempting to writeAuditError for Throwable.";
-		LOGGER.error(OcpBanner.newBanner(AnnotationConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
+		LOGGER.error(OcpBanner.newBanner(OcpConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 				msg, e);
 	}
 
