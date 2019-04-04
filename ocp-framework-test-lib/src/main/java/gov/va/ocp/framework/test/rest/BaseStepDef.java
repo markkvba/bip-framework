@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.restassured;
+package gov.va.ocp.framework.test.rest;
 
 import java.io.File;
 import java.io.IOException;

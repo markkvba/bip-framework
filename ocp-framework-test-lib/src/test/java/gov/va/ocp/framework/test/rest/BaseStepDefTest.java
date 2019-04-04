@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.restassured;
+package gov.va.ocp.framework.test.rest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -21,6 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import gov.va.ocp.framework.test.rest.BaseStepDef;
 
 public class BaseStepDefTest {
 

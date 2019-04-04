@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.jsonpath.PathNotFoundException;
 
 public class JsonUtilTest {
 
@@ -53,7 +54,7 @@ public class JsonUtilTest {
 		assertThat(firstName, equalTo("DOE"));
 	}
 
-	@Test
+	@Test(expected = PathNotFoundException.class)
 	public void test_getObjectAssertIsNull_Success() throws IOException {
 		JsonUtil.getString(json, "firstNameDummy");
 	}
@@ -66,15 +67,6 @@ public class JsonUtilTest {
 	@Test
 	public void test_getStringAssertIsBlank_Success() throws IOException {
 		JsonUtil.getStringAssertIsBlank(json, "blankKey");
-	}
-
-	@Test
-	public void test_getMap_Success() throws IOException {
-		Map<String, Object> attributes = JsonUtil.getMap(json, "attributes");
-		String attributeValue = JsonUtil.getString(attributes, "attribute1");
-		int intattributeValue = JsonUtil.getInt(attributes, "intattribute");
-		assertThat(attributeValue, equalTo("attributeValue1"));
-		assertThat(intattributeValue, equalTo(10));
 	}
 
 }

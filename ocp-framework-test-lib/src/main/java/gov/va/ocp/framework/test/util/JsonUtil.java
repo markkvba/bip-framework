@@ -1,10 +1,10 @@
 package gov.va.ocp.framework.test.util;
 
-import java.util.Map;
-
 import org.junit.Assert;
 
-import io.restassured.path.json.JsonPath;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
 /**
  * Utility class for parsing JSON.
  * @author sravi
@@ -16,34 +16,27 @@ public class JsonUtil {
 		throw new UnsupportedOperationException("Utility class");
 	}
 
+	private static DocumentContext getDocumentContext(String json) {
+		return JsonPath.parse(json);
+	}
+	
 	public static final String getString(final String json, final String path) {
-		return JsonPath.with(json).get(path);
+		return getDocumentContext(json).read(path);
+		
 	}
 
 	public static final Integer getInt(final String json, final String path) {
-		return JsonPath.with(json).get(path);
-	}
-
-	public static final Map<String, Object> getMap(final String json, final String path) {
-		return JsonPath.with(json).get(path);
-	}
-
-	public static final String getString(final Map<String, Object> map, final String name) {
-		return (String) map.get(name);
-	}
-
-	public static final int getInt(final Map<String, Object> map, final String name) {
-		return (int) map.get(name);
+		return getDocumentContext(json).read(path);
 	}
 
 	public static final Object getObjectAssertNotNull(String jsonRequest, String path) {
-		Object value = JsonPath.with(jsonRequest).get(path);
+		Object value = getDocumentContext(jsonRequest).read(path);
 		Assert.assertNotNull("json does not contain: " + path + ".", value);
 		return value;
 	}
 
 	public static final String getStringAssertNotBlank(String jsonRequest, String path) {
-		String value = (String) getObjectAssertNotNull(jsonRequest, path);
+		String value = getDocumentContext(jsonRequest).read(path);
 		Assert.assertTrue(path + " cannot be blank.", !value.trim().isEmpty());
 		return value;
 	}

@@ -66,7 +66,12 @@ public class RESTUtil {
 	String jsonText = new String();
 	ResponseEntity<String> response = null;
 	int httpResponseCode;
+	RestTemplate restTemplate;
 
+	public RESTUtil() {
+		this.restTemplate = getRestTemplate();
+	}
+	
 	/**
 	 * Reads file content for a given file resource using URL object.
 	 *
@@ -167,7 +172,6 @@ public class RESTUtil {
 	}
 	
 	private String executeAPI(final String serviceURL, HttpEntity<?> request, HttpMethod httpMethod) {
-		RestTemplate restTemplate = getRestTemplate();
 		try {
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
@@ -236,7 +240,7 @@ public class RESTUtil {
 
 	private RestTemplate getRestTemplate() {
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate apiTemplate = new RestTemplate();
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
 			KeyStore keyStore = null;
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
@@ -250,15 +254,15 @@ public class RESTUtil {
 			    SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 			    HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
 			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-			    restTemplate = new RestTemplate(requestFactory);				
+			    apiTemplate = new RestTemplate(requestFactory);				
 			} catch (Exception e) {
 				LOGGER.error("Issue with the certificate or password", e);
 			}			
 		}
-		restTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
-		restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
-		return restTemplate;
+		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
+		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+		return apiTemplate;
 	}
 		
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
