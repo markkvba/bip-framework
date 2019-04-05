@@ -110,9 +110,11 @@ public class BaseHttpProviderAspect extends BaseAsyncAudit {
 			responseAuditData.setResponse(response);
 		}
 
-		LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
-		super.getAsyncLogger().asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
-				messageSeverity, t);
+		if (super.getAsyncLogger() != null) {
+			LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
+			super.getAsyncLogger().asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
+					messageSeverity, t);
+		}
 	}
 
 	private void getHttpResponseAuditData(final HttpServletResponse httpServletReponse, final ResponseAuditData responseAuditData) {
