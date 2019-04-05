@@ -11,10 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.ocp.framework.audit.AuditEvents;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
 import gov.va.ocp.framework.audit.Auditable;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -108,6 +110,9 @@ public class AuditAnnotationAspectTest {
 		}
 		RequestContextHolder.setRequestAttributes(attrs);
 		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
 		Object returnValue = null;
 		try {
 			returnValue = aspect.auditAnnotationAspect(joinPoint);
