@@ -75,10 +75,8 @@ public class BaseAsyncAudit {
 
 		LOGGER.debug("RequestAuditData: {}", requestAuditData.toString());
 
-		if (asyncLogging != null) {
-			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
-					MessageSeverity.INFO, null);
-		}
+		asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
+				MessageSeverity.INFO, null);
 	}
 
 	/**
@@ -176,7 +174,7 @@ public class BaseAsyncAudit {
 
 	/**
 	 * Attempt to close an input stream.
-	 * 
+	 *
 	 * @param inputstream
 	 * @throws IOException
 	 */
