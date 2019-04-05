@@ -141,7 +141,7 @@ public class OcpRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param auditEventData the auditable annotation
 	 */
 	protected void audit(final List<Object> request, final AuditEventData auditEventData) {
-		super.writeRequestInfoAudit(request, auditEventData);
+		super.writeRequestAuditLog(request, auditEventData);
 	}
 
 	/**
