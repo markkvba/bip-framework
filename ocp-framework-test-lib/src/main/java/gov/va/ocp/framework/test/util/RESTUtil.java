@@ -63,10 +63,10 @@ public class RESTUtil {
 
 	// stores request headers
 	private MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>(); 
-	String jsonText = new String();
-	ResponseEntity<String> response = null;
-	int httpResponseCode;
-	RestTemplate restTemplate;
+	protected String jsonText = new String();
+	private ResponseEntity<String> response = null;
+	private int httpResponseCode;
+	private RestTemplate restTemplate;
 
 	public RESTUtil() {
 		this.restTemplate = getRestTemplate();
