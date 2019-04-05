@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.restassured;
+package gov.va.ocp.framework.test.rest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +17,8 @@ public class BaseStepDefHandler extends BaseStepDef {
 	public RESTUtil getRestUtil() {
 		return resUtil;
 	}
+
+	
 	@Override
 	public void passHeaderInformation(Map<String, String> tblHeader) {
 		headerMap = new HashMap<>(tblHeader);

@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.restassured;
+package gov.va.ocp.framework.test.rest;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,6 +85,28 @@ public class BaseStepDef {
 			setBearerToken();
 		}
 		invokeAPIUsingPost(strURL);
+	}
+
+	/**
+	 * Delegates put API call without bearer token to rest util.
+	 * 
+	 * @param strURL
+	 */
+	public void invokeAPIUsingPut(final String strURL) {
+		resUtil.setUpRequest(headerMap);
+		strResponse = resUtil.putResponse(strURL);
+	}
+	/**
+	 * Sets the bearer token and delegates put API call to rest util.
+	 * 
+	 * @param strURL
+	 * @param isAuth
+	 */
+	public void invokeAPIUsingPut(final String strURL, final boolean isAuth) {
+		if (isAuth) {
+			setBearerToken();
+		}
+		invokeAPIUsingPut(strURL);
 	}
 
 	/**

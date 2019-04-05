@@ -1,4 +1,4 @@
-package gov.va.ocp.framework.test.restassured;
+package gov.va.ocp.framework.test.rest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -21,6 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+
+import gov.va.ocp.framework.test.rest.BaseStepDef;
 
 public class BaseStepDefTest {
 
@@ -53,6 +55,7 @@ public class BaseStepDefTest {
 		addGetPersonStub();
 		addPostPersonStub();
 		addDeletePersonStub();
+		addPutPersonStub();
 		addPostBearerStub();
 		addPostMultiPart();
 	}
@@ -70,6 +73,11 @@ public class BaseStepDefTest {
 	private static void addDeletePersonStub() {
 		wireMockServer.stubFor(delete(urlEqualTo("/person"))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/delete-person-response.json")));
+	}
+
+	private static void addPutPersonStub() {
+		wireMockServer.stubFor(post(urlEqualTo("/person"))
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/post-person-response.json")));
 	}
 
 	private static void addPostBearerStub() {
@@ -96,6 +104,18 @@ public class BaseStepDefTest {
 	@Test
 	public void test_invokeAPIUsingDelete_WithBearerToken_Success() {
 		subject.invokeAPIUsingDelete("http://localhost:9999/person", true);
+		assertThat(true, equalTo(!subject.strResponse.isEmpty()));
+	}
+
+	@Test
+	public void test_invokeAPIUsingPut_Success() {
+		subject.invokeAPIUsingPut("http://localhost:9999/person", false);
+		assertThat(true, equalTo(!subject.strResponse.isEmpty()));
+	}
+
+	@Test
+	public void test_invokeAPIUsingPut_WithBearerToken_Success() {
+		subject.invokeAPIUsingPut("http://localhost:9999/person", true);
 		assertThat(true, equalTo(!subject.strResponse.isEmpty()));
 	}
 

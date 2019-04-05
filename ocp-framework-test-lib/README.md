@@ -1,13 +1,13 @@
 ## What is this test library project for? ##
 
-Test -lib test Automation Framework is customized to support testing the REST Services deployed on BIP platform. It supports testing of both REST and SOAP protocols with the help of REST Assured jars. Testing the APIs via Jayway REST- Assured tool is fast and lightweight.
+Test -lib test Automation Framework is customized to support testing the REST Services deployed on BIP platform. It supports testing of REST protocols with the help of REST template. Spring RestTemplate provides a convenient way to test RESTful web services. It simplifies the interaction with HTTP servers and enforces RESTful systems.
 
 ## Dependencies:
 
-Rest assured - This is the Rest-Assured library itself.
-
-       <groupId>io.rest-assured</groupId>
-       <artifactId>rest-assured</artifactId>
+Rest template - This is the Rest-template library itself.
+   
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
 
 cucumber-java - a library that makes it easier for us to write and execute parameterized test.
 
@@ -26,11 +26,11 @@ cucumber-java - a library that makes it easier for us to write and execute param
 
 ## Overview of the packages ##
 
-Test-lib Test Framework uses Java - Maven platform, the REST-Assured jars for core API validations.
+Test-lib Test Framework uses Java - Maven platform, the REST-template  for core API validations.
 
 This folder has all the support classes and methods that can be re-used to build Automated API tests for each API.
 
-**gov.va.ocp.framework.test.restassured**:
+**gov.va.ocp.framework.test.rest**:
 
 BaseStepDef: Base class for all the step definition.
 
@@ -44,7 +44,7 @@ BearerTokenService: It Fetches token from the token API. The token will be used 
 
 **gov.va.ocp.framework.test.util**:
 
-RestUtil: It is a wrapper for rest assured API for making HTTP calls, parse JSON and XML responses and status code check.
+RestUtil: It is a wrapper for rest template API for making HTTP calls, parse JSON and XML responses and status code check.
 
 JsonUtil: Utility class for parsing JSON.
 
