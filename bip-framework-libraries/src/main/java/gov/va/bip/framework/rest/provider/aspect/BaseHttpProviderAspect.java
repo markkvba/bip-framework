@@ -1,23 +1,12 @@
 package gov.va.bip.framework.rest.provider.aspect;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.event.Level;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -38,16 +27,10 @@ import gov.va.bip.framework.util.SanitizationUtil;
  *
  * @author jshrader
  */
-public class BaseHttpProviderAspect {
+public class BaseHttpProviderAspect extends BaseAsyncAudit {
 
 	/** The Constant LOGGER. */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BaseHttpProviderAspect.class);
-
-	/** How many bytes of an uploaded file will be read for inclusion in the audit record */
-	private static final int NUMBER_OF_BYTES = 1024;
-
-	@Autowired
-	AuditLogSerializer asyncLogging;
 
 	/**
 	 * Protected constructor.
@@ -159,7 +142,7 @@ public class BaseHttpProviderAspect {
 
 		LOGGER.debug("Content Type: {}", SanitizationUtil.stripXSS(contentType));
 
-		if (contentType != null && (contentType.toLowerCase(Locale.ENGLISH).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)
+		if ((contentType != null) && (contentType.toLowerCase(Locale.ENGLISH).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)
 				|| contentType.toLowerCase(Locale.ENGLISH).startsWith(BipConstants.MIME_MULTIPART_MIXED))) {
 			final List<String> attachmentTextList = new ArrayList<>();
 			InputStream inputstream = null;
@@ -191,7 +174,7 @@ public class BaseHttpProviderAspect {
 		}
 	}
 
-	private void closeInputStreamIfRequired(InputStream inputstream) throws IOException {
+	private void closeInputStreamIfRequired(final InputStream inputstream) throws IOException {
 		if (inputstream != null) {
 			inputstream.close();
 		}
@@ -258,9 +241,9 @@ public class BaseHttpProviderAspect {
 			responseAuditData.setResponse(response);
 		}
 
-		if (asyncLogging != null) {
+		if (super.getAsyncLogger() != null) {
 			LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
-			asyncLogging.asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
+			super.getAsyncLogger().asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
 					messageSeverity, t);
 		}
 	}
