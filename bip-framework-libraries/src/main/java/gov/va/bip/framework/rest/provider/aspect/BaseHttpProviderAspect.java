@@ -11,15 +11,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.bip.framework.audit.AuditEventData;
-import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.audit.RequestAuditData;
+import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.ResponseAuditData;
-import gov.va.bip.framework.constants.BipConstants;
-import gov.va.bip.framework.log.BipBanner;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.messages.MessageSeverity;
-import gov.va.bip.framework.util.SanitizationUtil;
 
 /**
  * This is the base class for REST provider aspects.

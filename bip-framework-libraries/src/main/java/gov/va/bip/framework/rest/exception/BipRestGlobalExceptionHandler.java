@@ -34,6 +34,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gov.va.bip.framework.audit.AuditEventData;
+import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.exception.BipExceptionExtender;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
@@ -42,6 +44,7 @@ import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
 import gov.va.bip.framework.rest.provider.ProviderResponse;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
 
 /**
  * A global exception handler as the last line of defense before sending response to the service consumer.
