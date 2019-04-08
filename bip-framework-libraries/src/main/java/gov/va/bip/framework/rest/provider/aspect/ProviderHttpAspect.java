@@ -40,6 +40,11 @@ import gov.va.bip.framework.rest.provider.ProviderResponse;
 @Order(-9998)
 public class ProviderHttpAspect extends BaseHttpProviderAspect {
 
+	/**
+	 * Developers note: for thread safety, only static constants
+	 * or spring proxies can be put at class level.
+	 */
+
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(ProviderHttpAspect.class);
 	/** Identity of the before advice */
