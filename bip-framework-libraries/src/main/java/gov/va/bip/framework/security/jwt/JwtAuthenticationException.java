@@ -76,7 +76,7 @@ public class JwtAuthenticationException extends AuthenticationException implemen
 	}
 
 	@Override
-	public Object[] getParams() {
+	public String[] getParams() {
 		return this.params;
 	}
 

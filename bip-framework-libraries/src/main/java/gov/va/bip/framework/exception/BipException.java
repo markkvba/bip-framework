@@ -80,7 +80,7 @@ public class BipException extends Exception implements BipExceptionExtender {
 	}
 
 	@Override
-	public Object[] getParams() {
+	public String[] getParams() {
 		return params;
 	}
 

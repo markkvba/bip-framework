@@ -78,7 +78,7 @@ public class BipRuntimeException extends RuntimeException implements BipExceptio
 	}
 
 	@Override
-	public Object[] getParams() {
+	public String[] getParams() {
 		return this.params;
 	}
 
