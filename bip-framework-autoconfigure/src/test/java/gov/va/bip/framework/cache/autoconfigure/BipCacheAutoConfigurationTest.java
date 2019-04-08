@@ -21,8 +21,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
-import gov.va.bip.framework.cache.autoconfigure.BipCacheAutoConfiguration;
-import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties;
 
 /**
  * Created by vgadda on 8/11/17.
@@ -45,6 +43,17 @@ public class BipCacheAutoConfigurationTest {
 		if (this.context != null) {
 			this.context.close();
 		}
+	}
+
+	@Test
+	public void testBipCacheOpsMBean() {
+		context = new AnnotationConfigApplicationContext();
+		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
+		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class);
+		context.refresh();
+		assertNotNull(context);
+		Object bipCacheOpsMBean = context.getBean("bipCacheOpsMBean");
+		assertNotNull(bipCacheOpsMBean);
 	}
 
 	@Test
