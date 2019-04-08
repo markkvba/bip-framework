@@ -1,4 +1,4 @@
-package gov.va.bip.framework.aspect;
+package gov.va.ocp.framework.aspect;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -15,9 +15,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import gov.va.bip.framework.audit.AuditEvents;
-import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.audit.Auditable;
+import gov.va.ocp.framework.audit.AuditEvents;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
+import gov.va.ocp.framework.audit.Auditable;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AuditAnnotationAspectTest {
@@ -66,12 +66,12 @@ public class AuditAnnotationAspectTest {
 
 		@Override
 		public Class getDeclaringType() {
-			return gov.va.bip.framework.aspect.AuditAnnotationAspectTest.class;
+			return gov.va.ocp.framework.aspect.AuditAnnotationAspectTest.class;
 		}
 
 		@Override
 		public String getDeclaringTypeName() {
-			return "gov.va.bip.framework.rest.provider.aspect.AuditAnnotationAspectTest";
+			return "gov.va.ocp.framework.rest.provider.aspect.AuditAnnotationAspectTest";
 		}
 
 		@Override

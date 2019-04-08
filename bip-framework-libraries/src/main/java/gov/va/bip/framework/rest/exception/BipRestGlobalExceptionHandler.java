@@ -1,6 +1,8 @@
 package gov.va.bip.framework.rest.exception;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -32,6 +34,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gov.va.bip.framework.audit.AuditEventData;
+import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.exception.BipExceptionExtender;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
@@ -40,6 +44,7 @@ import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
 import gov.va.bip.framework.rest.provider.ProviderResponse;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
 
 /**
  * A global exception handler as the last line of defense before sending response to the service consumer.
@@ -48,7 +53,7 @@ import gov.va.bip.framework.rest.provider.ProviderResponse;
  */
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class BipRestGlobalExceptionHandler {
+public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 
 	/** The Constant LOGGER. */
 	private static final Logger logger = LoggerFactory.getLogger(BipRestGlobalExceptionHandler.class);
@@ -127,6 +132,16 @@ public class BipRestGlobalExceptionHandler {
 		} else {
 			logger.debug(msg, ex);
 		}
+	}
+
+	/**
+	 * Write an audit log for the request object(s).
+	 *
+	 * @param request the request
+	 * @param auditEventData the auditable annotation
+	 */
+	protected void audit(final List<Object> request, final AuditEventData auditEventData) {
+		super.writeRequestAuditLog(request, auditEventData);
 	}
 
 	/**
@@ -266,6 +281,10 @@ public class BipRestGlobalExceptionHandler {
 						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
 			}
 		}
+
+		audit(Arrays.asList(apiError),
+				new AuditEventData(AuditEvents.API_REST_REQUEST, "jsr303Validation", req.getPathInfo()));
+
 		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
 	}
 

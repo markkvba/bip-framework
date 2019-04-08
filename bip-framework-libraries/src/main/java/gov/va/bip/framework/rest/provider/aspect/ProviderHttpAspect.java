@@ -80,7 +80,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 				LOGGER.debug("Method: {}", method);
 				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
 			}
-			writeRequestInfoAudit(requestArgs, auditEventData);
+			writeRequestAuditLog(requestArgs, auditEventData);
 
 		} catch (final Throwable throwable) { // NOSONAR intentionally catching throwable
 			handleInternalException(BEFORE_ADVICE, ATTEMPTING_WRITE_REQUEST, auditEventData, throwable);

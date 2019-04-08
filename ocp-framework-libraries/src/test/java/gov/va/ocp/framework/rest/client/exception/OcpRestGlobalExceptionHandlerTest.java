@@ -1,4 +1,4 @@
-package gov.va.bip.framework.rest.client.exception;
+package gov.va.ocp.framework.rest.client.exception;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -45,18 +45,18 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.exception.BipPartnerException;
-import gov.va.bip.framework.exception.BipPartnerRuntimeException;
-import gov.va.bip.framework.exception.BipRuntimeException;
-import gov.va.bip.framework.messages.MessageKey;
-import gov.va.bip.framework.messages.MessageKeys;
-import gov.va.bip.framework.messages.MessageSeverity;
-import gov.va.bip.framework.rest.exception.BipRestGlobalExceptionHandler;
+import gov.va.ocp.framework.audit.AuditLogSerializer;
+import gov.va.ocp.framework.exception.OcpPartnerException;
+import gov.va.ocp.framework.exception.OcpPartnerRuntimeException;
+import gov.va.ocp.framework.exception.OcpRuntimeException;
+import gov.va.ocp.framework.messages.MessageKey;
+import gov.va.ocp.framework.messages.MessageKeys;
+import gov.va.ocp.framework.messages.MessageSeverity;
+import gov.va.ocp.framework.rest.exception.OcpRestGlobalExceptionHandler;
 
-public class BipRestGlobalExceptionHandlerTest {
+public class OcpRestGlobalExceptionHandlerTest {
 
-	BipRestGlobalExceptionHandler bipRestGlobalExceptionHandler = new BipRestGlobalExceptionHandler();
+	OcpRestGlobalExceptionHandler ocpRestGlobalExceptionHandler = new OcpRestGlobalExceptionHandler();
 
 	DummyObjectToBeValidated dummyObjectToBeValidated;
 
@@ -66,7 +66,7 @@ public class BipRestGlobalExceptionHandlerTest {
 	public void handleIllegalArgumentExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		IllegalArgumentException ex = new IllegalArgumentException("test illegal argument exception message");
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleIllegalArgumentException(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleIllegalArgumentException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -76,7 +76,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		MethodParameter parameter = null;
 
 		try {
-			parameter = new MethodParameter(BipRestGlobalExceptionHandlerTest.this.getClass()
+			parameter = new MethodParameter(OcpRestGlobalExceptionHandlerTest.this.getClass()
 					.getMethod("methodForExtractingMethodObject", new Class[] { String.class }), 0);
 		} catch (NoSuchMethodException e) {
 			fail("Error mocking the parameter");
@@ -102,11 +102,11 @@ public class BipRestGlobalExceptionHandlerTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(bipRestGlobalExceptionHandler, "asyncLogging", serializer);
+		ReflectionTestUtils.setField(ocpRestGlobalExceptionHandler, "asyncLogging", serializer);
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpServletRequest));
 
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleMethodArgumentNotValidException(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleMethodArgumentNotValidException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -121,7 +121,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		HttpClientErrorException ex = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text", headers,
 				"test body".getBytes(), Charset.defaultCharset());
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleHttpClientErrorException(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleHttpClientErrorException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -130,7 +130,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		MethodParameter parameter = null;
 		try {
-			parameter = new MethodParameter(BipRestGlobalExceptionHandlerTest.this.getClass()
+			parameter = new MethodParameter(OcpRestGlobalExceptionHandlerTest.this.getClass()
 					.getMethod("methodForExtractingMethodObject", new Class[] { String.class }), 0);
 		} catch (NoSuchMethodException e) {
 			fail("Error mocking the parameter");
@@ -139,7 +139,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		}
 		MethodArgumentTypeMismatchException ex = new MethodArgumentTypeMismatchException("test value", String.class, "test name",
 				parameter, new Exception("test wrapped message"));
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleMethodArgumentTypeMismatch(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleMethodArgumentTypeMismatch(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -148,14 +148,14 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
-		BipRestGlobalExceptionHandlerTest.DummyObjectToBeValidated dummyObject =
-				new BipRestGlobalExceptionHandlerTest.DummyObjectToBeValidated();
+		OcpRestGlobalExceptionHandlerTest.DummyObjectToBeValidated dummyObject =
+				new OcpRestGlobalExceptionHandlerTest.DummyObjectToBeValidated();
 		dummyObject.dummyField = "";
 
 		Set<? extends ConstraintViolation<?>> constaintViolations = validator.validate(dummyObject, Default.class);
 
 		ConstraintViolationException ex = new ConstraintViolationException("test message", constaintViolations);
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleConstraintViolation(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleConstraintViolation(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -164,14 +164,14 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
-		BipRestGlobalExceptionHandlerTest.DummyObjectToBeValidated dummyObject =
-				new BipRestGlobalExceptionHandlerTest.DummyObjectToBeValidated();
+		OcpRestGlobalExceptionHandlerTest.DummyObjectToBeValidated dummyObject =
+				new OcpRestGlobalExceptionHandlerTest.DummyObjectToBeValidated();
 		dummyObject.dummyField = "";
 
 		Set<? extends ConstraintViolation<?>> constaintViolations = validator.validate(dummyObject, Default.class);
 
 		new ConstraintViolationException("test message", constaintViolations);
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleConstraintViolation(req, null);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleConstraintViolation(req, null);
 		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
@@ -195,7 +195,7 @@ public class BipRestGlobalExceptionHandlerTest {
 					}
 				});
 
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleHttpMessageNotReadableException(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleHttpMessageNotReadableException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -207,7 +207,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		NoHandlerFoundException ex = new NoHandlerFoundException("test msg", "wrapped message", headers);
 
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleNoHandlerFoundException", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleNoHandlerFoundException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.NOT_FOUND));
 	}
 
@@ -220,7 +220,7 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpRequestMethodNotSupportedException ex = new HttpRequestMethodNotSupportedException("test method name", suppotedMethods);
 
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleHttpRequestMethodNotSupported", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleHttpRequestMethodNotSupported", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.METHOD_NOT_ALLOWED));
 	}
 
@@ -235,17 +235,17 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpMediaTypeNotSupportedException ex = new HttpMediaTypeNotSupportedException(MediaType.TEXT_PLAIN, supportedMediatypes);
 
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleHttpMediaTypeNotSupported", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleHttpMediaTypeNotSupported", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
 	}
 
 	@Test
-	public void handleBipRuntimeExceptionTest() {
+	public void handleOcpRuntimeExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
-		BipRuntimeException ex = new BipRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		OcpRuntimeException ex = new OcpRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleBipRuntimeException", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpRuntimeException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
@@ -254,39 +254,39 @@ public class BipRestGlobalExceptionHandlerTest {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		Exception ex = new Exception("test message");
 
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleAll(req, ex);
+		ResponseEntity<Object> response = ocpRestGlobalExceptionHandler.handleAll(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	@Test
 	public void failSafeHandlerTest() {
-		ResponseEntity<Object> response = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "failSafeHandler");
+		ResponseEntity<Object> response = ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "failSafeHandler");
 		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	@Test
 	public void standardHandlerWithNullExceptionTest() {
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "standardHandler", null, HttpStatus.BAD_REQUEST);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "standardHandler", null, HttpStatus.BAD_REQUEST);
 		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	@Test
-	public void handleBipPartnerRuntimeExceptionTest() {
+	public void handleOcpPartnerRuntimeExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
-		BipPartnerRuntimeException ex =
-				new BipPartnerRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		OcpPartnerRuntimeException ex =
+				new OcpPartnerRuntimeException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleBipPartnerRuntimeException", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpPartnerRuntimeException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
-	public void handleBipPartnerCheckedExceptionTest() {
+	public void handleOcpPartnerCheckedExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
-		BipPartnerException ex = new BipPartnerException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
+		OcpPartnerException ex = new OcpPartnerException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 		ResponseEntity<Object> response =
-				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleBipPartnerCheckedException", req, ex);
+				ReflectionTestUtils.invokeMethod(ocpRestGlobalExceptionHandler, "handleOcpPartnerCheckedException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
