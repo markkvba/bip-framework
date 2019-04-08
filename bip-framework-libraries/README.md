@@ -37,4 +37,4 @@ gov.va.bip.framework.audit
    gov.va.bip.framework.exception <br/>
    gov.va.bip.framework.rest.exception<br/>
    
-<img src = "/images/cd-exception-packages.jpg">
+<img src = "/images/bip-exception-class-diagram.jpg">
