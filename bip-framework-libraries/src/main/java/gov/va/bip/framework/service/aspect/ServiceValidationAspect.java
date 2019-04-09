@@ -95,7 +95,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 			}
 
 			// attempt to validate all inputs to the method
-			validateInputsToTheMethod(domainResponse, methodParams, method);
+			domainResponse = validateInputsToTheMethod(methodParams, method);
 
 			// if there were no errors from validation, proceed with the actual method
 			if (!didValidationPass(domainResponse)) { // NOSONAR didValidationPass is not always true, unlike what sonar believes
@@ -132,8 +132,10 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	 *
 	 * @param methodParams - the method args
 	 * @param method - the method being executed
+	 * @return 
 	 */
-	private void validateInputsToTheMethod(DomainResponse response, final List<Object> methodParams, final Method method) {
+	private DomainResponse validateInputsToTheMethod(final List<Object> methodParams, final Method method) {
+		DomainResponse response = null;
 		if (methodParams != null) {
 			List<ServiceMessage> messages = new ArrayList<>();
 
@@ -148,6 +150,8 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 				response.addMessages(messages);
 			}
 		}
+
+		return response;
 	}
 
 	/**
@@ -165,7 +169,7 @@ public class ServiceValidationAspect extends BaseServiceAspect {
 	private void handleValidatorInstantiationExceptions(final Class<?> validatorClass, final Exception e, final Object object) {
 		// Validator programming issue - throw exception
 		MessageKeys key = MessageKeys.BIP_DEV_ILLEGAL_INVOCATION;
-		Object[] params = new Object[] { (validatorClass != null ? validatorClass.getName() : "null"), "validate",
+		String[] params = new String[] { (validatorClass != null ? validatorClass.getName() : "null"), "validate",
 				object.getClass().getName(), Validator.class.getName() };
 		LOGGER.error(key.getMessage(params), e);
 		throw new BipRuntimeException(key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, e, params);

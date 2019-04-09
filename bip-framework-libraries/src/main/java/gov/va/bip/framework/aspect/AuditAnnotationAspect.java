@@ -77,7 +77,7 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 								StringUtils.isBlank(auditableAnnotation.auditClass()) ? className : auditableAnnotation.auditClass());
 				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
 
-				writeRequestInfoAudit(request, auditEventData);
+				writeRequestAuditLog(request, auditEventData);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
 			LOGGER.error("Could not audit event due to unexpected exception.", e);
