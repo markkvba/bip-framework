@@ -71,14 +71,14 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param ex the Exception
 	 * @return String the message
 	 */
-	private String deriveMessage(final Exception ex, final MessageKey key, final Object... params) {
+	private String deriveMessage(final Exception ex, final MessageKey key, final String... params) {
 		MessageKey derivedKey = deriveKey(key);
 		String msg = derivedKey.getMessage(params);
 		if (StringUtils.isBlank(msg) || msg.matches("\\{[a-zA-Z0-9]{0,64}\\}")) {
 			msg = msg + " :: "
 					+ ((ex != null) && !StringUtils.isBlank(ex.getMessage())
-					? ex.getMessage()
-							: getMessageFromWrappedException(ex));
+							? ex.getMessage()
+									: getMessageFromWrappedException(ex));
 		}
 		return msg;
 	}
@@ -108,7 +108,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param status - the status to report for the exception
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status, final Object... params) {
+	private void log(final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status,
+			final String... params) {
 		log(Level.INFO, ex, key, severity, status, params);
 	}
 
@@ -122,7 +123,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param status - the status to report for the exception
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(final Level level, final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status, final Object... params) {
+	private void log(final Level level, final Exception ex, final MessageKey key, final MessageSeverity severity,
+			final HttpStatus status, final String... params) {
 		MessageKey derivedKey = deriveKey(key);
 		String msg = status + "-" + severity + " "
 				+ (ex == null ? "null" : ex.getClass().getName()) + " "
@@ -186,7 +188,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
 	protected ResponseEntity<Object> standardHandler(final Exception ex, final MessageKey key, final MessageSeverity severity,
-			final HttpStatus httpResponseStatus, final Object... params) {
+			final HttpStatus httpResponseStatus, final String... params) {
 		if (ex == null) {
 			return failSafeHandler();
 		}
@@ -272,14 +274,14 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 			MessageKey key = MessageKeys.BIP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID;
 			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				Object[] params = new Object[] { "field", errorCodes, error.getDefaultMessage() };
+				String[] params = new String[] { "field", errorCodes, error.getDefaultMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
 						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
 			}
 			for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				Object[] params = new Object[] { "object", errorCodes, error.getDefaultMessage() };
+				String[] params = new String[] { "object", errorCodes, error.getDefaultMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
 						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
@@ -311,7 +313,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 			MessageKey key = MessageKeys.BIP_GLOBAL_HTTP_CLIENT_ERROR;
 			HttpStatus status = httpClientErrorException.getStatusCode();
 			String statusReason = httpClientErrorException.getStatusCode().getReasonPhrase();
-			Object[] params = new Object[] { statusReason, httpClientErrorException.getMessage() };
+			String[] params = new String[] { statusReason, httpClientErrorException.getMessage() };
 
 			log(httpClientErrorException, key, MessageSeverity.ERROR, status, params);
 
@@ -344,7 +346,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 			final MethodArgumentTypeMismatchException ex) {
 
 		MessageKey key = MessageKeys.BIP_GLOBAL_REST_API_TYPE_MISMATCH;
-		Object[] params = new Object[] { ex.getName(), ex.getRequiredType().getName() };
+		String[] params = new String[] { ex.getName(), ex.getRequiredType().getName() };
 
 		log(Level.INFO, ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 
@@ -371,8 +373,9 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 		} else {
 			MessageKey key = MessageKeys.BIP_GLBOAL_VALIDATOR_CONSTRAINT_VIOLATION;
 			for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-				Object[] params =
-						new Object[] { violation.getRootBeanClass().getName(), violation.getPropertyPath(), violation.getMessage() };
+				String[] params =
+						new String[] { violation.getRootBeanClass().getName(), violation.getPropertyPath().toString(),
+								violation.getMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
 						key.getMessage(params), HttpStatus.BAD_REQUEST);
