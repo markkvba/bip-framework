@@ -36,6 +36,7 @@ gov.va.bip.framework.audit
 ##### Exception Packages
    gov.va.bip.framework.exception <br/>
    gov.va.bip.framework.rest.exception<br/>
+   gov.va.bip.framework.service<br/>
    
 <img src = "/images/bip-framework-exception-class-diagram.jpg">
 
