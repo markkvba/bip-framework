@@ -49,3 +49,11 @@ RestUtil: It is a wrapper for rest template API for making HTTP calls, parse JSO
 JsonUtil: Utility class for parsing JSON.
 
 PropertiesUtil: Utilities for handling properties.
+
+## Class Diagrams
+
+gov.va.bip.framework.test.rest
+gov.va.bip.framework.test.service
+gov.va.bip.framework.test.util
+
+<img src = "/images/bip-framework-test-lib-class-diagram.jpg">
