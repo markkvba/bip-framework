@@ -1,19 +1,35 @@
 package gov.va.bip.framework.aspect;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.bip.framework.audit.AuditEvents;
+import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.Auditable;
+import gov.va.bip.framework.log.BipLogger;
+import gov.va.bip.framework.log.BipLoggerFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AuditAnnotationAspectTest {
@@ -90,31 +106,62 @@ public class AuditAnnotationAspectTest {
 	}
 
 	@Mock
-	ProceedingJoinPoint joinPoint;
+	ProceedingJoinPoint proceedingJoinPoint;
+
+	@Mock
+	JoinPoint joinPoint;
 
 	@Mock
 	private ServletRequestAttributes attrs;
 
-	// TODO
-	@Ignore // need to adjust to cover Before and After advices
+	@SuppressWarnings("rawtypes")
+	@Mock
+	private ch.qos.logback.core.Appender mockAppender;
+
+	// Captor is genericised with ch.qos.logback.classic.spi.LoggingEvent
+	@Captor
+	private ArgumentCaptor<ch.qos.logback.classic.spi.LoggingEvent> captorLoggingEvent;
+
+	// added the mockAppender to the root logger
+	@SuppressWarnings("unchecked")
+	// It's not quite necessary but it also shows you how it can be done
+	@Before
+	public void setup() {
+		BipLoggerFactory.getLogger(BipLogger.ROOT_LOGGER_NAME).getLoggerBoundImpl().addAppender(mockAppender);
+	}
+
+	// Always have this teardown otherwise we can stuff up our expectations.
+	// Besides, it's
+	// good coding practice
+	@SuppressWarnings("unchecked")
+	@After
+	public void teardown() {
+		BipLoggerFactory.getLogger(BipLogger.ROOT_LOGGER_NAME).getLoggerBoundImpl().detachAppender(mockAppender);
+		SecurityContextHolder.clearContext();
+	}
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testAuditAnnotationAspect() {
-//		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
-//		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
-//		try {
-//			when(joinPoint.proceed()).thenReturn(TEST_RETURN_VALUE);
-//		} catch (Throwable e) {
-//			fail("Unable to mock joinPoint");
-//		}
-//		RequestContextHolder.setRequestAttributes(attrs);
-//		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
-//		Object returnValue = null;
-//		try {
-//			returnValue = aspect.auditAnnotationAspect(joinPoint);
-//			assertTrue(returnValue.equals(TEST_RETURN_VALUE));
-//		} catch (Throwable e) {
-//			fail("Exception should not be thrown");
-//		}
+		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
+		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		Object returnValue = null;
+		try {
+			aspect.auditAnnotationBefore(joinPoint);
+			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains(TEST_STRING_ARGUMENTS));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Exception should not be thrown");
+		}
 	}
 
 	@Auditable(event = AuditEvents.API_REST_REQUEST, activity = "testActivity")
