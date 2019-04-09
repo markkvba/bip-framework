@@ -19,14 +19,14 @@ cucumber-java - a library that makes it easier for us to write and execute param
         
         <dependency>
         <groupId>gov.va.bip.framework</groupId>
-	   <artifactId>bip-framework-test-lib</artifactId>
-	   <version><!-- add the appropriate version --></version>
-	   </dependency>
+	    <artifactId>bip-framework-test-lib</artifactId>
+	    <version><!-- add the appropriate version --></version>
+	    </dependency>
 
 
 ## Overview of the packages ##
 
-Test-lib Test Framework uses Java - Maven platform, the REST-template  for core API validations.
+Test-lib Test Framework uses Java - Maven platform, the REST-template for core API validations.
 
 This folder has all the support classes and methods that can be re-used to build Automated API tests for each API.
 
@@ -34,13 +34,13 @@ This folder has all the support classes and methods that can be re-used to build
 
 BaseStepDef: Base class for all the step definition.
 
-BaseStepDefHandler: Handler object that extends BaseStepDef to handle rest based api call. Step definition class inject this object thru constructor.
+BaseStepDefHandler: Handler object that extends BaseStepDef to handle rest based API call. Step definition class inject this object thru constructor.
 
 **gov.va.bip.framework.test.service**:
 
 RestConfigService: Loads the config file that has all the config related to reference services.
 
-BearerTokenService: It Fetches token from the token API. The token will be used as a header while invoking actual endpoints.
+BearerTokenService: It Fetches token from the token API. The token will be used as a header while invoking actual end points.
 
 **gov.va.bip.framework.test.util**:
 
@@ -51,3 +51,5 @@ JsonUtil: Utility class for parsing JSON. We could use this utility to parse and
 PropertiesUtil: Utilities for handling properties.
 
 RequestResponseLoggingInterceptor: It is an interceptor for all rest API calls to trace request and responses. This interceptor can also be used as a troubleshooting technique to trace request headers, parameter and response body.
+
+In the bip-reference-inttest project, bip-framework-test-lib is used as a dependency. This project bip-reference-inttest can be used as a reference for writing functional test https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/bip-reference-inttest
