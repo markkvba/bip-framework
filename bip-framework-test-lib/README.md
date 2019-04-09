@@ -11,16 +11,16 @@ Spring Rest template - Included via `spring-web` dependency.
 
 cucumber-java8 - a library that makes it easier for us to write and execute parameterized test.
 
-        <groupId>info.cukes</groupId>
-	<artifactId>cucumber-java8</artifactId>
+	   <groupId>info.cukes</groupId>
+	   <artifactId>cucumber-java8</artifactId>
 
 
 ## How to add BIP Test Library dependencies in your maven pom.xml? ##
         
-        <dependency>
-            <groupId>gov.va.bip.framework</groupId>
-	    <artifactId>bip-framework-test-lib</artifactId>
-	    <version><!-- add the appropriate version --></version>
+	<dependency>
+		<groupId>gov.va.bip.framework</groupId>
+		<artifactId>bip-framework-test-lib</artifactId>
+		<version><!-- add the appropriate version --></version>
 	</dependency>
 
 ## Overview of the packages ##
