@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -146,7 +147,7 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 	 * @param response
 	 */
 	@AfterReturning(pointcut = "auditableExecution()", returning = "response")
-	public void auditAnnotationAfter(final JoinPoint joinPoint, Object response) {
+	public void auditAnnotationAfterReturning(final JoinPoint joinPoint, Object response) {
 		LOGGER.debug("Response: {}", response);
 
 		Auditable auditableAnnotation = null;
@@ -175,4 +176,49 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 		}
 	}
 
+	/**
+	 * Advice for auditing after the call to a method annotated with {@link Auditable}.
+	 * <p>
+	 * Note that this aspect does NOT process AfterThrowing advice. Because
+	 * the {@code @Auditable} annotation could be applied to any method,
+	 * it has been decided to allow method exceptions to flow through the aspect
+	 * as-is.
+	 *
+	 * @param joinPoint
+	 * @param response
+	 * @throws Throwable
+	 */
+	@AfterThrowing(pointcut = "auditableExecution()", throwing = "throwable")
+	public void auditAnnotationAfterThrowing(final JoinPoint joinPoint, Throwable throwable) throws Throwable {
+		LOGGER.debug("afterThrowing throwable: {}" + throwable);
+
+		Auditable auditableAnnotation = null;
+		AuditEventData auditEventData = null;
+
+		try {
+			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+			final String className = method.getDeclaringClass().getName();
+			LOGGER.debug("Audit Annotated Class: {}", className);
+			auditableAnnotation = method.getAnnotation(Auditable.class);
+			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
+
+			if (auditableAnnotation != null) {
+				String auditedClass = StringUtils.isBlank(auditableAnnotation.auditClass())
+						? className
+						: auditableAnnotation.auditClass();
+				auditEventData =
+						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(), auditedClass);
+				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
+
+				writeResponseAudit("An exception occurred in " + auditedClass + ".",
+						auditEventData, MessageSeverity.INFO, throwable);
+			}
+		} catch (Exception e) { // NOSONAR intentionally broad catch
+			LOGGER.error("Could not audit event due to unexpected exception.", e);
+			throw new BipRuntimeException(MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, MessageSeverity.FATAL,
+					HttpStatus.INTERNAL_SERVER_ERROR, e);
+		}
+
+		throw throwable;
+	}
 }

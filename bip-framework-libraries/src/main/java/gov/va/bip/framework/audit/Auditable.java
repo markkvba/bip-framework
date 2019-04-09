@@ -9,6 +9,9 @@ import java.lang.annotation.Target;
  * Auditable annotation that asynchronously logs audit data.
  * Can be applied to methods or classes.
  * <p>
+ * This annotation is intended for use in the service layers,
+ * and should never be applied to a provider class or method.
+ * <p>
  * Required attributes:
  * <ul>
  * <li>event - an {@link AuditEvents} audit event enumeration
