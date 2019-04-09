@@ -38,3 +38,38 @@ gov.va.bip.framework.audit
    gov.va.bip.framework.rest.exception<br/>
    
 <img src = "/images/bip-exception-class-diagram.jpg">
+
+gov.va.bip.framework.log
+
+<img src = "/images/bip-framework-log-class-diagram.jpg">
+
+gov.va.bip.framework.security
+gov.va.bip.framework.security.model
+gov.va.bip.framework.security.util
+
+<img src = "/images/bip-framework-security-class-diagram.jpg">
+
+gov.va.bip.framework.security.jwt
+gov.va.bip.framework.security.jwt.correlation
+
+<img src = "/images/bip-framework-jwt-class-diagram.jpg">
+
+gov.va.bip.framework.transfer
+gov.va.bip.framework.transfer.jaxb.adapters
+gov.va.bip.framework.transfer.transform
+
+<img src = "/images/bip-framework-transfer-class-diagram.jpg">
+
+gov.va.bip.framework.validation
+
+<img src = "/images/bip-framework-validation-class-diagram.jpg">
+
+gov.va.bip.framework.ws.client
+gov.va.bip.framework.ws.client.interceptor
+gov.va.bip.framework.ws.client.interceptor.transport
+
+<img src = "/images/bip-framework-ws-class-diagram.jpg">
+
+
+
+
