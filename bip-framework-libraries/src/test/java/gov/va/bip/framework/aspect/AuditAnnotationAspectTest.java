@@ -30,19 +30,18 @@ import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.Auditable;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
+import gov.va.bip.framework.rest.provider.ProviderResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AuditAnnotationAspectTest {
 
-	private static final String TEST_RETURN_VALUE = "testReturnValue";
-
-	private Method method;
-
 	private static final String TEST_STRING_ARGUMENTS = "Test_String1";
+
+	private static final String TESTS_EXCEPTION_MESSAGE = "Test exception";
 
 	private final class TestMethodSignature implements org.aspectj.lang.reflect.MethodSignature {
 		@Override
-		public Class[] getParameterTypes() {
+		public Class<?>[] getParameterTypes() {
 			return new Class[] { String.class };
 		}
 
@@ -52,7 +51,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class[] getExceptionTypes() {
+		public Class<?>[] getExceptionTypes() {
 			return null;
 		}
 
@@ -77,7 +76,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class getDeclaringType() {
+		public Class<?> getDeclaringType() {
 			return gov.va.bip.framework.aspect.AuditAnnotationAspectTest.class;
 		}
 
@@ -87,7 +86,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class getReturnType() {
+		public Class<?> getReturnType() {
 			// TODO Auto-generated method stub
 			return String.class;
 		}
@@ -142,7 +141,7 @@ public class AuditAnnotationAspectTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testAuditAnnotationAspect() {
+	public void testAuditAnnotationBefore() {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
 		RequestContextHolder.setRequestAttributes(attrs);
@@ -150,7 +149,6 @@ public class AuditAnnotationAspectTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
-		Object returnValue = null;
 		try {
 			aspect.auditAnnotationBefore(joinPoint);
 			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
@@ -161,6 +159,88 @@ public class AuditAnnotationAspectTest {
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Exception should not be thrown");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAuditAnnotationAfterReturning() {
+		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
+		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		try {
+			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
+			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains("messages"));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Exception should not be thrown");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAuditAnnotationAfterThrowing() {
+		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
+		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		try {
+			try {
+				aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
+			} catch (Exception e) {
+				// never mind this, the advice re-throws the exception passed in
+			}
+			verify(mockAppender, Mockito.times(6)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains("An exception occurred in "));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Exception should not be thrown");
+		}
+	}
+
+	@Test
+	public void testExceptionHandling() {
+
+		when(joinPoint.getArgs()).thenThrow(IllegalStateException.class);
+		when(joinPoint.getSignature()).thenThrow(IllegalStateException.class);
+
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+
+		try {
+			aspect.auditAnnotationBefore(joinPoint);
+			fail("Should have thrown exception on before");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
+		}
+		try {
+			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
+			fail("Should have thrown exception on afterReturning");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
+		}
+		try {
+			aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
+			fail("Should have thrown exception on afterThrowing");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
 		}
 	}
 
