@@ -171,10 +171,10 @@ public enum MessageKeys implements MessageKey {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see gov.va.bip.framework.messages.MessageKey#getMessage(java.lang.Object[])
+	 * @see gov.va.bip.framework.messages.MessageKey#getMessage(java.lang.String[])
 	 */
 	@Override
-	public String getMessage(Object... params) {
+	public String getMessage(final String... params) {
 		return messageSource.getMessage(this.key, params, this.defaultMessage, Locale.getDefault());
 	}
 }

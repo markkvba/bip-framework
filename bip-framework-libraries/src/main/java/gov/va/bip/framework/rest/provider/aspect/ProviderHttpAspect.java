@@ -185,7 +185,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			final Throwable e) {
 		ResponseEntity<ProviderResponse> entity;
 		MessageKeys key = MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT;
-		String msg = key.getMessage(new Object[] { adviceName, originatingThrowable.getClass().getSimpleName() });
+		String msg = key.getMessage(new String[] { adviceName, originatingThrowable.getClass().getSimpleName() });
 		LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 				msg, e);
 
