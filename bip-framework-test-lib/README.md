@@ -6,21 +6,21 @@ Test -lib test Automation Framework is customized to support testing the REST Se
 
 Rest template - This is the Rest-template library itself.
    
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
+		<groupId>org.springframework</groupId>
+	    <artifactId>spring-web</artifactId>
 
 cucumber-java - a library that makes it easier for us to write and execute parameterized test.
 
-       <groupId>info.cukes</groupId>
-	   <artifactId>cucumber-java8</artifactId>
+        <groupId>info.cukes</groupId>
+	    <artifactId>cucumber-java8</artifactId>
 
 
 ## How to add dependencies in your maven pom.xml? ##
         
-          <dependency>
-             <groupId>gov.va.bip.framework</groupId>
-	     <artifactId>bip-framework-test-lib</artifactId>
-	     <version><!-- add the appropriate version --></version>
+        <dependency>
+        <groupId>gov.va.bip.framework</groupId>
+	   <artifactId>bip-framework-test-lib</artifactId>
+	   <version><!-- add the appropriate version --></version>
 	   </dependency>
 
 
@@ -46,6 +46,8 @@ BearerTokenService: It Fetches token from the token API. The token will be used 
 
 RestUtil: It is a wrapper for rest template API for making HTTP calls, parse JSON and XML responses and status code check.
 
-JsonUtil: Utility class for parsing JSON.
+JsonUtil: Utility class for parsing JSON. We could use this utility to parse and extract JSON snippet.
 
 PropertiesUtil: Utilities for handling properties.
+
+RequestResponseLoggingInterceptor: It is an interceptor for all rest API calls to trace request and responses. This interceptor can also be used as a troubleshooting technique to trace request headers, parameter and response body.
