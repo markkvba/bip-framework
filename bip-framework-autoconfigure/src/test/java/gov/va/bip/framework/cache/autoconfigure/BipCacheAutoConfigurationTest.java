@@ -46,17 +46,6 @@ public class BipCacheAutoConfigurationTest {
 	}
 
 	@Test
-	public void testBipCacheOpsMBean() {
-		context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
-		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class);
-		context.refresh();
-		assertNotNull(context);
-		Object bipCacheOpsMBean = context.getBean("bipCacheOpsMBean");
-		assertNotNull(bipCacheOpsMBean);
-	}
-
-	@Test
 	public void testReferenceCacheConfiguration() throws Exception {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
