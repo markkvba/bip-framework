@@ -33,6 +33,8 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.CollectionUtils;
 
 import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties.RedisExpires;
+import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
+import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsMBean;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
 import gov.va.bip.framework.cache.interceptor.BipCacheInterceptor;
 import gov.va.bip.framework.log.BipBanner;

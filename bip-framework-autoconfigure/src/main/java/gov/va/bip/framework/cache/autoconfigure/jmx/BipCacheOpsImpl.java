@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure;
+package gov.va.bip.framework.cache.autoconfigure.jmx;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;

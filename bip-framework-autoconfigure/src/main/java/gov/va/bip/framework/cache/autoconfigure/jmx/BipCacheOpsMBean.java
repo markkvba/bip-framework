@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure;
+package gov.va.bip.framework.cache.autoconfigure.jmx;
 
 /**
  * A JMX MBean interface definition for caching operations.
