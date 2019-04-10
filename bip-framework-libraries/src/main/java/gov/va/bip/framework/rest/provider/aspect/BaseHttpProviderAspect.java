@@ -1,21 +1,8 @@
 package gov.va.bip.framework.rest.provider.aspect;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import gov.va.bip.framework.audit.AuditEventData;
-import gov.va.bip.framework.audit.BaseAsyncAudit;
-import gov.va.bip.framework.audit.ResponseAuditData;
-import gov.va.bip.framework.log.BipLogger;
-import gov.va.bip.framework.log.BipLoggerFactory;
-import gov.va.bip.framework.messages.MessageSeverity;
+import gov.va.bip.framework.audit.http.AuditHttpRequestResponse;
 
 /**
  * This is the base class for REST provider aspects.
@@ -23,10 +10,7 @@ import gov.va.bip.framework.messages.MessageSeverity;
  *
  * @author jshrader
  */
-public class BaseHttpProviderAspect extends BaseAsyncAudit {
-
-	/** The Constant LOGGER. */
-	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BaseHttpProviderAspect.class);
+public class BaseHttpProviderAspect extends AuditHttpRequestResponse {
 
 	/**
 	 * Protected constructor.
@@ -85,51 +69,5 @@ public class BaseHttpProviderAspect extends BaseAsyncAudit {
 	@Pointcut("auditableAnnotation() && execution(* *(..))")
 	protected static final void auditableExecution() {
 		// Do nothing.
-	}
-
-	/**
-	 * Write audit for response.
-	 *
-	 * @param response the response
-	 * @param auditEventData the auditable annotation
-	 */
-	protected void writeResponseAudit(final Object response, final AuditEventData auditEventData,
-			final MessageSeverity messageSeverity,
-			final Throwable t) {
-
-		final HttpServletResponse httpServletReponse =
-				((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
-
-		final ResponseAuditData responseAuditData = new ResponseAuditData();
-
-		if (httpServletReponse != null) {
-			getHttpResponseAuditData(httpServletReponse, responseAuditData);
-		}
-
-		if (response != null) {
-			responseAuditData.setResponse(response);
-		}
-
-		if (super.getAsyncLogger() != null) {
-			LOGGER.debug("Invoking AuditLogSerializer.asyncLogRequestResponseAspectAuditData()");
-			super.getAsyncLogger().asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
-					messageSeverity, t);
-		}
-	}
-
-	private void getHttpResponseAuditData(final HttpServletResponse httpServletReponse, final ResponseAuditData responseAuditData) {
-		final Map<String, String> headers = new HashMap<>();
-		final Collection<String> headerNames = httpServletReponse.getHeaderNames();
-		populateHeadersMap(httpServletReponse, headers, headerNames);
-		responseAuditData.setHeaders(headers);
-	}
-
-	private void populateHeadersMap(final HttpServletResponse httpServletResponse, final Map<String, String> headersToBePopulated,
-			final Collection<String> listOfHeaderNames) {
-		for (final String headerName : listOfHeaderNames) {
-			String value;
-			value = httpServletResponse.getHeader(headerName);
-			headersToBePopulated.put(headerName, value);
-		}
 	}
 }

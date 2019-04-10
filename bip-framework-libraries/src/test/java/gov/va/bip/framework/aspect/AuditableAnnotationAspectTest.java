@@ -27,13 +27,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.audit.Auditable;
+import gov.va.bip.framework.audit.annotation.Auditable;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.rest.provider.ProviderResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class AuditAnnotationAspectTest {
+public class AuditableAnnotationAspectTest {
 
 	private static final String TEST_STRING_ARGUMENTS = "Test_String1";
 
@@ -77,7 +77,7 @@ public class AuditAnnotationAspectTest {
 
 		@Override
 		public Class<?> getDeclaringType() {
-			return gov.va.bip.framework.aspect.AuditAnnotationAspectTest.class;
+			return gov.va.bip.framework.aspect.AuditableAnnotationAspectTest.class;
 		}
 
 		@Override
@@ -94,7 +94,7 @@ public class AuditAnnotationAspectTest {
 		@Override
 		public Method getMethod() {
 			try {
-				return AuditAnnotationAspectTest.this.getClass().getMethod("annotatedMethod", new Class[] { String.class });
+				return AuditableAnnotationAspectTest.this.getClass().getMethod("annotatedMethod", new Class[] { String.class });
 			} catch (NoSuchMethodException e) {
 				fail("Error mocking the join point");
 			} catch (SecurityException e) {
@@ -145,7 +145,7 @@ public class AuditAnnotationAspectTest {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
 		RequestContextHolder.setRequestAttributes(attrs);
-		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
@@ -168,7 +168,7 @@ public class AuditAnnotationAspectTest {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
 		RequestContextHolder.setRequestAttributes(attrs);
-		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
@@ -191,7 +191,7 @@ public class AuditAnnotationAspectTest {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
 		RequestContextHolder.setRequestAttributes(attrs);
-		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
@@ -219,7 +219,7 @@ public class AuditAnnotationAspectTest {
 		when(joinPoint.getSignature()).thenThrow(IllegalStateException.class);
 
 		RequestContextHolder.setRequestAttributes(attrs);
-		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);

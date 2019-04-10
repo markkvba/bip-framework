@@ -37,8 +37,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.bip.framework.audit.AuditEventData;
 import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.audit.RequestAuditData;
-import gov.va.bip.framework.audit.ResponseAuditData;
+import gov.va.bip.framework.audit.model.HttpRequestAuditData;
+import gov.va.bip.framework.audit.model.HttpResponseAuditData;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.messages.MessageSeverity;
@@ -65,9 +65,9 @@ public class AuditLogSerializerTest {
 
 	AuditEventData auditServiceEventData = new AuditEventData(AuditEvents.SERVICE_AUDIT, "MethodName", "ClassName");
 
-	RequestAuditData requestAuditData = new RequestAuditData();
+	HttpRequestAuditData requestAuditData = new HttpRequestAuditData();
 
-	ResponseAuditData responseAuditData = new ResponseAuditData();
+	HttpResponseAuditData responseAuditData = new HttpResponseAuditData();
 
 	@SuppressWarnings("unchecked")
 	@Before
@@ -96,9 +96,9 @@ public class AuditLogSerializerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJson() throws Exception {
-		auditLogSerializer.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
+		auditLogSerializer.asyncAuditRequestResponseData(auditEventData, requestAuditData, HttpRequestAuditData.class,
 				MessageSeverity.INFO, null);
-		auditLogSerializer.asyncLogRequestResponseAspectAuditData(auditEventData, responseAuditData, ResponseAuditData.class,
+		auditLogSerializer.asyncAuditRequestResponseData(auditEventData, responseAuditData, HttpResponseAuditData.class,
 				MessageSeverity.INFO, null);
 		verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
@@ -116,7 +116,7 @@ public class AuditLogSerializerTest {
 	@Test
 	public void testJsonException() throws Exception {
 		when(mapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-		auditLogSerializer.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
+		auditLogSerializer.asyncAuditRequestResponseData(auditEventData, requestAuditData, HttpRequestAuditData.class,
 				MessageSeverity.INFO, null);
 		verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
@@ -132,7 +132,7 @@ public class AuditLogSerializerTest {
 	@Test
 	public void testJsonExceptionError() throws Exception {
 		when(mapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-		auditLogSerializer.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
+		auditLogSerializer.asyncAuditRequestResponseData(auditEventData, requestAuditData, HttpRequestAuditData.class,
 				MessageSeverity.ERROR, new Exception());
 		verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
@@ -147,7 +147,7 @@ public class AuditLogSerializerTest {
 	@Test
 	public void testJsonExceptionFatal() throws Exception {
 		when(mapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-		auditLogSerializer.asyncLogRequestResponseAspectAuditData(auditEventData, requestAuditData, RequestAuditData.class,
+		auditLogSerializer.asyncAuditRequestResponseData(auditEventData, requestAuditData, HttpRequestAuditData.class,
 				MessageSeverity.FATAL, new Exception());
 		verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
@@ -161,7 +161,7 @@ public class AuditLogSerializerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testServiceMessage() throws Exception {
-		auditLogSerializer.asyncLogMessageAspectAuditData(auditServiceEventData, "This is test", MessageSeverity.INFO, null);
+		auditLogSerializer.asyncAuditMessageData(auditServiceEventData, "This is test", MessageSeverity.INFO, null);
 
 		verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
@@ -172,7 +172,7 @@ public class AuditLogSerializerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testServiceMessageError() throws Exception {
-		auditLogSerializer.asyncLogMessageAspectAuditData(auditServiceEventData, "Error test", MessageSeverity.ERROR,
+		auditLogSerializer.asyncAuditMessageData(auditServiceEventData, "Error test", MessageSeverity.ERROR,
 				new Exception());
 
 		verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());

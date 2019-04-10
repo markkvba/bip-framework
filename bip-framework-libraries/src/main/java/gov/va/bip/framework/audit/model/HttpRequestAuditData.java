@@ -1,6 +1,5 @@
-package gov.va.bip.framework.audit;
+package gov.va.bip.framework.audit.model;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * The purpose of this class is to collect the audit data for a request before serializing it to the logs.
  */
 @JsonInclude(Include.NON_NULL)
-public class RequestAuditData implements Serializable, AuditableData {
+public class HttpRequestAuditData extends RequestAuditData {
 
 	private static final long serialVersionUID = -6346123934909781965L;
 
@@ -25,9 +24,6 @@ public class RequestAuditData implements Serializable, AuditableData {
 
 	/* The http method. */
 	private String method;
-
-	/* The request. */
-	private transient List<Object> request;
 
 	private List<String> attachmentTextList;
 
@@ -86,24 +82,6 @@ public class RequestAuditData implements Serializable, AuditableData {
 	}
 
 	/**
-	 * Gets the request.
-	 *
-	 * @return the request
-	 */
-	public List<Object> getRequest() {
-		return request;
-	}
-
-	/**
-	 * Sets the request.
-	 *
-	 * @param request
-	 */
-	public void setRequest(final List<Object> request) {
-		this.request = request;
-	}
-
-	/**
 	 * gets the attachmentTextList.
 	 *
 	 * @return the attachment text list
@@ -128,8 +106,7 @@ public class RequestAuditData implements Serializable, AuditableData {
 	 */
 	@Override
 	public String toString() {
-		return "RequestAuditData{" + "headers=" + (headers == null ? "" : ReflectionToStringBuilder.toString(headers)) + ", uri='"
-				+ uri + "\'" + ", method='" + method + "\'" + ", request="
-				+ (request == null ? "" : ReflectionToStringBuilder.toString(request)) + '}';
+		return "HttpRequestAuditData{" + "headers=" + (headers == null ? "" : ReflectionToStringBuilder.toString(headers)) + ", uri='"
+				+ uri + "\'" + ", method='" + method + "\'" + ", " + getRequest().toString() + '}';
 	}
 }

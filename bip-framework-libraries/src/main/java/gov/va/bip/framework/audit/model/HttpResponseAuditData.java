@@ -1,6 +1,5 @@
-package gov.va.bip.framework.audit;
+package gov.va.bip.framework.audit.model;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -12,15 +11,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * The purpose of this class is to collect the audit data for a response before serializing it to the logs.
  */
 @JsonInclude(Include.NON_NULL)
-public class ResponseAuditData implements Serializable, AuditableData {
+public class HttpResponseAuditData extends ResponseAuditData {
 
 	private static final long serialVersionUID = 3362363966640647082L;
 
 	/* A map of the http headers on the response. */
 	private Map<String, String> headers;
-
-	/* The response. */
-	private transient Object response;
 
 	/**
 	 * Gets the http headers.
@@ -41,29 +37,11 @@ public class ResponseAuditData implements Serializable, AuditableData {
 	}
 
 	/**
-	 * Gets the response.
-	 *
-	 * @return the response
-	 */
-	public Object getResponse() {
-		return response;
-	}
-
-	/**
-	 * Sets the response.
-	 *
-	 * @param response
-	 */
-	public void setResponse(final Object response) {
-		this.response = response;
-	}
-
-	/**
 	 * Manually formatted JSON-like string of key/value pairs.
 	 */
 	@Override
 	public String toString() {
-		return "ResponseAuditData{" + "headers=" + (headers == null ? "" : ReflectionToStringBuilder.toString(headers)) + ", uri='"
-				+ ", response=" + (response == null ? "" : ReflectionToStringBuilder.toString(response)) + '}';
+		return "HttpResponseAuditData{" + "headers=" + (headers == null ? "" : ReflectionToStringBuilder.toString(headers)) + ", uri='"
+				+ ", " + getResponse().toString() + '}';
 	}
 }

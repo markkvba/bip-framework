@@ -31,7 +31,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditWsInterceptor.class);
 
 	/** Asynchronous audit logger */
-	private static final AuditLogSerializer asyncLogging = new AuditLogSerializer();
+	private static final AuditLogSerializer asyncLogger = new AuditLogSerializer();
 
 	/** Ensure logging only occurs once per instantiation */
 	private boolean alreadyLogged = false;
@@ -96,7 +96,7 @@ public class AuditWsInterceptor implements ClientInterceptor {
 			WebServiceMessage webServiceMessage) {
 		LOGGER.debug("Writing audit log with metadata: " + metadata.getClass().getName());
 		try {
-			asyncLogging.asyncLogMessageAspectAuditData(metadata.eventData(),
+			asyncLogger.asyncAuditMessageData(metadata.eventData(),
 					metadata.messagePrefix() + getXml(webServiceMessage),
 					MessageSeverity.INFO, null);
 		} catch (Exception e) {

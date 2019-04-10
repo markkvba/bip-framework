@@ -53,7 +53,7 @@ public class AuditLogSerializer implements Serializable {
 	 * @param auditData The request and response audit data
 	 */
 	@Async
-	public void asyncLogRequestResponseAspectAuditData(final AuditEventData auditEventData, final AuditableData auditData,
+	public void asyncAuditRequestResponseData(final AuditEventData auditEventData, final AuditableData auditData,
 			final Class<?> auditDataClass, final MessageSeverity messageSeverity, final Throwable t) {
 
 		String auditDetails = null;
@@ -103,7 +103,7 @@ public class AuditLogSerializer implements Serializable {
 	 * @param activityDetail the activity detail
 	 */
 	@Async
-	public void asyncLogMessageAspectAuditData(final AuditEventData auditEventData, final String activityDetail,
+	public void asyncAuditMessageData(final AuditEventData auditEventData, final String activityDetail,
 			final MessageSeverity messageSeverity, final Throwable t) {
 
 		if (messageSeverity.equals(MessageSeverity.ERROR) || messageSeverity.equals(MessageSeverity.FATAL)) {

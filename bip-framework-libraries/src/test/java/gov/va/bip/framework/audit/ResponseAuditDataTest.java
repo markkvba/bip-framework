@@ -8,13 +8,13 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Test;
 
-import gov.va.bip.framework.audit.ResponseAuditData;
+import gov.va.bip.framework.audit.model.HttpResponseAuditData;
 
 public class ResponseAuditDataTest {
 
 	@Test
 	public void toStringTest() {
-		ResponseAuditData responseAuditData = new ResponseAuditData();
+		HttpResponseAuditData responseAuditData = new HttpResponseAuditData();
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("testKey", "testValue");
 		responseAuditData.setHeaders(headers);
@@ -26,7 +26,7 @@ public class ResponseAuditDataTest {
 
 	@Test
 	public void toStringWithNullHeadersTest() {
-		ResponseAuditData responseAuditData = new ResponseAuditData();
+		HttpResponseAuditData responseAuditData = new HttpResponseAuditData();
 		responseAuditData.setHeaders(null);
 		assertTrue(responseAuditData.toString().equals("ResponseAuditData{headers=, uri=\', response=}"));
 	}
