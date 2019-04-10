@@ -164,6 +164,8 @@ public class BaseAsyncAudit {
 					"Error ServiceMessage: " + bipRuntimeException.getMessage(),
 					bipRuntimeException);
 
+			throw bipRuntimeException;
+
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
 			handleAnyRethrownExceptions(adviceName, e);
 		}
