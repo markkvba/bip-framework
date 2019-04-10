@@ -1,15 +1,25 @@
 package gov.va.bip.framework.aspect;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -18,19 +28,20 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.Auditable;
+import gov.va.bip.framework.log.BipLogger;
+import gov.va.bip.framework.log.BipLoggerFactory;
+import gov.va.bip.framework.rest.provider.ProviderResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AuditAnnotationAspectTest {
 
-	private static final String TEST_RETURN_VALUE = "testReturnValue";
-
-	private Method method;
-
 	private static final String TEST_STRING_ARGUMENTS = "Test_String1";
+
+	private static final String TESTS_EXCEPTION_MESSAGE = "Test exception";
 
 	private final class TestMethodSignature implements org.aspectj.lang.reflect.MethodSignature {
 		@Override
-		public Class[] getParameterTypes() {
+		public Class<?>[] getParameterTypes() {
 			return new Class[] { String.class };
 		}
 
@@ -40,7 +51,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class[] getExceptionTypes() {
+		public Class<?>[] getExceptionTypes() {
 			return null;
 		}
 
@@ -65,7 +76,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class getDeclaringType() {
+		public Class<?> getDeclaringType() {
 			return gov.va.bip.framework.aspect.AuditAnnotationAspectTest.class;
 		}
 
@@ -75,7 +86,7 @@ public class AuditAnnotationAspectTest {
 		}
 
 		@Override
-		public Class getReturnType() {
+		public Class<?> getReturnType() {
 			// TODO Auto-generated method stub
 			return String.class;
 		}
@@ -94,31 +105,142 @@ public class AuditAnnotationAspectTest {
 	}
 
 	@Mock
-	ProceedingJoinPoint joinPoint;
+	ProceedingJoinPoint proceedingJoinPoint;
+
+	@Mock
+	JoinPoint joinPoint;
 
 	@Mock
 	private ServletRequestAttributes attrs;
 
+	@SuppressWarnings("rawtypes")
+	@Mock
+	private ch.qos.logback.core.Appender mockAppender;
+
+	// Captor is genericised with ch.qos.logback.classic.spi.LoggingEvent
+	@Captor
+	private ArgumentCaptor<ch.qos.logback.classic.spi.LoggingEvent> captorLoggingEvent;
+
+	// added the mockAppender to the root logger
+	@SuppressWarnings("unchecked")
+	// It's not quite necessary but it also shows you how it can be done
+	@Before
+	public void setup() {
+		BipLoggerFactory.getLogger(BipLogger.ROOT_LOGGER_NAME).getLoggerBoundImpl().addAppender(mockAppender);
+	}
+
+	// Always have this teardown otherwise we can stuff up our expectations.
+	// Besides, it's
+	// good coding practice
+	@SuppressWarnings("unchecked")
+	@After
+	public void teardown() {
+		BipLoggerFactory.getLogger(BipLogger.ROOT_LOGGER_NAME).getLoggerBoundImpl().detachAppender(mockAppender);
+		SecurityContextHolder.clearContext();
+	}
+
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testAuditAnnotationAspect() {
+	public void testAuditAnnotationBefore() {
 		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
 		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
-		try {
-			when(joinPoint.proceed()).thenReturn(TEST_RETURN_VALUE);
-		} catch (Throwable e) {
-			fail("Unable to mock joinPoint");
-		}
 		RequestContextHolder.setRequestAttributes(attrs);
 		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
-		Object returnValue = null;
 		try {
-			returnValue = aspect.auditAnnotationAspect(joinPoint);
-			assertTrue(returnValue.equals(TEST_RETURN_VALUE));
+			aspect.auditAnnotationBefore(joinPoint);
+			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains(TEST_STRING_ARGUMENTS));
 		} catch (Throwable e) {
+			e.printStackTrace();
 			fail("Exception should not be thrown");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAuditAnnotationAfterReturning() {
+		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
+		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		try {
+			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
+			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains("messages"));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Exception should not be thrown");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAuditAnnotationAfterThrowing() {
+		when(joinPoint.getArgs()).thenReturn(new Object[] { TEST_STRING_ARGUMENTS });
+		when(joinPoint.getSignature()).thenReturn(new TestMethodSignature());
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		try {
+			try {
+				aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
+			} catch (Exception e) {
+				// never mind this, the advice re-throws the exception passed in
+			}
+			verify(mockAppender, Mockito.times(6)).doAppend(captorLoggingEvent.capture());
+			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
+			assertNotNull(loggingEvents);
+			assertTrue(loggingEvents.size() > 0);
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains("An exception occurred in "));
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Exception should not be thrown");
+		}
+	}
+
+	@Test
+	public void testExceptionHandling() {
+
+		when(joinPoint.getArgs()).thenThrow(IllegalStateException.class);
+		when(joinPoint.getSignature()).thenThrow(IllegalStateException.class);
+
+		RequestContextHolder.setRequestAttributes(attrs);
+		AuditAnnotationAspect aspect = new AuditAnnotationAspect();
+		AuditLogSerializer serializer = new AuditLogSerializer();
+		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+
+		try {
+			aspect.auditAnnotationBefore(joinPoint);
+			fail("Should have thrown exception on before");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
+		}
+		try {
+			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
+			fail("Should have thrown exception on afterReturning");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
+		}
+		try {
+			aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
+			fail("Should have thrown exception on afterThrowing");
+		} catch (Throwable e) {
+			assertTrue(IllegalStateException.class.equals(e.getCause().getClass()));
 		}
 	}
 

@@ -71,18 +71,22 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param ex the Exception
 	 * @return String the message
 	 */
-	private String deriveMessage(Exception ex, MessageKey key, Object... params) {
+	private String deriveMessage(final Exception ex, final MessageKey key, final String... params) {
 		MessageKey derivedKey = deriveKey(key);
 		String msg = derivedKey.getMessage(params);
 		if (StringUtils.isBlank(msg) || msg.matches("\\{[a-zA-Z0-9]{0,64}\\}")) {
 			msg = msg + " :: "
-					+ (ex != null && !StringUtils.isBlank(ex.getMessage())
+					+ ((ex != null) && !StringUtils.isBlank(ex.getMessage())
 							? ex.getMessage()
-							: (ex != null && ex.getCause() != null && !StringUtils.isBlank(ex.getCause().getMessage())
-									? ex.getCause().getMessage()
-									: NO_EXCEPTION_MESSAGE));
+									: getMessageFromWrappedException(ex));
 		}
 		return msg;
+	}
+
+	private String getMessageFromWrappedException(final Exception ex) {
+		return (ex != null) && (ex.getCause() != null) && !StringUtils.isBlank(ex.getCause().getMessage())
+				? ex.getCause().getMessage()
+						: NO_EXCEPTION_MESSAGE;
 	}
 
 	/**
@@ -91,7 +95,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param key - the initial string intended to represent the key
 	 * @return MessageKey - the key, or NO_KEY
 	 */
-	private MessageKey deriveKey(MessageKey key) {
+	private MessageKey deriveKey(final MessageKey key) {
 		return ObjectUtils.defaultIfNull(key, MessageKeys.NO_KEY);
 	}
 
@@ -104,7 +108,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param status - the status to report for the exception
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(Exception ex, MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+	private void log(final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status,
+			final String... params) {
 		log(Level.INFO, ex, key, severity, status, params);
 	}
 
@@ -118,7 +123,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param status - the status to report for the exception
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
-	private void log(Level level, Exception ex, MessageKey key, MessageSeverity severity, HttpStatus status, Object... params) {
+	private void log(final Level level, final Exception ex, final MessageKey key, final MessageSeverity severity,
+			final HttpStatus status, final String... params) {
 		MessageKey derivedKey = deriveKey(key);
 		String msg = status + "-" + severity + " "
 				+ (ex == null ? "null" : ex.getClass().getName()) + " "
@@ -181,8 +187,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 * @return ResponseEntity the HTTP Response Entity
 	 */
-	protected ResponseEntity<Object> standardHandler(Exception ex, MessageKey key, MessageSeverity severity,
-			HttpStatus httpResponseStatus, Object... params) {
+	protected ResponseEntity<Object> standardHandler(final Exception ex, final MessageKey key, final MessageSeverity severity,
+			final HttpStatus httpResponseStatus, final String... params) {
 		if (ex == null) {
 			return failSafeHandler();
 		}
@@ -206,7 +212,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = BipPartnerRuntimeException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleBipPartnerRuntimeException(HttpServletRequest req, BipPartnerRuntimeException ex) {
+	public final ResponseEntity<Object> handleBipPartnerRuntimeException(final HttpServletRequest req, final BipPartnerRuntimeException ex) {
 		return standardHandler(ex, HttpStatus.BAD_REQUEST);
 	}
 
@@ -219,7 +225,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = BipPartnerException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleBipPartnerCheckedException(HttpServletRequest req, BipPartnerException ex) {
+	public final ResponseEntity<Object> handleBipPartnerCheckedException(final HttpServletRequest req, final BipPartnerException ex) {
 		return standardHandler(ex, HttpStatus.BAD_REQUEST);
 	}
 
@@ -232,7 +238,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = IllegalArgumentException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleIllegalArgumentException(HttpServletRequest req, IllegalArgumentException ex) {
+	public final ResponseEntity<Object> handleIllegalArgumentException(final HttpServletRequest req, final IllegalArgumentException ex) {
 		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 	}
 
@@ -245,7 +251,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = IllegalStateException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleIllegalStateException(HttpServletRequest req, IllegalStateException ex) {
+	public final ResponseEntity<Object> handleIllegalStateException(final HttpServletRequest req, final IllegalStateException ex) {
 		return standardHandler(ex, MessageKeys.BIP_DEV_ILLEGAL_INSTANTIATION, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST);
 	}
 
@@ -258,8 +264,8 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = MethodArgumentNotValidException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleMethodArgumentNotValidException(HttpServletRequest req,
-			MethodArgumentNotValidException ex) {
+	public final ResponseEntity<Object> handleMethodArgumentNotValidException(final HttpServletRequest req,
+			final MethodArgumentNotValidException ex) {
 
 		final ProviderResponse apiError = new ProviderResponse();
 		if ((ex == null) || (ex.getBindingResult() == null)) {
@@ -268,14 +274,14 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 			MessageKey key = MessageKeys.BIP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID;
 			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				Object[] params = new Object[] { "field", errorCodes, error.getDefaultMessage() };
+				String[] params = new String[] { "field", errorCodes, error.getDefaultMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
 						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
 			}
 			for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				Object[] params = new Object[] { "object", errorCodes, error.getDefaultMessage() };
+				String[] params = new String[] { "object", errorCodes, error.getDefaultMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
 						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
@@ -297,7 +303,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = HttpClientErrorException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleHttpClientErrorException(HttpServletRequest req,
+	public final ResponseEntity<Object> handleHttpClientErrorException(final HttpServletRequest req,
 			final HttpClientErrorException httpClientErrorException) {
 
 		ProviderResponse apiError = new ProviderResponse();
@@ -307,7 +313,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 			MessageKey key = MessageKeys.BIP_GLOBAL_HTTP_CLIENT_ERROR;
 			HttpStatus status = httpClientErrorException.getStatusCode();
 			String statusReason = httpClientErrorException.getStatusCode().getReasonPhrase();
-			Object[] params = new Object[] { statusReason, httpClientErrorException.getMessage() };
+			String[] params = new String[] { statusReason, httpClientErrorException.getMessage() };
 
 			log(httpClientErrorException, key, MessageSeverity.ERROR, status, params);
 
@@ -336,11 +342,11 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleMethodArgumentTypeMismatch(HttpServletRequest req,
+	public final ResponseEntity<Object> handleMethodArgumentTypeMismatch(final HttpServletRequest req,
 			final MethodArgumentTypeMismatchException ex) {
 
 		MessageKey key = MessageKeys.BIP_GLOBAL_REST_API_TYPE_MISMATCH;
-		Object[] params = new Object[] { ex.getName(), ex.getRequiredType().getName() };
+		String[] params = new String[] { ex.getName(), ex.getRequiredType().getName() };
 
 		log(Level.INFO, ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 
@@ -359,7 +365,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = ConstraintViolationException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleConstraintViolation(HttpServletRequest req, final ConstraintViolationException ex) {
+	public final ResponseEntity<Object> handleConstraintViolation(final HttpServletRequest req, final ConstraintViolationException ex) {
 
 		final ProviderResponse apiError = new ProviderResponse();
 		if ((ex == null) || (ex.getConstraintViolations() == null)) {
@@ -367,8 +373,9 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 		} else {
 			MessageKey key = MessageKeys.BIP_GLBOAL_VALIDATOR_CONSTRAINT_VIOLATION;
 			for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-				Object[] params =
-						new Object[] { violation.getRootBeanClass().getName(), violation.getPropertyPath(), violation.getMessage() };
+				String[] params =
+						new String[] { violation.getRootBeanClass().getName(), violation.getPropertyPath().toString(),
+								violation.getMessage() };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
 						key.getMessage(params), HttpStatus.BAD_REQUEST);
@@ -386,7 +393,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = HttpMessageNotReadableException.class)
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public final ResponseEntity<Object> handleHttpMessageNotReadableException(HttpServletRequest req,
+	public final ResponseEntity<Object> handleHttpMessageNotReadableException(final HttpServletRequest req,
 			final HttpMessageNotReadableException httpMessageNotReadableException) {
 		return standardHandler(httpMessageNotReadableException, MessageKeys.NO_KEY, MessageSeverity.ERROR,
 				HttpStatus.BAD_REQUEST);
@@ -403,7 +410,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = NoHandlerFoundException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
-	public final ResponseEntity<Object> handleNoHandlerFoundException(HttpServletRequest req, final NoHandlerFoundException ex) {
+	public final ResponseEntity<Object> handleNoHandlerFoundException(final HttpServletRequest req, final NoHandlerFoundException ex) {
 		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.NOT_FOUND);
 	}
 
@@ -418,7 +425,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
 	@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED)
-	public final ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpServletRequest req,
+	public final ResponseEntity<Object> handleHttpRequestMethodNotSupported(final HttpServletRequest req,
 			final HttpRequestMethodNotSupportedException ex) {
 		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.METHOD_NOT_ALLOWED);
 	}
@@ -434,7 +441,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = MediaTypeNotSupportedStatusException.class)
 	@ResponseStatus(value = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-	public final ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpServletRequest req,
+	public final ResponseEntity<Object> handleHttpMediaTypeNotSupported(final HttpServletRequest req,
 			final HttpMediaTypeNotSupportedException ex) {
 		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.ERROR, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 	}
@@ -449,7 +456,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 * @return the response entity
 	 */
 	@ExceptionHandler(value = BipRuntimeException.class)
-	public final ResponseEntity<Object> handleBipRuntimeException(HttpServletRequest req, BipRuntimeException ex) {
+	public final ResponseEntity<Object> handleBipRuntimeException(final HttpServletRequest req, final BipRuntimeException ex) {
 		return standardHandler(ex, ex.getStatus());
 	}
 
@@ -462,7 +469,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
 	 */
 	@ExceptionHandler(value = Exception.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	public final ResponseEntity<Object> handleAll(HttpServletRequest req, final Exception ex) {
+	public final ResponseEntity<Object> handleAll(final HttpServletRequest req, final Exception ex) {
 		return standardHandler(ex, MessageKeys.NO_KEY, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
