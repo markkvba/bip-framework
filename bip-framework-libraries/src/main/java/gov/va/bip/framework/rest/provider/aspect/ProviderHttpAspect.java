@@ -42,6 +42,12 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 
 	private static final String FINISHED_STRING = " finished.";
 	private static final String JOINPOINT_STRING = " joinpoint: ";
+
+	/**
+	 * Developers note: for thread safety, only static constants
+	 * or spring proxies can be put at class level.
+	 */
+
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(ProviderHttpAspect.class);
 	/** Identity of the before advice */
@@ -146,7 +152,7 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 
 		try {
 			providerResponse = writeAuditError(AFTER_THROWING_ADVICE,
-					// null throwable almost certain not to happen, but check nonetheless
+				// null throwable almost certain not to happen, but check nonetheless
 					throwable != null ? throwable : new Throwable("Unknown problem. Thrown exception was null."), auditEventData);
 
 		} catch (Throwable t) { // NOSONAR intentionally catching throwable
