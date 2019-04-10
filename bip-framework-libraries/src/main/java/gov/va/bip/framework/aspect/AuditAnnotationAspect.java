@@ -36,6 +36,21 @@ import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
 public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 	/** The Constant LOGGER. */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditAnnotationAspect.class);
+	
+	/** The Constant AUDIT_DEBUG_PREFIX_METHOD. */
+	private static final String AUDIT_DEBUG_PREFIX_METHOD = "Audit Annotated Method: {}";
+	
+	/** The Constant AUDIT_DEBUG_PREFIX_CLASS. */
+	private static final String AUDIT_DEBUG_PREFIX_CLASS = "Audit Annotated Class: {}";
+
+	/** The Constant AUDIT_DEBUG_PREFIX_ANNOTATION. */
+	private static final String AUDIT_DEBUG_PREFIX_ANNOTATION = "Auditable Annotation: {}";
+	
+	/** The Constant AUDIT_DEBUG_PREFIX_EVENT. */
+	private static final String AUDIT_DEBUG_PREFIX_EVENT = "AuditEventData: {}";
+	
+	/** The Constant AUDIT_ERROR_PREFIX_EXCEPTION. */
+	private static final String AUDIT_ERROR_PREFIX_EXCEPTION = "Could not audit event due to unexpected exception.";
 
 	/**
 	 * Instantiate the aspect.
@@ -66,21 +81,21 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 			}
 
 			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-			LOGGER.debug("Audit Annotated Method: {}", method);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_METHOD, method);
 			final String className = method.getDeclaringClass().getName();
-			LOGGER.debug("Audit Annotated Class: {}", className);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_CLASS, className);
 			auditableAnnotation = method.getAnnotation(Auditable.class);
-			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_ANNOTATION, auditableAnnotation);
 			if (auditableAnnotation != null) {
 				auditEventData =
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
 								StringUtils.isBlank(auditableAnnotation.auditClass()) ? className : auditableAnnotation.auditClass());
-				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
+				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
 				writeRequestAuditLog(request, auditEventData);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
-			LOGGER.error("Could not audit event due to unexpected exception.", e);
+			LOGGER.error(AUDIT_ERROR_PREFIX_EXCEPTION, e);
 			throw new BipRuntimeException(MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, MessageSeverity.FATAL,
 					HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
@@ -107,22 +122,22 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 
 		try {
 			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-			LOGGER.debug("Audit Annotated Method: {}", method);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_METHOD, method);
 			final String className = method.getDeclaringClass().getName();
-			LOGGER.debug("Audit Annotated Class: {}", className);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_CLASS, className);
 			auditableAnnotation = method.getAnnotation(Auditable.class);
-			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_ANNOTATION, auditableAnnotation);
 
 			if (auditableAnnotation != null) {
 				auditEventData =
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(),
 								StringUtils.isBlank(auditableAnnotation.auditClass()) ? className : auditableAnnotation.auditClass());
-				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
+				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
 				writeResponseAudit(response, auditEventData, MessageSeverity.INFO, null);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
-			LOGGER.error("Could not audit event due to unexpected exception.", e);
+			LOGGER.error(AUDIT_ERROR_PREFIX_EXCEPTION, e);
 			throw new BipRuntimeException(MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, MessageSeverity.FATAL,
 					HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
@@ -150,9 +165,9 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 		try {
 			final Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 			final String className = method.getDeclaringClass().getName();
-			LOGGER.debug("Audit Annotated Class: {}", className);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_CLASS, className);
 			auditableAnnotation = method.getAnnotation(Auditable.class);
-			LOGGER.debug("Auditable Annotation: {}", auditableAnnotation);
+			LOGGER.debug(AUDIT_DEBUG_PREFIX_ANNOTATION, auditableAnnotation);
 
 			if (auditableAnnotation != null) {
 				String auditedClass = StringUtils.isBlank(auditableAnnotation.auditClass())
@@ -160,13 +175,13 @@ public class AuditAnnotationAspect extends BaseHttpProviderAspect {
 						: auditableAnnotation.auditClass();
 				auditEventData =
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(), auditedClass);
-				LOGGER.debug("AuditEventData: {}", auditEventData.toString());
+				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
 				writeResponseAudit("An exception occurred in " + auditedClass + ".",
 						auditEventData, MessageSeverity.INFO, throwable);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
-			LOGGER.error("Could not audit event due to unexpected exception.", e);
+			LOGGER.error(AUDIT_ERROR_PREFIX_EXCEPTION, e);
 			throw new BipRuntimeException(MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, MessageSeverity.FATAL,
 					HttpStatus.INTERNAL_SERVER_ERROR, e);
 		}
