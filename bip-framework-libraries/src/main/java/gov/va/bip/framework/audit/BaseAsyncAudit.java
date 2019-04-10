@@ -32,6 +32,8 @@ public class BaseAsyncAudit {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BaseAsyncAudit.class);
 
+	private static final String INTERNAL_EXCEPTION_PREFIX = "Error ServiceMessage: ";
+
 	/** How many bytes of an uploaded file will be read for inclusion in the audit record */
 	public static final int NUMBER_OF_BYTES = 1024;
 
@@ -161,7 +163,7 @@ public class BaseAsyncAudit {
 					adviceName, attemptingTo);
 
 			AuditLogger.error(auditEventData,
-					"Error ServiceMessage: " + bipRuntimeException.getMessage(),
+					INTERNAL_EXCEPTION_PREFIX + bipRuntimeException.getMessage(),
 					bipRuntimeException);
 
 			throw bipRuntimeException;
