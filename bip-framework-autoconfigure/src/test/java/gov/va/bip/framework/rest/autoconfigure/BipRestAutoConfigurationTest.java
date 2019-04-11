@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
-import gov.va.bip.framework.rest.autoconfigure.BipRestAutoConfiguration;
 import gov.va.bip.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.bip.framework.security.autoconfigure.BipSecurityAutoConfiguration;
 
@@ -37,7 +36,7 @@ public class BipRestAutoConfigurationTest {
 	public void setup() {
 		context = new AnnotationConfigWebApplicationContext();
 		TestPropertyValues.of("feign.hystrix.enabled=true").applyTo(context);
-		TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
+		TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
 		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class,
 				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				BipSecurityAutoConfiguration.class,
@@ -61,7 +60,7 @@ public class BipRestAutoConfigurationTest {
 
 	@Test
 	public void testConfiguration_Broken() {
-		TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=BLAHBLAH").applyTo(context);
+		TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=BLAHBLAH").applyTo(context);
 
 		try {
 			context.refresh();
@@ -70,7 +69,7 @@ public class BipRestAutoConfigurationTest {
 		} catch (Exception e) {
 			assertTrue(BeansException.class.isAssignableFrom(e.getClass()));
 		} finally {
-			TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
+			TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
 			context.refresh();
 			bipRestAutoConfiguration = context.getBean(BipRestAutoConfiguration.class);
 			assertNotNull(bipRestAutoConfiguration);

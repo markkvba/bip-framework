@@ -25,8 +25,6 @@ import feign.Feign;
 import feign.Target;
 import feign.hystrix.SetterFactory;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
-import gov.va.bip.framework.feign.autoconfigure.BipFeignAutoConfiguration;
-import gov.va.bip.framework.feign.autoconfigure.TokenFeignRequestInterceptor;
 import gov.va.bip.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.bip.framework.security.autoconfigure.BipSecurityAutoConfiguration;
 
@@ -46,7 +44,7 @@ public class BipFeignAutoConfigurationTest {
 	public void setup() {
 		context = new AnnotationConfigWebApplicationContext();
 		TestPropertyValues.of("feign.hystrix.enabled=true").applyTo(context);
-		TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
+		TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
 		context.register(JacksonAutoConfiguration.class, SecurityAutoConfiguration.class,
 				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				BipSecurityAutoConfiguration.class,
@@ -75,7 +73,7 @@ public class BipFeignAutoConfigurationTest {
 
 	@Test
 	public void testWebConfiguration_BrokenProp() throws Exception {
-		TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=BLAHBLAH").applyTo(context);
+		TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=BLAHBLAH").applyTo(context);
 		context.refresh();
 
 		try {
@@ -84,7 +82,7 @@ public class BipFeignAutoConfigurationTest {
 		} catch (Exception e) {
 			assertTrue(BeansException.class.isAssignableFrom(e.getClass()));
 		} finally {
-			TestPropertyValues.of("bip.framework.rest.client.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
+			TestPropertyValues.of("bip.framework.client.rest.connectionTimeout=" + CONNECTION_TIMEOUT).applyTo(context);
 			context.refresh();
 		}
 
