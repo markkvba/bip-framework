@@ -2,7 +2,8 @@ This page documents the purpose and capabilities of **OpenShift Container Platfo
 
 ## What is this library project for? ##
 
-This project contains interfaces, annotations and classes consumed by the application services for various functionality as listed below
+This project contains interfaces, annotations and classes consumed by the application services for various functionality:
+* Marker interfaces for transfer objects to support ommon identification and behavior
 * Rest Provider Message classes, RestTemplate
 * Audit and Performance Logging aspects
 * Utility ops for logging and handling exceptions
@@ -10,6 +11,28 @@ This project contains interfaces, annotations and classes consumed by the applic
 * WebService client config
 * Security JWT base classes, properties and exceptions
 * Service Domain Message classes, timer and validation aspects
+
+## BIP Framework principles
+BIP Framework aims to:
+* free developers from many of the complexities of dealing with the underlying platform,
+* enable centralized application configuration,
+* enable developers to focus more on business requirements and less on boilerplate code,
+* encourage developers to use good coding practices and patterns that are effective and efficient,
+* encourage developers to write code that presents a common "look and feel" across projects,
+* enable developers to produce reliable code that takes less time to develop and test.
+
+## Framework usage in service applications
+
+#### Model objects and layer separation
+BIP Framework requires distinct separation of model objects between the **Provider**, **Domain**, and **Partner** layers. For more information, see [Design: Layer and Model Separation](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/design-layer-separation.md).
+
+#### Auditing
+
+
+#### Application security
+Security is applied at the REST interface by the security layer. See [Application Security Management](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/application-security-management.md).
+
+#### 
 
 ## How to add dependency in your project?
 
