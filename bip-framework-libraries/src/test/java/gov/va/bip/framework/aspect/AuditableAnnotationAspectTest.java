@@ -148,10 +148,10 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
 		try {
 			aspect.auditAnnotationBefore(joinPoint);
-			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
+			verify(mockAppender, Mockito.times(6)).doAppend(captorLoggingEvent.capture());
 			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 			assertNotNull(loggingEvents);
 			assertTrue(loggingEvents.size() > 0);
@@ -171,7 +171,7 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
 		try {
 			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
 			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
@@ -194,7 +194,7 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
 		try {
 			try {
 				aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
@@ -205,7 +205,8 @@ public class AuditableAnnotationAspectTest {
 			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 			assertNotNull(loggingEvents);
 			assertTrue(loggingEvents.size() > 0);
-			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage().contains("An exception occurred in "));
+			assertTrue(loggingEvents.get(loggingEvents.size() - 1).getMessage()
+					.contains("An exception occurred in " + this.getClass().getName()));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Exception should not be thrown");
@@ -222,7 +223,7 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogging", serializer);
+		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
 
 		try {
 			aspect.auditAnnotationBefore(joinPoint);

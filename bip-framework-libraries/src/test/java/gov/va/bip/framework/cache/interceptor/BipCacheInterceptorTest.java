@@ -91,7 +91,7 @@ public class BipCacheInterceptorTest {
 		doNothing().when(asyncAuditLogSerializer).asyncAuditRequestResponseData(any(), any(), any(), any(), any());
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
 		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", asyncAuditLogSerializer);
-		bipCacheInterceptor.asyncAudit = baseAsyncAudit;
+		bipCacheInterceptor.baseAsyncAudit = baseAsyncAudit;
 	}
 
 	@Test

@@ -73,8 +73,8 @@ public class BaseAsyncAudit {
 	 * @param severity - the Message Severity, if {@code null} then MessageSeverity.INFO is used
 	 * @param t - a throwable, if relevant (may be {@code null})
 	 */
-	public void writeRequestAuditLog(final List<Object> request, RequestAuditData requestAuditData,
-			AuditEventData auditEventData, MessageSeverity severity, Throwable t) {
+	public void writeRequestAuditLog(final List<Object> request, final RequestAuditData requestAuditData,
+			final AuditEventData auditEventData, final MessageSeverity severity, final Throwable t) {
 		if (request != null) {
 			requestAuditData.setRequest(request);
 		}
@@ -94,7 +94,7 @@ public class BaseAsyncAudit {
 	 * @param severity - the Message Severity, if {@code null} then MessageSeverity.INFO is used
 	 * @param t - a throwable, if relevant (may be {@code null})
 	 */
-	public void writeResponseAuditLog(Object response, ResponseAuditData responseAuditData, final AuditEventData auditEventData,
+	public void writeResponseAuditLog(final Object response, final ResponseAuditData responseAuditData, final AuditEventData auditEventData,
 			final MessageSeverity severity, final Throwable t) {
 		if (response != null) {
 			responseAuditData.setResponse(response);
@@ -131,7 +131,7 @@ public class BaseAsyncAudit {
 	 * @param inputstream
 	 * @throws IOException
 	 */
-	protected void closeInputStreamIfRequired(InputStream inputstream) {
+	protected void closeInputStreamIfRequired(final InputStream inputstream) {
 		if (inputstream != null) {
 			try {
 				inputstream.close();
@@ -142,15 +142,15 @@ public class BaseAsyncAudit {
 	}
 
 	/**
-	 * Standard handling of exceptions that are thrown from within the advice
-	 * (not exceptions thrown by application code).
+	 * Standard handling of exceptions that are thrown from within the advice (not exceptions thrown by application code, such
+	 * exceptions are rethrown).
 	 *
 	 * @param adviceName the name of the advice/method in which the exception was thrown
 	 * @param attemptingTo the attempted task that threw the exception
 	 * @param auditEventData the audit event data object
 	 * @param throwable the exception that was thrown
 	 */
-	public void handleInternalException(final String adviceName, final String attemptingTo,
+	public void handleInternalExceptionAndRethrowApplicationExceptions(final String adviceName, final String attemptingTo,
 			final AuditEventData auditEventData, MessageKeys key, final Throwable throwable) {
 
 		try {
