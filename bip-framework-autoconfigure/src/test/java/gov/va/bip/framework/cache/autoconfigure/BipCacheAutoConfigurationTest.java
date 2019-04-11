@@ -20,6 +20,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
 import gov.va.bip.framework.cache.autoconfigure.BipCacheAutoConfiguration;
 import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties;
@@ -123,6 +124,7 @@ public class BipCacheAutoConfigurationTest {
 	public void testCacheEvictError() throws Exception {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
+		context.registerBean(BaseAsyncAudit.class);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class);
 		context.refresh();
 		assertNotNull(context);
@@ -135,7 +137,8 @@ public class BipCacheAutoConfigurationTest {
 	public void testCacheClearError() throws Exception {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
-		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class);
+		context.register(BaseAsyncAudit.class, RedisAutoConfiguration.class, BipCacheAutoConfiguration.class,
+				BipAuditAutoConfiguration.class);
 		context.refresh();
 		assertNotNull(context);
 
@@ -150,4 +153,10 @@ public class BipCacheAutoConfigurationTest {
 	public void someMethod() {
 		// do nothing
 	}
+
+	// @Configuration
+	// @ComponentScan(basePackages = { "gov.va.bip.framework" })
+	// static class TestConfigurationForAuditHttpServletResponseBean {
+	//
+	// }
 }

@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import gov.va.bip.framework.audit.AuditLogSerializer;
+import gov.va.bip.framework.audit.BaseAsyncAudit;
+import gov.va.bip.framework.audit.http.AuditHttpRequestResponse;
 
 /**
  * Created by rthota on 8/24/17.
@@ -19,5 +21,17 @@ public class BipAuditAutoConfiguration {
 	@ConditionalOnMissingBean
 	public AuditLogSerializer auditLogSerializer() {
 		return new AuditLogSerializer();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public BaseAsyncAudit baseAsyncAudit() {
+		return new BaseAsyncAudit();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public AuditHttpRequestResponse.AuditHttpServletResponse auditHttpServletResponse() {
+		return new AuditHttpRequestResponse().new AuditHttpServletResponse();
 	}
 }

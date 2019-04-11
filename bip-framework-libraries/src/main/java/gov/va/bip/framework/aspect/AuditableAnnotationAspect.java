@@ -82,9 +82,8 @@ public class AuditableAnnotationAspect extends BaseAsyncAudit {
 				super.writeRequestAuditLog(request, new RequestAuditData(), auditEventData, null, null);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
-			LOGGER.error("Could not audit event due to unexpected exception.", e);
-			throw new BipRuntimeException(MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, MessageSeverity.FATAL,
-					HttpStatus.INTERNAL_SERVER_ERROR, e);
+			handleInternalExceptionAndRethrowApplicationExceptions("auditAnnotationBefore", "AuditingUsingAuditableAnnotation", auditEventData,
+					MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, e);
 		}
 
 	}

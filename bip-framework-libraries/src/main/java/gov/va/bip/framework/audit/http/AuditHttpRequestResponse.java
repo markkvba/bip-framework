@@ -14,9 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -44,10 +46,13 @@ public class AuditHttpRequestResponse {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditHttpRequestResponse.class);
 
+	@Autowired
+	private AuditHttpServletResponse auditHttpServletResponse;
+
 	/**
 	 * Protected constructor.
 	 */
-	protected AuditHttpRequestResponse() {
+	public AuditHttpRequestResponse() {
 		super();
 	}
 
@@ -175,7 +180,7 @@ public class AuditHttpRequestResponse {
 	 * @return AuditServletResponse - the container for response audit operations
 	 */
 	public AuditHttpServletResponse auditServletResponse() {
-		return new AuditHttpServletResponse();
+		return auditHttpServletResponse;
 	}
 
 	/**
@@ -184,6 +189,7 @@ public class AuditHttpRequestResponse {
 	 * @return AuditServletResponse - the container for response audit operations
 	 * @author aburkholder
 	 */
+	@Component
 	public class AuditHttpServletResponse extends BaseAsyncAudit {
 
 		/**

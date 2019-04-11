@@ -103,7 +103,7 @@ public class AuditLogSerializerTest {
 		verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 		final String expectedRequest = String.valueOf(BufferRecyclers.getJsonStringEncoder().quoteAsString(
-				"{\"headers\":{\"Header1\":\"Header1Value\"},\"uri\":\"/\",\"method\":\"GET\",\"request\":[\"Request\"],\"attachmentTextList\":[\"attachment1\",\"attachment2\"]}"));
+				"{\"request\":[\"Request\"],\"headers\":{\"Header1\":\"Header1Value\"},\"uri\":\"/\",\"method\":\"GET\",\"attachmentTextList\":[\"attachment1\",\"attachment2\"]}"));
 		final String expectedResponse =
 				String.valueOf(BufferRecyclers.getJsonStringEncoder().quoteAsString("{\"response\":\"Response\"}"));
 		assertEquals(expectedRequest, loggingEvents.get(0).getMessage());
@@ -122,8 +122,8 @@ public class AuditLogSerializerTest {
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 		assertTrue(loggingEvents.get(0).getMessage().startsWith(MESSAGE_STARTSWITH));
 		assertThat(loggingEvents.get(0).getLevel(), is(ch.qos.logback.classic.Level.ERROR));
-		assertTrue(loggingEvents.get(1).getMessage() != null
-				&& loggingEvents.get(1).getMessage().startsWith("RequestAuditData{headers="));
+		assertTrue((loggingEvents.get(1).getMessage() != null)
+				&& loggingEvents.get(1).getMessage().startsWith("HttpRequestAuditData{headers="));
 		assertThat(loggingEvents.get(1).getLevel(), is(ch.qos.logback.classic.Level.INFO));
 
 	}
@@ -138,8 +138,8 @@ public class AuditLogSerializerTest {
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 		assertTrue(loggingEvents.get(0).getMessage().startsWith(MESSAGE_STARTSWITH));
 		assertThat(loggingEvents.get(0).getLevel(), is(ch.qos.logback.classic.Level.ERROR));
-		assertTrue(loggingEvents.get(1).getMessage() != null
-				&& loggingEvents.get(1).getMessage().startsWith("RequestAuditData{headers="));
+		assertTrue((loggingEvents.get(1).getMessage() != null)
+				&& loggingEvents.get(1).getMessage().startsWith("HttpRequestAuditData{headers="));
 		assertThat(loggingEvents.get(1).getLevel(), is(ch.qos.logback.classic.Level.ERROR));
 	}
 
@@ -153,8 +153,8 @@ public class AuditLogSerializerTest {
 		final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 		assertTrue(loggingEvents.get(0).getMessage().startsWith(MESSAGE_STARTSWITH));
 		assertThat(loggingEvents.get(0).getLevel(), is(ch.qos.logback.classic.Level.ERROR));
-		assertTrue(loggingEvents.get(1).getMessage() != null
-				&& loggingEvents.get(1).getMessage().startsWith("RequestAuditData{headers="));
+		assertTrue((loggingEvents.get(1).getMessage() != null)
+				&& loggingEvents.get(1).getMessage().startsWith("HttpRequestAuditData{headers="));
 		assertThat(loggingEvents.get(1).getLevel(), is(ch.qos.logback.classic.Level.ERROR));
 	}
 

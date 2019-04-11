@@ -24,6 +24,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.groups.Default;
 
 import org.junit.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -45,7 +48,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
 import gov.va.bip.framework.exception.BipRuntimeException;
@@ -99,15 +101,15 @@ public class BipRestGlobalExceptionHandlerTest {
 		objectErrors.add(oe);
 
 		when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
-		AuditLogSerializer serializer = new AuditLogSerializer();
+		AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(TestConfigurationForAuditHttpServletResponseBean.class);
+		BipRestGlobalExceptionHandler brgeh = annotationConfigApplicationContext.getBean(BipRestGlobalExceptionHandler.class);
 
-		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(bipRestGlobalExceptionHandler, "asyncLogging", serializer);
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpServletRequest));
 
-		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleMethodArgumentNotValidException(req, ex);
+		ResponseEntity<Object> response = brgeh.handleMethodArgumentNotValidException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		annotationConfigApplicationContext.close();
 	}
 
 	public void methodForExtractingMethodObject(final String parameter) {
@@ -294,6 +296,12 @@ public class BipRestGlobalExceptionHandlerTest {
 
 		@NotBlank
 		String dummyField;
+	}
+
+	@Configuration
+	@ComponentScan(basePackages = { "gov.va.bip.framework" })
+	static class TestConfigurationForAuditHttpServletResponseBean {
+
 	}
 
 }

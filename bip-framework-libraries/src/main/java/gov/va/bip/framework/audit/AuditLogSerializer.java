@@ -71,7 +71,7 @@ public class AuditLogSerializer implements Serializable {
 				mapper.disable(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS);
 				mapper.disable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES);
 
-				auditDetails = mapper.writeValueAsString(auditDataClass.cast(auditData));
+				auditDetails = mapper.writeValueAsString(auditData);
 			} catch (JsonProcessingException ex) {
 				LOGGER.error("Error occurred on ClassCast or JSON processing, calling custom toString()", ex);
 				try {
