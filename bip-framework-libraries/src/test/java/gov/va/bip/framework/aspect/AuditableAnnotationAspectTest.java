@@ -27,6 +27,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import gov.va.bip.framework.audit.AuditEvents;
 import gov.va.bip.framework.audit.AuditLogSerializer;
+import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.annotation.Auditable;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -148,7 +149,9 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
+		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
+		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationBefore(joinPoint);
 			verify(mockAppender, Mockito.times(6)).doAppend(captorLoggingEvent.capture());
@@ -171,7 +174,9 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
+		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
+		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
 			verify(mockAppender, Mockito.times(7)).doAppend(captorLoggingEvent.capture());
@@ -194,7 +199,9 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
+		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
+		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			try {
 				aspect.auditAnnotationAfterThrowing(joinPoint, new Exception(TESTS_EXCEPTION_MESSAGE));
@@ -223,8 +230,9 @@ public class AuditableAnnotationAspectTest {
 		AuditableAnnotationAspect aspect = new AuditableAnnotationAspect();
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		ReflectionTestUtils.setField(aspect, "asyncLogger", serializer);
-
+		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
+		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationBefore(joinPoint);
 			fail("Should have thrown exception on before");

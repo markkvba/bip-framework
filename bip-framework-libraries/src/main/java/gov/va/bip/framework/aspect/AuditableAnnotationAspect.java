@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import gov.va.bip.framework.audit.AuditEventData;
@@ -23,6 +24,7 @@ import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
 
 /**
  * Before and After audit logging for the {@link Auditable} annotation.
@@ -35,7 +37,7 @@ import gov.va.bip.framework.messages.MessageSeverity;
  * @author aburkholder
  */
 @Aspect
-public class AuditableAnnotationAspect extends BaseAsyncAudit {
+public class AuditableAnnotationAspect extends BaseHttpProviderAspect {
 	/** The Constant LOGGER. */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditableAnnotationAspect.class);
 	
@@ -53,6 +55,9 @@ public class AuditableAnnotationAspect extends BaseAsyncAudit {
 	
 	/** The Constant AUDIT_ERROR_PREFIX_EXCEPTION. */
 	private static final String AUDIT_ERROR_PREFIX_EXCEPTION = "Could not audit event due to unexpected exception.";
+
+	@Autowired
+	BaseAsyncAudit baseAsyncAudit;
 
 	/**
 	 * Instantiate the aspect.
@@ -94,10 +99,11 @@ public class AuditableAnnotationAspect extends BaseAsyncAudit {
 								StringUtils.isBlank(auditableAnnotation.auditClass()) ? className : auditableAnnotation.auditClass());
 				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
-				super.writeRequestAuditLog(request, new RequestAuditData(), auditEventData, null, null);
+				baseAsyncAudit.writeRequestAuditLog(request, new RequestAuditData(), auditEventData, null, null);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
-			handleInternalExceptionAndRethrowApplicationExceptions("auditAnnotationBefore", "AuditingUsingAuditableAnnotation", auditEventData,
+			baseAsyncAudit.handleInternalExceptionAndRethrowApplicationExceptions("auditAnnotationBefore",
+					"AuditingUsingAuditableAnnotation", auditEventData,
 					MessageKeys.BIP_AUDIT_ASPECT_ERROR_CANNOT_AUDIT, e);
 		}
 
@@ -135,7 +141,7 @@ public class AuditableAnnotationAspect extends BaseAsyncAudit {
 								StringUtils.isBlank(auditableAnnotation.auditClass()) ? className : auditableAnnotation.auditClass());
 				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
-				super.writeResponseAuditLog(response, new ResponseAuditData(), auditEventData, null, null);
+				baseAsyncAudit.writeResponseAuditLog(response, new ResponseAuditData(), auditEventData, null, null);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch
 			LOGGER.error(AUDIT_ERROR_PREFIX_EXCEPTION, e);
@@ -178,7 +184,8 @@ public class AuditableAnnotationAspect extends BaseAsyncAudit {
 						new AuditEventData(auditableAnnotation.event(), auditableAnnotation.activity(), auditedClass);
 				LOGGER.debug(AUDIT_DEBUG_PREFIX_EVENT, auditEventData.toString());
 
-				super.writeResponseAuditLog("An exception occurred in " + auditedClass + ".", new ResponseAuditData(), auditEventData,
+				baseAsyncAudit.writeResponseAuditLog("An exception occurred in " + auditedClass + ".", new ResponseAuditData(),
+						auditEventData,
 						MessageSeverity.ERROR, throwable);
 			}
 		} catch (Exception e) { // NOSONAR intentionally broad catch

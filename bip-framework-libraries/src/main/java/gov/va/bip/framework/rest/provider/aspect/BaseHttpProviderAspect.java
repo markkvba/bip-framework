@@ -51,10 +51,10 @@ public class BaseHttpProviderAspect extends AuditHttpRequestResponse {
 	/**
 	 * This point cut selects code (e.g. methods) that ...
 	 * <ol>
-	 * <li>are annotated with gov.va.bip.framework.audit.Auditable
+	 * <li>are annotated with gov.va.bip.framework.audit.annotation.Auditable
 	 * </ol>
 	 */
-	@Pointcut("@annotation(gov.va.bip.framework.audit.Auditable)")
+	@Pointcut("@annotation(gov.va.bip.framework.audit.annotation.Auditable)")
 	protected static final void auditableAnnotation() {
 		// Do nothing.
 	}
@@ -62,7 +62,7 @@ public class BaseHttpProviderAspect extends AuditHttpRequestResponse {
 	/**
 	 * This point cut selects code (e.g. methods) that...
 	 * <ol>
-	 * <li>are annotated with gov.va.bip.framework.audit.Auditable - see {@link #auditableAnnotation()}
+	 * <li>are annotated with gov.va.bip.framework.audit.annotation.Auditable - see {@link #auditableAnnotation()}
 	 * <li>and, only at the time when the code inside the annotated method is executed
 	 * </ol>
 	 */
