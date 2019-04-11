@@ -12,6 +12,13 @@ To run spring boot and spring cloud enabled services on the BIP Platform, it mus
 
 1. bip-framework-test-lib: Test library framework to support functional testing for the services
 
+## Links to sub projects
+
+* [bip-framework-autoconfigure](bip-framework-autoconfigure/README.md)
+* [bip-framework-libraries](bip-framework-libraries/README.md)
+* [bip-framework-parentpom](bip-framework-parentpom/README.md)
+* [bip-framework-test-lib](bip-framework-test-lib/README.md)
+
 ## How to include and download these dependency libraries in your project
 
      <dependency>
