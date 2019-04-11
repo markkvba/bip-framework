@@ -22,8 +22,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
-import gov.va.bip.framework.cache.autoconfigure.BipCacheAutoConfiguration;
-import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties;
 
 /**
  * Created by vgadda on 8/11/17.
