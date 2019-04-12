@@ -25,6 +25,7 @@ import feign.Feign;
 import feign.Target;
 import feign.hystrix.SetterFactory;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
+import gov.va.bip.framework.cache.autoconfigure.TestConfigurationForAuditBeans;
 import gov.va.bip.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.bip.framework.security.autoconfigure.BipSecurityAutoConfiguration;
 
@@ -49,7 +50,7 @@ public class BipFeignAutoConfigurationTest {
 				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				BipSecurityAutoConfiguration.class,
 				BipAuditAutoConfiguration.class, BipFeignAutoConfiguration.class,
-				ProviderHttpAspect.class);
+				ProviderHttpAspect.class, TestConfigurationForAuditBeans.class);
 
 		context.refresh();
 		assertNotNull(context);

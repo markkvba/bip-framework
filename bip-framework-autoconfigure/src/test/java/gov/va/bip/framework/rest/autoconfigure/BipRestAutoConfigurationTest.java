@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
+import gov.va.bip.framework.cache.autoconfigure.TestConfigurationForAuditBeans;
 import gov.va.bip.framework.rest.provider.aspect.ProviderHttpAspect;
 import gov.va.bip.framework.security.autoconfigure.BipSecurityAutoConfiguration;
 
@@ -41,7 +42,7 @@ public class BipRestAutoConfigurationTest {
 				EmbeddedWebServerFactoryCustomizerAutoConfiguration.class,
 				BipSecurityAutoConfiguration.class,
 				BipAuditAutoConfiguration.class, BipRestAutoConfiguration.class,
-				ProviderHttpAspect.class);
+				ProviderHttpAspect.class, TestConfigurationForAuditBeans.class);
 
 		context.refresh();
 		assertNotNull(context);

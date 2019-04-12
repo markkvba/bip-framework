@@ -150,7 +150,7 @@ public class AuditableAnnotationAspectTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", serializer);
 		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationBefore(joinPoint);
@@ -175,7 +175,7 @@ public class AuditableAnnotationAspectTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", serializer);
 		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationAfterReturning(joinPoint, new ProviderResponse());
@@ -200,7 +200,7 @@ public class AuditableAnnotationAspectTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", serializer);
 		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			try {
@@ -231,7 +231,7 @@ public class AuditableAnnotationAspectTest {
 		AuditLogSerializer serializer = new AuditLogSerializer();
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", serializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", serializer);
 		ReflectionTestUtils.setField(aspect, "baseAsyncAudit", baseAsyncAudit);
 		try {
 			aspect.auditAnnotationBefore(joinPoint);

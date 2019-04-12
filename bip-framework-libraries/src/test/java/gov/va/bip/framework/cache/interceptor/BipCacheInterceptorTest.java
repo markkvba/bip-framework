@@ -31,7 +31,7 @@ public class BipCacheInterceptorTest {
 	BipCacheInterceptor bipCacheInterceptor = new BipCacheInterceptor();
 
 	class TestObject {
-		public String testMethod(String msg) {
+		public String testMethod(final String msg) {
 			return "Hello";
 		}
 	}
@@ -90,7 +90,7 @@ public class BipCacheInterceptorTest {
 	public void setup() throws Throwable {
 		doNothing().when(asyncAuditLogSerializer).asyncAuditRequestResponseData(any(), any(), any(), any(), any());
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogger", asyncAuditLogSerializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", asyncAuditLogSerializer);
 		bipCacheInterceptor.baseAsyncAudit = baseAsyncAudit;
 	}
 
