@@ -12,6 +12,7 @@ import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
@@ -32,6 +33,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.CollectionUtils;
 
+import gov.va.bip.framework.audit.AuditLogSerializer;
+import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties.RedisExpires;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsMBean;
@@ -73,6 +76,28 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@Bean
 	public BipCacheOpsMBean bipCacheOpsMBean() {
 		return new BipCacheOpsImpl();
+	}
+	
+	/**
+	 * Audit log serializer.
+	 *
+	 * @return the audit log serializer
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public AuditLogSerializer auditLogSerializer() {
+		return new AuditLogSerializer();
+	}
+
+	/**
+	 * Base async audit.
+	 *
+	 * @return the base async audit
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public BaseAsyncAudit baseAsyncAudit() {
+		return new BaseAsyncAudit();
 	}
 
 	/**
