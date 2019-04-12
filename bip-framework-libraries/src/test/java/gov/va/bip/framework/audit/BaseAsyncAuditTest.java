@@ -9,7 +9,7 @@ public class BaseAsyncAuditTest {
 	public void postConstructTest() {
 		BaseAsyncAudit baseAsyncAudit = new BaseAsyncAudit();
 		AuditLogSerializer auditLogSerializer = new AuditLogSerializer();
-		ReflectionTestUtils.setField(baseAsyncAudit, "asyncLogging", auditLogSerializer);
+		ReflectionTestUtils.setField(baseAsyncAudit, "auditLogSerializer", auditLogSerializer);
 		baseAsyncAudit.postConstruct();
 	}
 }

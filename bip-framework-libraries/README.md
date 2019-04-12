@@ -65,9 +65,9 @@ gov.va.bip.framework.validation
 
 <img src = "/images/bip-framework-validation-class-diagram.jpg">
 
-gov.va.bip.framework.ws.client
-gov.va.bip.framework.ws.client.interceptor
-gov.va.bip.framework.ws.client.interceptor.transport
+gov.va.bip.framework.client.ws
+gov.va.bip.framework.client.ws.interceptor
+gov.va.bip.framework.client.ws.interceptor.transport
 
 <img src = "/images/bip-framework-ws-class-diagram.jpg">
 
