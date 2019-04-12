@@ -71,6 +71,20 @@ public class BipRestGlobalExceptionHandlerTest {
 	}
 
 	@Test
+	public void deriveMessageTest() {
+		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(),
+				MessageKeys.NO_KEY, new String[] {});
+		assertTrue(returnValue.equals("NO_KEY"));
+	}
+
+	@Test
+	public void getMessageFromWrappedExceptionTest() {
+		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "getMessageFromWrappedException",
+				new Exception(new Exception("wrapped message")));
+		assertTrue(returnValue.equals("wrapped message"));
+	}
+
+	@Test
 	public void handleMethodArgumentNotValidExceptionTest() {
 		HttpServletRequest req = mock(HttpServletRequest.class);
 		MethodParameter parameter = null;
@@ -96,9 +110,10 @@ public class BipRestGlobalExceptionHandlerTest {
 
 		List<ObjectError> objectErrors = new LinkedList<>();
 		ObjectError oe = new ObjectError("test ObjectError objectName", "test ObjectError DefaultMessage");
+		ReflectionTestUtils.setField(oe, "codes", new String[] { "code1", "code2" });
 		objectErrors.add(oe);
 
-		when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
+		when(bindingResult.getGlobalErrors()).thenReturn(objectErrors);
 		AuditLogSerializer serializer = new AuditLogSerializer();
 
 		ReflectionTestUtils.setField(serializer, "dateFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
