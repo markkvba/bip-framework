@@ -163,7 +163,7 @@ public class AuditableAnnotationAspect extends BaseHttpProviderPointcuts {
 	 * @throws Throwable
 	 */
 	@AfterThrowing(pointcut = "auditableExecution()", throwing = "throwable")
-	public void auditAnnotationAfterThrowing(final JoinPoint joinPoint, final Throwable throwable) throws Throwable {
+	public void auditAnnotationAfterThrowing(final JoinPoint joinPoint, final Throwable throwable) throws Throwable { // NOSONAR Have to define generic Throwable exception
 		LOGGER.debug("afterThrowing throwable: {}" + throwable);
 
 		Auditable auditableAnnotation = null;

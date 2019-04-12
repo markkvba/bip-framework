@@ -50,12 +50,6 @@ public class AuditHttpRequestResponse {
 	@Autowired
 	BaseAsyncAudit baseAsyncAudit;
 
-//	@Autowired
-//	private AuditHttpServletRequest auditHttpServletRequest;
-//
-//	@Autowired
-//	private AuditHttpServletResponse auditHttpServletResponse;
-
 	/**
 	 * Protected constructor.
 	 */
