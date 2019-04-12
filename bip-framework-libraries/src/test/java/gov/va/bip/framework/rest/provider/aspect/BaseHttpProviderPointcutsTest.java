@@ -10,19 +10,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderPointcuts;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BaseHttpProviderAspectTest {
+public class BaseHttpProviderPointcutsTest {
 
 	@Test
 	public void testRestController() {
-		BaseHttpProviderAspect.restController();
+		BaseHttpProviderPointcuts.restController();
 	}
 
 	@Test
 	public void testPublicServiceResponseRestMethod() {
-		BaseHttpProviderAspect.publicServiceResponseRestMethod();
+		BaseHttpProviderPointcuts.publicServiceResponseRestMethod();
 	}
 
 	@Mock
@@ -45,27 +45,27 @@ public class BaseHttpProviderAspectTest {
 	}
 
 	/**
-	 * Test of auditableAnnotation method, of class BaseHttpProviderAspect.
+	 * Test of auditableAnnotation method, of class BaseHttpProviderPointcuts.
 	 */
 	@Test
 	public void testAuditableAnnotation() {
-		BaseHttpProviderAspect.auditableAnnotation();
+		BaseHttpProviderPointcuts.auditableAnnotation();
 	}
 
 	/**
-	 * Test of auditableExecution method, of class BaseHttpProviderAspect.
+	 * Test of auditableExecution method, of class BaseHttpProviderPointcuts.
 	 */
 	@Test
 	public void testAuditableExecution() {
-		BaseHttpProviderAspect.auditableExecution();
+		BaseHttpProviderPointcuts.auditableExecution();
 	}
 
 	/**
-	 * Test of auditRestController method, of class BaseHttpProviderAspect.
+	 * Test of auditRestController method, of class BaseHttpProviderPointcuts.
 	 */
 	@Test
 	public void testAuditRestController() {
-		BaseHttpProviderAspect.restController();
+		BaseHttpProviderPointcuts.restController();
 	}
 
 

@@ -43,6 +43,10 @@ public class AuditLogSerializer implements Serializable {
 	@Value("${spring.jackson.date-format:yyyy-MM-dd'T'HH:mm:ss.SSSZ}")
 	private String dateFormat;
 
+	public AuditLogSerializer() {
+		super();
+	}
+
 	/**
 	 * Asynchronuously converts an object to JSON and then writes it to the audit logger.
 	 * <p>

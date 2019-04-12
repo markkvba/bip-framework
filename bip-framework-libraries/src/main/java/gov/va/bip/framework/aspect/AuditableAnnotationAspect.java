@@ -24,7 +24,7 @@ import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
-import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderPointcuts;
 
 /**
  * Before and After audit logging for the {@link Auditable} annotation.
@@ -37,7 +37,7 @@ import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
  * @author aburkholder
  */
 @Aspect
-public class AuditableAnnotationAspect extends BaseHttpProviderAspect {
+public class AuditableAnnotationAspect extends BaseHttpProviderPointcuts {
 	/** The Constant LOGGER. */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditableAnnotationAspect.class);
 	

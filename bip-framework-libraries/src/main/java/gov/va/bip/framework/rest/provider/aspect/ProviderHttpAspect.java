@@ -30,11 +30,11 @@ import gov.va.bip.framework.rest.provider.ProviderResponse;
  * and converted to appropriate JSON object with a FATAL message.
  *
  * @author akulkarni
- * @see gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect
+ * @see gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderPointcuts
  */
 @Aspect
 @Order(-9998)
-public class ProviderHttpAspect extends BaseHttpProviderAspect {
+public class ProviderHttpAspect extends BaseHttpProviderPointcuts {
 
 	private static final String FINISHED_STRING = " finished.";
 	private static final String JOINPOINT_STRING = " joinpoint: ";
@@ -87,6 +87,9 @@ public class ProviderHttpAspect extends BaseHttpProviderAspect {
 			super.auditServletRequest().writeHttpRequestAuditLog(requestArgs, auditEventData);
 
 		} catch (final Throwable throwable) { // NOSONAR intentionally catching throwable
+			LOGGER.error(this.getClass().getSimpleName() + " " + BEFORE_ADVICE + " while attempting " + ATTEMPTING_WRITE_REQUEST
+					+ ": " + throwable.getClass().getSimpleName() + " " + throwable.getMessage(),
+					throwable);
 			handleInternalException(BEFORE_ADVICE, ATTEMPTING_WRITE_REQUEST, auditEventData, throwable);
 		} finally {
 			LOGGER.debug(BEFORE_ADVICE + FINISHED_STRING);

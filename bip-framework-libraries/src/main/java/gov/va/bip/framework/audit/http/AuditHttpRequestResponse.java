@@ -42,12 +42,19 @@ import gov.va.bip.framework.util.SanitizationUtil;
  *
  * @author aburkholder
  */
+@Component
 public class AuditHttpRequestResponse {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditHttpRequestResponse.class);
 
 	@Autowired
-	private AuditHttpServletResponse auditHttpServletResponse;
+	BaseAsyncAudit baseAsyncAudit;
+
+//	@Autowired
+//	private AuditHttpServletRequest auditHttpServletRequest;
+//
+//	@Autowired
+//	private AuditHttpServletResponse auditHttpServletResponse;
 
 	/**
 	 * Protected constructor.
@@ -70,7 +77,7 @@ public class AuditHttpRequestResponse {
 	 *
 	 * @author aburkholder
 	 */
-	public class AuditHttpServletRequest extends BaseAsyncAudit {
+	public class AuditHttpServletRequest {
 
 		/**
 		 * Write audit log for HTTP request.
@@ -90,7 +97,7 @@ public class AuditHttpRequestResponse {
 				getHttpRequestAuditData(httpServletRequest, requestAuditData);
 			}
 
-			super.writeRequestAuditLog(request, requestAuditData, auditEventData, null, null);
+			baseAsyncAudit.writeRequestAuditLog(request, requestAuditData, auditEventData, null, null);
 		}
 
 		/**
@@ -142,13 +149,13 @@ public class AuditHttpRequestResponse {
 
 					inputstream = part.getInputStream();
 
-					multipartHeaders.add(partHeaders.toString() + ", " + convertBytesToString(inputstream));
+					multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
 			} finally {
-				closeInputStreamIfRequired(inputstream);
+				baseAsyncAudit.closeInputStreamIfRequired(inputstream);
 			}
 			return multipartHeaders;
 		}
@@ -180,7 +187,7 @@ public class AuditHttpRequestResponse {
 	 * @return AuditServletResponse - the container for response audit operations
 	 */
 	public AuditHttpServletResponse auditServletResponse() {
-		return auditHttpServletResponse;
+		return new AuditHttpServletResponse();
 	}
 
 	/**
@@ -189,8 +196,7 @@ public class AuditHttpRequestResponse {
 	 * @return AuditServletResponse - the container for response audit operations
 	 * @author aburkholder
 	 */
-	@Component
-	public class AuditHttpServletResponse extends BaseAsyncAudit {
+	public class AuditHttpServletResponse {
 
 		/**
 		 * Write audit log for HTTP response.
@@ -212,7 +218,7 @@ public class AuditHttpRequestResponse {
 				getHttpResponseAuditData(httpServletReponse, responseAuditData);
 			}
 
-			super.writeResponseAuditLog(response, responseAuditData, auditEventData, severity, t);
+			baseAsyncAudit.writeResponseAuditLog(response, responseAuditData, auditEventData, severity, t);
 		}
 
 		/**

@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import gov.va.bip.framework.audit.AuditLogSerializer;
-import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.http.AuditHttpRequestResponse;
 
 /**
@@ -23,15 +22,15 @@ public class BipAuditAutoConfiguration {
 		return new AuditLogSerializer();
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public BaseAsyncAudit baseAsyncAudit() {
-		return new BaseAsyncAudit();
-	}
+//	@Bean
+//	@ConditionalOnMissingBean
+//	public BaseAsyncAudit baseAsyncAudit() {
+//		return new BaseAsyncAudit();
+//	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public AuditHttpRequestResponse.AuditHttpServletResponse auditHttpServletResponse() {
-		return new AuditHttpRequestResponse().new AuditHttpServletResponse();
-	}
+//	@Bean
+//	@ConditionalOnMissingBean
+//	public AuditHttpRequestResponse.AuditHttpServletResponse auditHttpServletResponse() {
+//		return new AuditHttpRequestResponse().new AuditHttpServletResponse();
+//	}
 }

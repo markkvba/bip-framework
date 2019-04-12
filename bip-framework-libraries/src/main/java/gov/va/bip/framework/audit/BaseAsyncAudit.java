@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import gov.va.bip.framework.audit.model.HttpRequestAuditData;
 import gov.va.bip.framework.audit.model.HttpResponseAuditData;
@@ -28,6 +29,7 @@ import gov.va.bip.framework.validation.Defense;
  *
  * @author aburkholder
  */
+@Component
 public class BaseAsyncAudit {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BaseAsyncAudit.class);
@@ -38,7 +40,7 @@ public class BaseAsyncAudit {
 	public static final int NUMBER_OF_BYTES = 1024;
 
 	@Autowired
-	AuditLogSerializer asyncLogger;
+	AuditLogSerializer auditLogSerializer;
 
 	/**
 	 * Instantiate the class.
@@ -52,7 +54,7 @@ public class BaseAsyncAudit {
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		Defense.notNull(asyncLogger);
+		Defense.notNull(auditLogSerializer);
 	}
 
 	/**
@@ -61,7 +63,7 @@ public class BaseAsyncAudit {
 	 * @return AuditLogSerializer
 	 */
 	public AuditLogSerializer getAsyncLogger() {
-		return asyncLogger;
+		return auditLogSerializer;
 	}
 
 	/**
@@ -94,7 +96,8 @@ public class BaseAsyncAudit {
 	 * @param severity - the Message Severity, if {@code null} then MessageSeverity.INFO is used
 	 * @param t - a throwable, if relevant (may be {@code null})
 	 */
-	public void writeResponseAuditLog(final Object response, final ResponseAuditData responseAuditData, final AuditEventData auditEventData,
+	public void writeResponseAuditLog(final Object response, final ResponseAuditData responseAuditData,
+			final AuditEventData auditEventData,
 			final MessageSeverity severity, final Throwable t) {
 		if (response != null) {
 			responseAuditData.setResponse(response);
@@ -112,7 +115,7 @@ public class BaseAsyncAudit {
 	 * @return the string
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	protected static String convertBytesToString(final InputStream in) throws IOException {
+	public static String convertBytesToString(final InputStream in) throws IOException {
 		int offset = 0;
 		int bytesRead = 0;
 		final byte[] data = new byte[NUMBER_OF_BYTES];
@@ -131,7 +134,7 @@ public class BaseAsyncAudit {
 	 * @param inputstream
 	 * @throws IOException
 	 */
-	protected void closeInputStreamIfRequired(final InputStream inputstream) {
+	public void closeInputStreamIfRequired(final InputStream inputstream) {
 		if (inputstream != null) {
 			try {
 				inputstream.close();

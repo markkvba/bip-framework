@@ -42,7 +42,7 @@ import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
 import gov.va.bip.framework.rest.provider.ProviderResponse;
-import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
+import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderPointcuts;
 
 /**
  * A global exception handler as the last line of defense before sending response to the service consumer.
@@ -51,7 +51,7 @@ import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderAspect;
  */
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class BipRestGlobalExceptionHandler extends BaseHttpProviderAspect {
+public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 
 	/** The Constant LOGGER. */
 	private static final Logger logger = LoggerFactory.getLogger(BipRestGlobalExceptionHandler.class);

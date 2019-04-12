@@ -10,12 +10,12 @@ import gov.va.bip.framework.audit.http.AuditHttpRequestResponse;
  *
  * @author jshrader
  */
-public class BaseHttpProviderAspect extends AuditHttpRequestResponse {
+public class BaseHttpProviderPointcuts extends AuditHttpRequestResponse {
 
 	/**
 	 * Protected constructor.
 	 */
-	protected BaseHttpProviderAspect() {
+	protected BaseHttpProviderPointcuts() {
 		super();
 	}
 
