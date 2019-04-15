@@ -10,9 +10,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -139,6 +144,12 @@ public class RESTUtilTest {
 		assertThat(true, equalTo(!response.isEmpty()));
 		restUtil.validateStatusCode(200);
 	}
+	@Test
+	public void test_postResponseWithMultipart__mbfile_Success() {
+		String response = restUtil.postResponseWithMultipart("http://localhost:9999/multipart/person", "IS_25mb.txt", "submitpayload.txt");
+		assertThat(true, equalTo(!response.isEmpty()));
+		restUtil.validateStatusCode(200);
+	}
 
 	@Test
 	public void test_postResponseWithMultipart_InvalidFile_Failed() {
@@ -151,6 +162,17 @@ public class RESTUtilTest {
 		String response = restUtil.postResponseWithMultipart("http://localhost:9999/multipart/person", "document.txt", "HelloWorld".getBytes());
 		assertThat(true, equalTo(!response.isEmpty()));
 	}
+	
+	@Test
+	public void test_postResponseWithMultipart_ByteArray__mbFileSuccess() throws IOException, URISyntaxException {
+		final URL urlSubmitPayload = RESTUtilTest.class.getClassLoader()
+				.getResource("payload" + "/" + "submitpayload.txt");
+				final File filePathSubmitPayload = new File(urlSubmitPayload.toURI());
+		String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");	
+		String response = restUtil.postResponseWithMultipart("http://localhost:9999/multipart/person", "IS_25mb.txt", submitPayload.getBytes());
+		assertThat(true, equalTo(!response.isEmpty()));
+	}
+	
 
 	@Test
 	public void test_postResponseWithMultipart_ByteArray_InvalidPart_Failed() {
