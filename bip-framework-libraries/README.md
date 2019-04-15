@@ -21,20 +21,8 @@ BIP Framework aims to:
 * encourage developers to write code that presents a common "look and feel" across projects,
 * enable developers to produce reliable code that takes less time to develop and test.
 
-## Framework usage in service applications
-
-#### Model objects and layer separation
-BIP Framework requires distinct separation of model objects between the **Provider**, **Domain**, and **Partner** layers. For more information, see [Design: Layer and Model Separation](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/design-layer-separation.md).
-
-#### Auditing
-
-
-#### Application security
-Security is applied at the REST interface by the security layer. See [Application Security Management](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/application-security-management.md).
-
-#### 
-
-## How to add dependency in your project?
+## How to add the Framework dependency
+Add the dependency in the application projects POM file.
 
     <dependency>
         <groupId>gov.va.bip.framework</groupId>
@@ -42,12 +30,11 @@ Security is applied at the REST interface by the security layer. See [Applicatio
         <version><!-- add the appropriate version --></version>
     </dependency>
 
+## Framework usage in service applications
+
+For more information about developing applications on the BIP Framework, see [Developing with BIP Framework](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/developeing-with-bip-framework.md).
+
 ## Class Diagrams
-
-##### Auditing Package
-gov.va.bip.framework.audit
-
-<img src = "/images/cd-audit-package.jpg">
 
 ##### Aspects Join Points and Pointcuts Packages
    gov.va.bip.framework.aspect <br/>
@@ -56,6 +43,18 @@ gov.va.bip.framework.audit
    
 <img src = "/images/cd-aspect-packages.jpg">
 
+##### Auditing Package
+gov.va.bip.framework.audit
+
+<img src = "/images/cd-audit-package.jpg">
+
+##### Client Packages
+gov.va.bip.framework.client.ws
+gov.va.bip.framework.client.ws.interceptor
+gov.va.bip.framework.client.ws.interceptor.transport
+
+<img src = "/images/bip-framework-ws-class-diagram.jpg">
+
 ##### Exception Packages
    gov.va.bip.framework.exception <br/>
    gov.va.bip.framework.rest.exception<br/>
@@ -63,10 +62,12 @@ gov.va.bip.framework.audit
    
 <img src = "/images/bip-framework-exception-class-diagram.jpg">
 
+##### Logging Packages
 gov.va.bip.framework.log
 
 <img src = "/images/bip-framework-log-class-diagram.jpg">
 
+##### Security Packages
 gov.va.bip.framework.security
 gov.va.bip.framework.security.model
 gov.va.bip.framework.security.util
@@ -78,22 +79,17 @@ gov.va.bip.framework.security.jwt.correlation
 
 <img src = "/images/bip-framework-jwt-class-diagram.jpg">
 
+##### Transfer Packages
 gov.va.bip.framework.transfer
 gov.va.bip.framework.transfer.jaxb.adapters
 gov.va.bip.framework.transfer.transform
 
 <img src = "/images/bip-framework-transfer-class-diagram.jpg">
 
+##### Validation Packages
 gov.va.bip.framework.validation
 
 <img src = "/images/bip-framework-validation-class-diagram.jpg">
-
-gov.va.bip.framework.client.ws
-gov.va.bip.framework.client.ws.interceptor
-gov.va.bip.framework.client.ws.interceptor.transport
-
-<img src = "/images/bip-framework-ws-class-diagram.jpg">
-
 
 
 
