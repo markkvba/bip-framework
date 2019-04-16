@@ -116,7 +116,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); 
 			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 

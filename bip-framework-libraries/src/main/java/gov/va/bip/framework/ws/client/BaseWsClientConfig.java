@@ -453,7 +453,7 @@ public class BaseWsClientConfig {
 			try {
 				closeableHttpClient.close();
 			} catch (IOException e) {
-				LOGGER.warn("Error occurred while closing the socket. ");
+				LOGGER.warn("Error occurred while closing the socket.");
 			}
 		}
 

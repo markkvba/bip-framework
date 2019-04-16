@@ -273,7 +273,7 @@ public class BipBaseLogger {
 			sendLogDebug(marker, part, t);
 		} else {
 			if (org.slf4j.event.Level.ERROR.equals(level)) {
-				sendLogError(marker, SanitizationUtil.stripXSS(part), t);
+				sendLogError(marker,SanitizationUtil.stripXSS(part), t);
 			} else if (org.slf4j.event.Level.WARN.equals(level)) {
 				sendLogWarn(marker, SanitizationUtil.stripXSS(part), t);
 			} else if (org.slf4j.event.Level.INFO.equals(level)) {
