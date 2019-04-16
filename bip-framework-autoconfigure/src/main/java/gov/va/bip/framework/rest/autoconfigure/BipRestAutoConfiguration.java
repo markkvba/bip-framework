@@ -145,20 +145,10 @@ public class BipRestAutoConfiguration {
 
 		});
 
-		CloseableHttpClient closeableHttpClient = null;
-		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = null;
-		try {
-			closeableHttpClient = clientBuilder.build();
-			clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(closeableHttpClient);
-			clientHttpRequestFactory.setConnectTimeout(connTimeoutValue);
-			clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
-		} finally {
-			try {
-				closeableHttpClient.close();
-			} catch (IOException e) {
-				LOGGER.warn("Error occurred while closing the socket.");
-			}
-		}
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = 
+				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
+		clientHttpRequestFactory.setConnectTimeout(connTimeoutValue);
+		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
 		
 		return clientHttpRequestFactory;
 	}

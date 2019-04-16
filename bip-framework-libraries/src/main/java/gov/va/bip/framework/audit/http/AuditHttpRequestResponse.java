@@ -144,12 +144,11 @@ public class AuditHttpRequestResponse {
 					inputstream = part.getInputStream();
 
 					multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
+					inputstream.close(); //Closing this here to fix fortify violation
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
-			} finally {
-				baseAsyncAudit.closeInputStreamIfRequired(inputstream);
 			}
 			return multipartHeaders;
 		}
