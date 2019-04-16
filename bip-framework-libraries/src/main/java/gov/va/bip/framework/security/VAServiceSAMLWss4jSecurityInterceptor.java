@@ -129,8 +129,6 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 			LOGGER.info("Client SAML assertion XML String : " + clientAssertion);
 
 			inStream.setCharacterStream(new StringReader(clientAssertion));
-			
-
 
 			final Document doc = builder.parse(inStream);
 			retVal = doc.getDocumentElement();
