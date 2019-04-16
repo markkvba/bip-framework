@@ -116,6 +116,10 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
 			factory.setNamespaceAware(true);
 			final DocumentBuilder builder = factory.newDocumentBuilder();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -125,6 +129,8 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 			LOGGER.info("Client SAML assertion XML String : " + clientAssertion);
 
 			inStream.setCharacterStream(new StringReader(clientAssertion));
+			
+
 
 			final Document doc = builder.parse(inStream);
 			retVal = doc.getDocumentElement();

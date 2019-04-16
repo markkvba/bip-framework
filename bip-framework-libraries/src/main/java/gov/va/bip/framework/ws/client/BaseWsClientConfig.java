@@ -23,6 +23,7 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -443,7 +444,18 @@ public class BaseWsClientConfig {
 		LOGGER.debug("HttpClient Object : %s% {}", ReflectionToStringBuilder.toString(httpClient));
 		LOGGER.debug("Default Uri : %s% {}", endpoint);
 
-		messageSender.setHttpClient(httpClient.build());
+		CloseableHttpClient closeableHttpClient = null;
+		closeableHttpClient = httpClient.build();
+		
+		try {
+			messageSender.setHttpClient(closeableHttpClient);
+		} finally {
+			try {
+				closeableHttpClient.close();
+			} catch (IOException e) {
+				LOGGER.warn("Error occurred while closing the socket. ");
+			}
+		}
 
 		// set the message factory & configure and return the template
 		final WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
