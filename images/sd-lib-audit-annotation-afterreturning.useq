@@ -68,22 +68,22 @@
   </object>  
   <combined-fragment id="28" interaction-operator="OPT">    
     <interaction-operand id="29" constraint="auditableAnnotation != null">      
-      <fragment refId="22"/>      
+      <fragment refId="30"/>      
+      <fragment refId="5"/>      
+      <fragment refId="9"/>      
       <fragment refId="7"/>      
       <fragment refId="13"/>      
-      <fragment refId="30"/>      
-      <fragment refId="15"/>      
       <fragment refId="31"/>      
-      <fragment refId="5"/>      
-      <fragment refId="9"/>    
+      <fragment refId="15"/>      
+      <fragment refId="22"/>    
     </interaction-operand>    
-    <combined-fragment id="30" interaction-operator="ALT">      
+    <combined-fragment id="31" interaction-operator="ALT">      
       <interaction-operand id="32" constraint="StringUtils.isBlank(auditableAnnotation.auditClass())"/>      
       <interaction-operand id="33" constraint="else">        
         <fragment refId="11"/>      
       </interaction-operand>    
     </combined-fragment>    
-    <combined-fragment id="31" interaction-operator="OPT">      
+    <combined-fragment id="30" interaction-operator="OPT">      
       <interaction-operand id="34" constraint="response != null">        
         <fragment refId="20"/>      
       </interaction-operand>    
@@ -92,7 +92,8 @@
   <note id="35">    
     <position height="51" width="179" x="949" y="947"/>    
     <text><![CDATA[See: AutidLogSerializer
-        sequence diagram]]>
+        sequence diagram
+    ]]>
     </text>  
   </note>  
   <message id="3" operation="auditAnnotationAfterReturning(org.aspectj.lang.JoinPoint,java.lang.Object):void" 

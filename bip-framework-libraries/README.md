@@ -54,8 +54,11 @@ For more information about developing applications on the BIP Framework, see [De
 
 ##### AuditLogger
 
-##### Logger
+#### Logger
 <img src="/images/sd-lib-log.png">
+
+#### JWT Token Generator
+<img src="/images/sd-lib-security-jwt-generator.png">
 
 ## Class Diagrams
 

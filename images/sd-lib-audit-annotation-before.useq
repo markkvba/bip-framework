@@ -74,15 +74,15 @@
   </object>  
   <combined-fragment id="32" interaction-operator="OPT">    
     <interaction-operand id="33" constraint="auditableAnnotation != null">      
-      <fragment refId="26"/>      
-      <fragment refId="7"/>      
-      <fragment refId="9"/>      
-      <fragment refId="34"/>      
       <fragment refId="15"/>      
-      <fragment refId="5"/>      
-      <fragment refId="35"/>      
+      <fragment refId="26"/>      
       <fragment refId="24"/>      
-      <fragment refId="13"/>    
+      <fragment refId="9"/>      
+      <fragment refId="13"/>      
+      <fragment refId="5"/>      
+      <fragment refId="34"/>      
+      <fragment refId="35"/>      
+      <fragment refId="7"/>    
     </interaction-operand>    
     <combined-fragment id="35" interaction-operator="ALT">      
       <interaction-operand id="36" constraint="StringUtils.isBlank(auditableAnnotation.auditClass())"/>      
@@ -104,7 +104,8 @@
   <note id="41">    
     <position height="53" width="200" x="953" y="1035"/>    
     <text><![CDATA[See: AuditLogSerializer
-        sequence diagram]]>
+        sequence diagram
+    ]]>
     </text>  
   </note>  
   <message id="3" operation="auditAnnotationBefore(org.aspectj.lang.JoinPoint):void" asynchronous="false">    
@@ -164,10 +165,10 @@
   </message>  
   <text-link id="42">    
     <link-end type="SOURCE" refId="41"/>    
-    <link-end type="TARGET" refId="41"/>  
+    <link-end type="TARGET" refId="29"/>  
   </text-link>  
   <text-link id="43">    
     <link-end type="SOURCE" refId="41"/>    
-    <link-end type="TARGET" refId="29"/>  
+    <link-end type="TARGET" refId="41"/>  
   </text-link>
 </sequence-diagram>
