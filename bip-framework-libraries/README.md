@@ -50,9 +50,8 @@ For more information about developing applications on the BIP Framework, see [De
 ##### BipCacheInterceptor
 <img src="/images/sd-lib-audit-cache.png">
 
-##### AuditLogSerializer
-
-##### AuditLogger
+##### AuditLogSerializer & AuditLogger
+<img src="/images/sd-lib-audit-logserializer.png">
 
 #### Logger
 <img src="/images/sd-lib-log.png">
