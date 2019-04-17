@@ -728,7 +728,7 @@
 							</execution>
 						</executions>
 						<configuration>
-							<repository>ocpdev/${project.artifactId}</repository>
+							<repository>bipdev/${project.artifactId}</repository>
 						</configuration>
 					</plugin>
 				</plugins>
