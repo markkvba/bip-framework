@@ -33,3 +33,7 @@ nbdist/
 .metadata
 /nbproject/
 /bin
+
+### ObjectAid UML diagrams ###
+*.ucls
+*.useq
