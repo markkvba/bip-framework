@@ -39,6 +39,9 @@ BaseStepDefHandler: Handler object that extends BaseStepDef to handle rest based
 
 RestConfigService: Loads the configuration file that has all the properties related to reference services.
 
+**Note: All the configurations are defined external to the code and is per profile/environment. The naming conversion of the file
+vetservices-inttest-<env>.properties**
+
 BearerTokenService: Fetches token from the token API. The token will be used as a header while invoking actual end points.
 
 **gov.va.bip.framework.test.util**:
