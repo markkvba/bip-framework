@@ -178,43 +178,43 @@ Vault starter and bootstrap auto-configuration to bootstrap the Vault PropertySo
 
 #### Audit Autoconfigure
     gov.va.bip.framework.audit.autoconfigure
-<img src = "/images/bip-framework-audit-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-audit.png">
 
 #### Cache Autoconfigure
     gov.va.bip.framework.cache.autoconfigure
-<img src = "/images/bip-framework-cache-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-cache.png">
 
 #### Feign Autoconfigure
     gov.va.bip.framework.feign.autoconfigure
-<img src = "/images/bip-framework-feign-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-feign.png">
 
 #### Hystrix Autoconfigure
     gov.va.bip.framework.hystrix.autoconfigure
-<img src = "/images/bip-framework-hystrix-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-hystrix.png">
 
 #### REST Autoconfigure
     gov.va.bip.framework.rest.autoconfigure
-<img src = "/images/bip-framework-rest-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-rest.png">
 
 #### Security Autoconfigure
     gov.va.bip.framework.security.autoconfigure
-<img src = "/images/bip-framework-security-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-security.png">
 
 #### Service Autoconfigure
     gov.va.bip.framework.service.autoconfigure
-<img src = "/images/bip-framework-service-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-service.png">
 
 #### Swagger Autoconfigure
     gov.va.bip.framework.swagger.autoconfigure
-<img src = "/images/bip-framework-swagger-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-swagger.png">
 
 #### Validator Autoconfigure
     gov.va.bip.framework.validator.autoconfigure
-<img src = "/images/bip-framework-validator-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-validator.png">
 
 #### Vault Autoconfigure
     gov.va.bip.framework.vault.bootstrap.autoconfigure
-<img src = "/images/bip-framework-vault-autoconfigure-class-diagram.jpg">
+<img src = "/images/cd-autoconf-vault.png">
 
 
 
