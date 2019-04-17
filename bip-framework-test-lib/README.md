@@ -55,5 +55,5 @@ RequestResponseLoggingInterceptor: It is an interceptor for all rest API calls t
 In the `bip-reference-inttest` project, `bip-framework-test-lib` is added as a dependency. This project `bip-reference-inttest` can be used as a reference for writing functional tests https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/bip-reference-inttest
 
 ## Class Diagrams
-	gov.va.bip.framework.test <br/>
+	gov.va.bip.framework.test 
 <img src="/images/cd-test-lib-package.jpg" />
