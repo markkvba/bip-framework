@@ -34,94 +34,116 @@ Add the dependency in the application projects POM file.
 
 For more information about developing applications on the BIP Framework, see [Developing with BIP Framework](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/docs/developeing-with-bip-framework.md).
 
+## Sequence Diagrams
+
+#### Audit
+##### @Auditable
+<img src="/images/sd-lib-audit-annotation-before.png">
+<img src="/images/sd-lib-audit-annotation-afterreturning.png">
+<img src="/images/sd-lib-audit-annotation-afterthrowing.png">
+
+##### ProviderHttpAspect
+<img src="/images/sd-lib-audit-providerhttpascpect-before.png">
+<img src="/images/sd-lib-audit-providerhttpascpect-afterreturning.png">
+<img src="/images/sd-lib-audit-providerhttpascpect-afterthrowing.png">
+
+##### BipCacheInterceptor
+<img src="/images/sd-lib-audit-cache.png">
+
+##### AuditLogSerializer
+
+##### AuditLogger
+
+##### Logger
+<img src="/images/sd-lib-log.png">
+
 ## Class Diagrams
 
-#### Aspects Join Points and Pointcuts Packages
+#### Aspects, Join Points and Pointcuts
     gov.va.bip.framework.aspect
     gov.va.bip.framework.rest.provider.aspect
     gov.va.bip.framework.service.aspect
-<img src = "/images/cd-aspect-packages.jpg">
+<img src="/images/cd-lib-aspect.png">
 
-#### Auditing Package
+#### Audit
     gov.va.bip.framework.audit
     gov.va.bip.framework.audit.annotation
     gov.va.bip.framework.audit.http
     gov.va.bip.framework.audit.model
-<img src = "/images/cd-audit-package.jpg">
+<img src="/images/cd-lib-audit.png">
 
-#### Auditing Package
+#### Cache
     gov.va.bip.framework.cache
     gov.va.bip.framework.cache.interceptor
-<img src = "/images/cd-cache-package.jpg">
+<img src="/images/cd-lib-cache.png">
 
-#### Client Packages
-**REST**
-
+#### Client
+##### REST Client
     gov.va.bip.framework.client.rest.template
-<img src = "/images/cd-client-rest-package.jpg">
+<img src="/images/cd-lib-client-rest.png">
 
-**SOAP**
-
+##### SOAP Client
     gov.va.bip.framework.client.ws
     gov.va.bip.framework.client.ws.interceptor
     gov.va.bip.framework.client.ws.interceptor.transport
     gov.va.bip.framework.client.ws.remote
-<img src = "/images/cd-client-ws-package.jpg">
+<img src="/images/cd-lib-client-ws.png">
 
-#### Config Packages
+#### Config
     gov.va.bip.framework.config
-<img src = "/images/cd-config-package.jpg">
+<img src="/images/cd-lib-config.png">
 
-##### Exception Packages
+##### Exception
     gov.va.bip.framework.exception
     gov.va.bip.framework.exception.interceptor
     gov.va.bip.framework.rest.exception
     gov.va.bip.framework.security.jwt
     gov.va.bip.framework.service
-<img src = "/images/cd-exception-package.jpg">
+<img src="/images/cd-lib-exception.png">
 
-#### Logging Packages
+#### Logging
     gov.va.bip.framework.log
-<img src = "/images/cd-log-package.jpg">
+<img src="/images/cd-lib-log.png">
 
-#### Messages Packages
+#### Messages
     gov.va.bip.framework.messages
-<img src = "/images/cd-messages-package.jpg">
+<img src="/images/cd-lib-messages.png">
 
-#### Rest Packages
+#### Rest
     gov.va.bip.framework.rest.exception
     gov.va.bip.framework.rest.provider
     gov.va.bip.framework.rest.aspect
-<img src = "/images/cd-rest-package.jpg">
+<img src="/images/cd-lib-rest.png">
 
-#### Security Packages
+#### Security
     gov.va.bip.framework.security
     gov.va.bip.framework.security.model
     gov.va.bip.framework.security.util
-<img src = "/images/cd-security-package.jpg">
+<img src="/images/cd-lib-security.png">
 
+#### Security JWT
     gov.va.bip.framework.security.jwt
     gov.va.bip.framework.security.jwt.correlation
-<img src = "/images/cd-security-jwt-package.jpg">
+<img src="/images/cd-lib-security-jwt.png">
 
-#### Service Packages
+#### Service
     gov.va.bip.framework.service
     gov.va.bip.framework.service.spect
-<img src = "/images/cd-service-package.jpg">
+<img src="/images/cd-lib-service.png">
 
-#### Swagger Packages
+#### Swagger
     gov.va.bip.framework.swagger
-<img src = "/images/cd-swagger-package.jpg">
+<img src="/images/cd-lib-swagger.png">
 
-#### Transfer Packages
+#### Transfer
     gov.va.bip.framework.transfer
     gov.va.bip.framework.transfer.jaxb.adapters
     gov.va.bip.framework.transfer.transform
-<img src = "/images/cd-transfer-package.jpg">
+<img src="/images/cd-lib-transfer.png">
 
-#### Validation Packages
+#### Validation
     gov.va.bip.framework.validation
-<img src = "/images/cd-validator-package.jpg">
+<img src="/images/cd-lib-validation.png">
 
 
 

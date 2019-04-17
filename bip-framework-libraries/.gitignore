@@ -34,6 +34,3 @@ nbdist/
 /nbproject/
 /local-only.fpr
 /bin
-### ObjectAid UML ###
-*.ucls
-*.useq
