@@ -141,10 +141,12 @@ public class AuditHttpRequestResponse {
 						partHeaders.put(headerName, value);
 					}
 
-					inputstream = part.getInputStream();
-
-					multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
-					inputstream.close(); //Closing this here to fix fortify violation
+					try {
+						inputstream = part.getInputStream();
+						multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
+					} finally {
+						baseAsyncAudit.closeInputStreamIfRequired(inputstream);
+					}
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),

@@ -64,9 +64,6 @@ public class BaseWsClientConfig {
 	/** Logger for this class */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BaseWsClientConfig.class);
 
-	/** Java's tmpdir property */
-	protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
-
 	/** base package for framework exceptions */
 	public static final String PACKAGE_FRAMEWORK_EXCEPTION = "gov.va.bip.framework.exception";
 
@@ -157,7 +154,6 @@ public class BaseWsClientConfig {
 
 		// create axiom message factory
 		final AxiomSoapMessageFactory axiomSoapMessageFactory = new AxiomSoapMessageFactory();
-		axiomSoapMessageFactory.setAttachmentCacheDir(new File(System.getProperty(BaseWsClientConfig.JAVA_IO_TMPDIR)));
 
 		return this
 				.createWebServiceTemplate(endpoint, readTimeout, connectionTimeout, marshaller, unmarshaller, httpRequestInterceptors,
@@ -319,7 +315,6 @@ public class BaseWsClientConfig {
 
 		// create axiom message factory
 		final AxiomSoapMessageFactory axiomSoapMessageFactory = new AxiomSoapMessageFactory();
-		axiomSoapMessageFactory.setAttachmentCacheDir(new File(System.getProperty(BaseWsClientConfig.JAVA_IO_TMPDIR)));
 
 		return this
 				.createWebServiceTemplate(endpoint, readTimeout, connectionTimeout, marshaller, unmarshaller, httpRequestInterceptors,

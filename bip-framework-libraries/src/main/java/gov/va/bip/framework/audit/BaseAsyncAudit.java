@@ -129,6 +129,22 @@ public class BaseAsyncAudit {
 	}
 
 	/**
+	 * Attempt to close an input stream.
+	 * 
+	 * @param inputstream
+	 * @throws IOException
+	 */
+	public void closeInputStreamIfRequired(final InputStream inputstream) {
+		if (inputstream != null) {
+			try {
+				inputstream.close();
+			} catch (Exception e) { // NOSONAR intentionally broad catch
+				LOGGER.debug("Problem closing input stream.", e);
+			}
+		}
+	}
+
+	/**
 	 * Standard handling of exceptions that are thrown from within the advice (not exceptions thrown by application code, such
 	 * exceptions are rethrown).
 	 *
