@@ -157,9 +157,7 @@ public class BaseAsyncAudit {
 			final AuditEventData auditEventData, MessageKeys key, final Throwable throwable) {
 
 		try {
-			if (key == null) {
-				key = MessageKeys.BIP_GLOBAL_GENERAL_EXCEPTION;
-			}
+			key = MessageKeys.BIP_GLOBAL_GENERAL_EXCEPTION;
 			LOGGER.error(key.getMessage(adviceName, attemptingTo), throwable);
 			final BipRuntimeException bipRuntimeException = new BipRuntimeException(
 					key, MessageSeverity.FATAL, HttpStatus.INTERNAL_SERVER_ERROR, throwable,

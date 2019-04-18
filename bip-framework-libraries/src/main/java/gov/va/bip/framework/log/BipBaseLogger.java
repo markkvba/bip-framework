@@ -270,7 +270,7 @@ public class BipBaseLogger {
 	 */
 	private void sendLogAtLevel(final Level level, final Marker marker, final String part, final Throwable t) {
 		if (level == null) {
-			sendLogDebug(marker, part, t);
+			sendLogDebug(marker, SanitizationUtil.stripXSS(part), t);
 		} else {
 			if (org.slf4j.event.Level.ERROR.equals(level)) {
 				sendLogError(marker,SanitizationUtil.stripXSS(part), t);
