@@ -2,7 +2,7 @@ package gov.va.bip.framework.cache.autoconfigure;
 
 import org.junit.Test;
 
-import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,23 +15,23 @@ public class ReferenceCachePropertiesTest {
 
 	@Test
 	public void testGetters() {
-		BipCacheProperties bipCacheProperties = new BipCacheProperties();
-		assertNull(bipCacheProperties.getExpires());
-		assertEquals(new Long(86400L), bipCacheProperties.getDefaultExpires());
+		BipRedisClientProperties bipRedisClientProperties = new BipRedisClientProperties();
+		assertNull(bipRedisClientProperties.getExpires());
+		assertEquals(new Long(86400L), bipRedisClientProperties.getDefaultExpires());
 	}
 
 	@Test
 	public void testSetters() {
-		BipCacheProperties bipCacheProperties = new BipCacheProperties();
-		List<BipCacheProperties.RedisExpires> listRedisExpires = new ArrayList<>();
-		BipCacheProperties.RedisExpires redisExpires = new BipCacheProperties.RedisExpires();
+		BipRedisClientProperties bipRedisClientProperties = new BipRedisClientProperties();
+		List<BipRedisClientProperties.RedisExpires> listRedisExpires = new ArrayList<>();
+		BipRedisClientProperties.RedisExpires redisExpires = new BipRedisClientProperties.RedisExpires();
 		redisExpires.setName("methodcachename_projectname_projectversion");
 		redisExpires.setTtl(86400L);
 		listRedisExpires.add(0, redisExpires);
-		bipCacheProperties.setExpires(listRedisExpires);
-		bipCacheProperties.setDefaultExpires(500L);
-		assertTrue(!bipCacheProperties.getExpires().isEmpty());
-		assertTrue(Long.valueOf(86400L).equals(bipCacheProperties.getExpires().get(0).getTtl()));
-		assertEquals(new Long(500L), bipCacheProperties.getDefaultExpires());
+		bipRedisClientProperties.setExpires(listRedisExpires);
+		bipRedisClientProperties.setDefaultExpires(500L);
+		assertTrue(!bipRedisClientProperties.getExpires().isEmpty());
+		assertTrue(Long.valueOf(86400L).equals(bipRedisClientProperties.getExpires().get(0).getTtl()));
+		assertEquals(new Long(500L), bipRedisClientProperties.getDefaultExpires());
 	}
 }

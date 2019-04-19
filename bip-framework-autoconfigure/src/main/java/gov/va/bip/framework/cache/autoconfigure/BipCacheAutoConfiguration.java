@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocketFactory;
+
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +34,16 @@ import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.CollectionUtils;
 
 import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.BaseAsyncAudit;
-import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties.RedisExpires;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.JedisPoolProps;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsMBean;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
@@ -43,12 +51,21 @@ import gov.va.bip.framework.cache.interceptor.BipCacheInterceptor;
 import gov.va.bip.framework.log.BipBanner;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
+import gov.va.bip.framework.validation.Defense;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * The Class BipCacheAutoConfiguration.
+ * Cache auto configuration:
+ * <ul>
+ * <li> Configure and start Redis embedded server if necessary (as declared under spring profiles in application yaml).
+ * See {@link BipRedisProperties}.
+ * <li> Configure the Redis "Standalone" module with the host and port. See {@link BipRedisProperties}.
+ * <li> Configure the Jedis Client, including SSL and Connection Pooling. See {@link BipRedisClientProperties}.
+ * <li> Configure Cache TTLs and expirations. See {@link BipRedisCacheProperties}.
+ * </ul>
  */
 @Configuration
-@EnableConfigurationProperties(BipCacheProperties.class)
+@EnableConfigurationProperties({ BipRedisClientProperties.class, BipRedisCacheProperties.class })
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableCaching
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
@@ -58,15 +75,31 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipCacheAutoConfiguration.class);
 
 	/**
+	 * Cache propertiesClient derived from application propertiesClient file
+	 */
+	@Autowired
+	private BipRedisClientProperties propertiesClient;
+
+	/**
 	 * Cache properties derived from application properties file
 	 */
 	@Autowired
-	private BipCacheProperties bipCacheProperties;
+	private BipRedisCacheProperties propertiesCache;
 
 	/** Embedded Redis bean to make sure embedded redis is started before redis cache is created. */
 	@SuppressWarnings("unused")
 	@Autowired(required = false)
 	private BipEmbeddedRedisServer referenceServerRedisEmbedded;
+
+	/**
+	 * Post construction validations.
+	 */
+	@PostConstruct
+	public void postConstruct() {
+		Defense.notNull(propertiesCache, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(propertiesClient, BipRedisClientProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(referenceServerRedisEmbedded, BipEmbeddedRedisServer.class.getSimpleName() + " cannot be null.");
+	}
 
 	/**
 	 * JMX MBean that exposes cache management operations.
@@ -77,7 +110,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	public BipCacheOpsMBean bipCacheOpsMBean() {
 		return new BipCacheOpsImpl();
 	}
-	
+
 	/**
 	 * Audit log serializer.
 	 *
@@ -101,6 +134,103 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	}
 
 	/**
+	 * JedisConnectionFactory configuration for Redis Client, Jedis Pool, and SSL
+	 *
+	 * @return RedisConnectionFactory
+	 */
+	@Bean
+	public RedisConnectionFactory redisConnectionFactory() {
+
+		Defense.notNull(propertiesClient.getRedisProps(),
+				propertiesClient.getClass().getSimpleName() + ".RedisConfig cannot be null.");
+
+		/* ======== Redis Standalone Config ======== */
+
+		Defense.hasText(propertiesClient.getRedisProps().getHost(),
+				propertiesClient.getClass().getSimpleName() + ".host must have a value.");
+		Defense.notNull(propertiesClient.getRedisProps().getPort(),
+				propertiesClient.getClass().getSimpleName() + ".port must have a value.");
+		Defense.isTrue(propertiesClient.getRedisProps().getPort() > 0,
+				propertiesClient.getClass().getSimpleName() + ".port must be a valid port number.");
+
+		RedisStandaloneConfiguration redisStandaloneConfig =
+				new RedisStandaloneConfiguration(propertiesClient.getRedisProps().getHost(),
+						Integer.valueOf(propertiesClient.getRedisProps().getPort()));
+
+		/* ======== Jedis Client Config ======== */
+
+		JedisPoolProps jedisPoolProps = propertiesClient.getJedisClientProps().getPoolConfig();
+
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+		poolConfig.setMaxTotal(jedisPoolProps.maxTotal);
+		poolConfig.setMaxIdle(jedisPoolProps.maxIdle); // max
+		poolConfig.setMaxWaitMillis(jedisPoolProps.maxWaitMillis);
+		poolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.minEvictableIdleTimeMillis);
+		poolConfig.setMinIdle(jedisPoolProps.minIdle);
+		poolConfig.setBlockWhenExhausted(jedisPoolProps.blockWhenExhausted);
+		poolConfig.setEvictionPolicy(jedisPoolProps.evictionPolicy);
+		poolConfig.setEvictionPolicyClassName(jedisPoolProps.evictionPolicyClassName);
+		poolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.evictorShutdownTimeoutMillis);
+		poolConfig.setFairness(jedisPoolProps.fairness);
+		poolConfig.setJmxEnabled(jedisPoolProps.jmxEnabled);
+		poolConfig.setJmxNameBase(jedisPoolProps.jmxNameBase);
+		poolConfig.setJmxNamePrefix(jedisPoolProps.jmxNamePrefix);
+		poolConfig.setLifo(jedisPoolProps.lifo);
+		poolConfig.setNumTestsPerEvictionRun(jedisPoolProps.numTestsPerEvictionRun);
+		poolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.softMinEvictableIdleTimeMillis);
+		poolConfig.setTestOnBorrow(jedisPoolProps.testOnBorrow);
+		poolConfig.setTestOnCreate(jedisPoolProps.testOnCreate);
+		poolConfig.setTestOnReturn(jedisPoolProps.testOnReturn);
+		poolConfig.setTestWhileIdle(jedisPoolProps.testWhileIdle);
+
+		JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigBuilder = JedisClientConfiguration.builder()
+				// .clientName(clientName) // TODO should this be the same as the first part of the cache key?
+				.connectTimeout(propertiesClient.getJedisClientProps().connectTimeout)
+				.readTimeout(propertiesClient.getJedisClientProps().readTimeout);
+
+		if (propertiesClient.getJedisClientProps().usePooling) {
+			JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+			jedisPoolConfig.setBlockWhenExhausted(jedisPoolProps.blockWhenExhausted);
+			jedisPoolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.evictorShutdownTimeoutMillis);
+			jedisPoolConfig.setFairness(jedisPoolProps.fairness);
+			jedisPoolConfig.setJmxEnabled(jedisPoolProps.jmxEnabled);
+			jedisPoolConfig.setJmxNameBase(jedisPoolProps.jmxNameBase);
+			jedisPoolConfig.setJmxNamePrefix(jedisPoolProps.jmxNamePrefix);
+			jedisPoolConfig.setLifo(jedisPoolProps.lifo);
+			jedisPoolConfig.setMaxIdle(jedisPoolProps.maxIdle);
+			jedisPoolConfig.setMaxTotal(jedisPoolProps.maxTotal);
+			jedisPoolConfig.setMaxWaitMillis(jedisPoolProps.maxWaitMillis);
+			jedisPoolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.minEvictableIdleTimeMillis);
+			jedisPoolConfig.setMinIdle(jedisPoolProps.minIdle);
+			jedisPoolConfig.setNumTestsPerEvictionRun(jedisPoolProps.numTestsPerEvictionRun);
+			jedisPoolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.softMinEvictableIdleTimeMillis);
+			jedisPoolConfig.setTestOnBorrow(jedisPoolProps.testOnBorrow);
+			jedisPoolConfig.setTestOnCreate(jedisPoolProps.testOnCreate);
+			jedisPoolConfig.setTestOnReturn(jedisPoolProps.testOnReturn);
+			jedisPoolConfig.setTestWhileIdle(jedisPoolProps.testWhileIdle);
+			jedisPoolConfig.setTimeBetweenEvictionRunsMillis(jedisPoolProps.timeBetweenEvictionRunsMillis);
+
+			jedisClientConfigBuilder.usePooling().poolConfig(jedisPoolConfig);
+		}
+
+		if (propertiesClient.getJedisClientProps().useSsl) {
+			jedisClientConfigBuilder
+					.useSsl()
+					// .hostnameVerifier(hostnameVerifier) // TODO don't think this is needed
+					.sslParameters(new SSLParameters(new String[] { "cipherSuites" }))
+					.sslSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
+		}
+
+		JedisClientConfiguration jedisClientConfig = jedisClientConfigBuilder.build();
+
+		/* ======== Jedis Connection Factory ======== */
+
+		JedisConnectionFactory connectionFactory = new JedisConnectionFactory(redisStandaloneConfig, jedisClientConfig);
+
+		return connectionFactory;
+	}
+
+	/**
 	 * Create the default cache configuration, with TTL set as declared by {@code reference:cache:defaultExpires} in the
 	 * <i>[project]/src/main/resources/[app].yml</i>. Used by {@link RedisCacheManager}.
 	 *
@@ -108,7 +238,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public RedisCacheConfiguration redisCacheConfiguration() {
-		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(bipCacheProperties.getDefaultExpires()));
+		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(propertiesCache.getDefaultExpires()));
 	}
 
 	/**
@@ -121,9 +251,9 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-		if (!CollectionUtils.isEmpty(bipCacheProperties.getExpires())) {
+		if (!CollectionUtils.isEmpty(propertiesCache.getExpires())) {
 			// key = name, value - TTL
-			final Map<String, Long> resultExpires = bipCacheProperties.getExpires().stream().filter(o -> o.getName() != null)
+			final Map<String, Long> resultExpires = propertiesCache.getExpires().stream().filter(o -> o.getName() != null)
 					.filter(o -> o.getTtl() != null).collect(Collectors.toMap(RedisExpires::getName, RedisExpires::getTtl));
 			for (Entry<String, Long> entry : resultExpires.entrySet()) {
 				org.springframework.data.redis.cache.RedisCacheConfiguration rcc =
@@ -229,4 +359,5 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 			LOGGER.error(BipBanner.newBanner("Unable to clean cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 	}
+
 }

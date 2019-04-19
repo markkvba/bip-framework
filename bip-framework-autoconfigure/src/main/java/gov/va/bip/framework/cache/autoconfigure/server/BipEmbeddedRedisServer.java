@@ -10,7 +10,7 @@ import javax.net.ServerSocketFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 
-import gov.va.bip.framework.cache.autoconfigure.BipCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisProperties;
 import gov.va.bip.framework.config.BipCommonSpringProfiles;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -33,7 +33,7 @@ public class BipEmbeddedRedisServer {
 	 * Cache Properties Bean
 	 */
 	@Autowired
-	private BipCacheProperties properties;
+	private BipRedisProperties properties;
 
 	/**
 	 * Embedded redis server object
@@ -51,23 +51,23 @@ public class BipEmbeddedRedisServer {
 	 */
 	@PostConstruct
 	public void startRedis() throws IOException {
-		Defense.notNull(properties.getRedisConfig(), "properties.getRedisConfig() is required to run/use Redis!");
+		Defense.notNull(properties.getRedisProps(), "properties.getRedisConfig() is required to run/use Redis!");
 
-		if (properties.getRedisConfig().getPort() == null) {
+		if (properties.getRedisProps().getPort() == null) {
 			ServerSocket ss = null;
 			try {
 				ss = ServerSocketFactory.getDefault().createServerSocket(0);
-				properties.getRedisConfig().setPort(ss.getLocalPort());
+				properties.getRedisProps().setPort(ss.getLocalPort());
 			} finally {
-				if (ss!=null) {
+				if (ss != null) {
 					ss.close();
 				}
 			}
 		}
 		LOGGER.info("Starting Embedded Redis. This embedded redis is only to be used in local enviroments");
-		LOGGER.info("Embedded redis starting on port {}", properties.getRedisConfig().getPort());
+		LOGGER.info("Embedded redis starting on port {}", properties.getRedisProps().getPort());
 		try {
-			redisServer = RedisServer.builder().port(properties.getRedisConfig().getPort())
+			redisServer = RedisServer.builder().port(properties.getRedisProps().getPort())
 					// .redisExecProvider(customRedisExec) //com.github.kstyrc (not com.orange.redis-embedded)
 					.setting("maxmemory 128M") // maxheap 128M
 					.setting("bind localhost") // force bind to localhost to avoid firewall pop-ups

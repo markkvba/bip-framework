@@ -63,15 +63,15 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		TestPropertyValues.of("bip.framework.cache.defaultExpires=86401").applyTo(context);
-		context.register(RedisAutoConfiguration.class, BipCacheProperties.class);
+		context.register(RedisAutoConfiguration.class, BipRedisClientProperties.class);
 		context.refresh();
-		BipCacheProperties bipCacheProperties = context.getBean(BipCacheProperties.class);
-		BipCacheProperties.RedisExpires redisExpires = new gov.va.bip.framework.cache.autoconfigure.BipCacheProperties.RedisExpires();
+		BipRedisClientProperties bipRedisClientProperties = context.getBean(BipRedisClientProperties.class);
+		BipRedisClientProperties.RedisExpires redisExpires = new gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.RedisExpires();
 		redisExpires.setName("testName");
 		redisExpires.setTtl(1500L);
-		List<BipCacheProperties.RedisExpires> expiresList = new LinkedList<BipCacheProperties.RedisExpires>();
+		List<BipRedisClientProperties.RedisExpires> expiresList = new LinkedList<BipRedisClientProperties.RedisExpires>();
 		expiresList.add(redisExpires);
-		bipCacheProperties.setExpires(expiresList);
+		bipRedisClientProperties.setExpires(expiresList);
 		context.register(BipCacheAutoConfiguration.class);
 		BipCacheAutoConfiguration bipCacheAutoConfiguration = context.getBean(BipCacheAutoConfiguration.class);
 
