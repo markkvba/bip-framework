@@ -141,17 +141,16 @@ public class AuditHttpRequestResponse {
 						partHeaders.put(headerName, value);
 					}
 
-					try {
-						inputstream = part.getInputStream();
-						multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
-					} finally {
-						BaseAsyncAudit.closeInputStreamIfRequired(inputstream);
-					}
+					inputstream = part.getInputStream();
+
+					multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
-			} 
+			} finally {
+				BaseAsyncAudit.closeInputStreamIfRequired(inputstream);
+			}
 			return multipartHeaders;
 		}
 
