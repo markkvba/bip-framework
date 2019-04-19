@@ -121,6 +121,7 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 
 			factory.setNamespaceAware(true);
+			factory.setValidating(true);
 			final DocumentBuilder builder = factory.newDocumentBuilder();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 

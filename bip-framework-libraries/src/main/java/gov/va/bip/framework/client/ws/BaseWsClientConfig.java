@@ -490,7 +490,7 @@ public class BaseWsClientConfig {
 	}
 
 	/**
-	 * Produce a KeyStore object for a given JKS file and its password.
+	 * Produce a KeyStore object for a given JKS file and its pass-word.
 	 *
 	 * @param keystoreResource the keystore resource
 	 * @param pass the pass-word
@@ -608,7 +608,7 @@ public class BaseWsClientConfig {
 	 * Gets the security interceptor.
 	 *
 	 * @param username the username
-	 * @param password the pass-word
+	 * @param pass-word 
 	 * @param vaApplicationName the va application name
 	 * @param stationId the stationd id
 	 * @return the security interceptor
