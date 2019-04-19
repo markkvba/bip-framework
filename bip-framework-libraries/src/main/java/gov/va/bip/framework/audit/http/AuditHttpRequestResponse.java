@@ -48,7 +48,7 @@ public class AuditHttpRequestResponse {
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(AuditHttpRequestResponse.class);
 
 	@Autowired
-	BaseAsyncAudit baseAsyncAudit;
+	protected BaseAsyncAudit baseAsyncAudit;
 
 	/**
 	 * Protected constructor.
@@ -114,7 +114,7 @@ public class AuditHttpRequestResponse {
 
 			LOGGER.debug("Content Type: {}", SanitizationUtil.stripXSS(contentType));
 
-			if (contentType != null && (contentType.toLowerCase(Locale.ENGLISH).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)
+			if ((contentType != null) && (contentType.toLowerCase(Locale.ENGLISH).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)
 					|| contentType.toLowerCase(Locale.ENGLISH).startsWith(BipConstants.MIME_MULTIPART_MIXED))) {
 
 				final List<String> attachmentTextList = getMultipartHeaders(httpServletRequest);
@@ -145,13 +145,13 @@ public class AuditHttpRequestResponse {
 						inputstream = part.getInputStream();
 						multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
 					} finally {
-						baseAsyncAudit.closeInputStreamIfRequired(inputstream);
+						BaseAsyncAudit.closeInputStreamIfRequired(inputstream);
 					}
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
-			}
+			} 
 			return multipartHeaders;
 		}
 
