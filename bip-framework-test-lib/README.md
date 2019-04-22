@@ -1,15 +1,15 @@
 ## What is this test library project for?
 
-BIP Test library is customized to support testing the RESTful Service applications deployed on BIP platform. This library is configured to use broad range of operations provided by the Spring REST Client `RestTemplate`. Spring's rest template provides a convenient way to test RESTful web services by simplifying the interaction with HTTP servers.
+BIP Test library is customized to support testing the RESTful Service applications deployed on BIP platform. This library is configured to use operations provided by the Spring REST Client `RestTemplate`. Spring's rest template provides a convenient way to test RESTful web services by simplifying the interaction with HTTP servers.
 
 ## Dependencies:
 
-Spring rest template, included via the `spring-web` dependency.
+Spring rest template is included via the `spring-web` dependency.
 
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-web</artifactId>
 
-cucmber, included via the `cucumber-java8` dependency. It is a library that makes it easier to write and execute parameterized test.
+Cucmber is included via the `cucumber-java8` dependency. It is a library that makes it easier to write and execute parameterized test.
 
 	   <groupId>info.cukes</groupId>
 	   <artifactId>cucumber-java8</artifactId>
@@ -26,13 +26,13 @@ Add the dependency to the POM file in your `project-name-inttest` project.
 
 ## Overview of the packages
 
-Test Library uses Maven and RestTemplate for core API validations. It provides the support classes and methods that can be used to build Automated API tests for the RESTful services.
+Test Library uses Maven and RestTemplate for core API validations. It provides support classes and methods that can be used to build Automated API tests for the RESTful services.
 
 #### gov.va.bip.framework.test.rest:
 
 `BaseStepDef`: Base class for all the step definitions.
 
-`BaseStepDefHandler`: Handler object that extends BaseStepDef to handle rest based API call. 
+`BaseStepDefHandler`: Handler object that extends BaseStepDef to handle rest based API calls. 
 
 #### gov.va.bip.framework.test.service:
 
