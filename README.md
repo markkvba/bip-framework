@@ -49,7 +49,7 @@ This will bring the framework source code to your local machine.
 
 2. Navigate to the `bip-framework` folder, and run:
 
-	mvn clean install
+```	mvn clean install```
 
 This will build all the libraries with versions as configured in `pom.xml` files.
 

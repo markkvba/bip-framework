@@ -1,4 +1,4 @@
-This page documents the purpose and capabilities of **OpenShift Container Platform Framework Libraries** for the services.
+This page documents the purpose and capabilities of **BIP Framework Libraries** for the services.
 
 ## What is this library project for? ##
 
