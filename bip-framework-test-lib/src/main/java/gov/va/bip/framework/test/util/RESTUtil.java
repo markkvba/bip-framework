@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
@@ -23,11 +22,9 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,18 +79,16 @@ public class RESTUtil {
 	public void setUpRequest(final String strRequestFile, final Map<String, String> mapHeader) {
 		try {
 			requestHeaders.setAll(mapHeader);
-			if (strRequestFile != null) {
-				LOGGER.info("Request File {}", strRequestFile);
-				final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
-				if (urlFilePath == null) {
-					LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
-				} else {
-					// Note - Enhance the code so if Header.Accept is xml, then it
-					// should use something like convertToXML function
-					jsonText = readFile(new File(urlFilePath.toURI()));
-				}
+			LOGGER.info("Request File {}", strRequestFile);
+			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
+			if (urlFilePath == null) {
+				LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
+			} else {
+				// Note - Enhance the code so if Header.Accept is xml, then it
+				// should use something like convertToXML function
+				jsonText = readFile(new File(urlFilePath.toURI()));
 			}
-		} catch (final URISyntaxException ex) {
+		} catch (final URISyntaxException | IOException ex) {
 			LOGGER.error("Unable to do setUpRequest", ex);
 		}
 	}
@@ -256,7 +251,7 @@ public class RESTUtil {
 			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 			    apiTemplate = new RestTemplate(requestFactory);				
 			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e);
+				LOGGER.error("Issue with the certificate or password", e); 
 			}			
 		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
@@ -267,41 +262,37 @@ public class RESTUtil {
 		
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
-		String connectionBufferSize = "4128";
-		String maxTotalPool = "10";
-		String defaultMaxPerRoutePool = "5";
-		String validateAfterInactivityPool = "10000";
 		String readTimeout = "30000";
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
+				new HttpComponentsClientHttpRequestFactory(getHttpClientBuilder().build());
+		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
+		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
+		return clientHttpRequestFactory;
+	}
+	
+	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
+		String maxTotalPool = "15";
+		String defaultMaxPerRoutePool = "5";
+		String validateAfterInactivityPool = "5000";
+		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
+        // shut down the connection pool only if exclusively owned by the client
+		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
+		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
+		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
+		return poolingConnectionManager;
+	}
+	
+	private HttpClientBuilder getHttpClientBuilder() {
+		String connectionBufferSize = "4128";
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
 				.setBufferSize(Integer.valueOf(connectionBufferSize))
 				.build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
-		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
-		                                                                                                        // shut down the connection pool only if exclusively owned by the client
-		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
-		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
-		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
 
-		clientBuilder.setConnectionManager(poolingConnectionManager);
+		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
-		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
-			@Override
-			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
-				if (exception instanceof org.apache.http.NoHttpResponseException) {
-					LOGGER.warn("No response from server on " + executionCount + " call");
-					return true;
-				}
-				return super.retryRequest(exception, executionCount, context);
-			}
-
-		});
-
-		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
-				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
-		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
-		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
-		return clientHttpRequestFactory;
+	
+		return clientBuilder;
 	}
 	
 	/**
@@ -328,15 +319,17 @@ public class RESTUtil {
 		return strExpectedResponse;
 	}
 
-	protected String readFile(final File filename) {
+	protected String readFile(final File filename) throws IOException {
 		String content = null;
 		final File file = filename;
-		try (FileReader reader = new FileReader(file)) {
+		FileReader reader = new FileReader(file);
+		try  {			
 			final char[] chars = new char[(int) file.length()];
 			reader.read(chars);
 			content = new String(chars);
-		} catch (final IOException e) {
-			LOGGER.error(e.getMessage(), e);
+		} 
+		finally {
+			reader.close();
 		}
 		return content;
 
