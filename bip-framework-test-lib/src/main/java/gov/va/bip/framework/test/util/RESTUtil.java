@@ -79,16 +79,14 @@ public class RESTUtil {
 	public void setUpRequest(final String strRequestFile, final Map<String, String> mapHeader) {
 		try {
 			requestHeaders.setAll(mapHeader);
-			if (strRequestFile != null) {
-				LOGGER.info("Request File {}", strRequestFile);
-				final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
-				if (urlFilePath == null) {
-					LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
-				} else {
-					// Note - Enhance the code so if Header.Accept is xml, then it
-					// should use something like convertToXML function
-					jsonText = readFile(new File(urlFilePath.toURI()));
-				}
+			LOGGER.info("Request File {}", strRequestFile);
+			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
+			if (urlFilePath == null) {
+				LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
+			} else {
+				// Note - Enhance the code so if Header.Accept is xml, then it
+				// should use something like convertToXML function
+				jsonText = readFile(new File(urlFilePath.toURI()));
 			}
 		} catch (final URISyntaxException | IOException ex) {
 			LOGGER.error("Unable to do setUpRequest", ex);
@@ -253,7 +251,7 @@ public class RESTUtil {
 			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 			    apiTemplate = new RestTemplate(requestFactory);				
 			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e);
+				LOGGER.error("Issue with the certificate or password", e); 
 			}			
 		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
@@ -324,11 +322,15 @@ public class RESTUtil {
 	protected String readFile(final File filename) throws IOException {
 		String content = null;
 		final File file = filename;
-		try (FileReader reader = new FileReader(file)) {
+		FileReader reader = new FileReader(file);
+		try  {			
 			final char[] chars = new char[(int) file.length()];
 			reader.read(chars);
 			content = new String(chars);
 		} 
+		finally {
+			reader.close();
+		}
 		return content;
 
 	}

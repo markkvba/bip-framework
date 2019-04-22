@@ -3,17 +3,22 @@ package gov.va.bip.framework.test.util;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.junit.Rule;
 import org.junit.Test;
-
-import gov.va.bip.framework.test.util.PropertiesUtil;
+import org.junit.rules.ExpectedException;
 
 public class PropertiesUtilTest {
+	
+	@Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void utilityClassTest() throws NoSuchMethodException, IllegalAccessException, InstantiationException {
@@ -28,12 +33,29 @@ public class PropertiesUtilTest {
 
 	@Test
 	public void testreadFile_Success() {
-
 		final URL urlConfigFile = PropertiesUtilTest.class.getClassLoader().getResource("test-properties.properties");
 		Properties properties = PropertiesUtil.readFile(urlConfigFile);
 		assertThat("reference", equalTo(properties.get("project")));
 	}
 
+	@Test
+	public void testreadFile_badcorrupted_Success() {
+		final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("BAD_corrupted-pdf.pdf");
+		File strFilePath;
+		try {
+			strFilePath = new File(urlFilePath.toURI());
+			strFilePath.setReadable(false);
+			final URL urlConfigFile = PropertiesUtilTest.class.getClassLoader().getResource("BAD_corrupted-pdf.pdf");
+			PropertiesUtil.readFile(urlConfigFile);
+			strFilePath.setReadable(true);
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
 	@Test
 	public void testreadEmptyFile_Success() {
 
@@ -44,10 +66,9 @@ public class PropertiesUtilTest {
 
 	@Test
 	public void testreadFile_failure() throws MalformedURLException {
-		URL urlConfigFile = new URL("file:/E:/Program Files/IBM/SDP/runtimes/base");
-		Properties properties = PropertiesUtil.readFile(urlConfigFile);
+		Properties properties = PropertiesUtil.readFile(new URL("file:/E@@:/Program Files/IBM/SDP/runtimes/base"));
 		assertThat(true, equalTo(properties == null));
-
 	}
+	
 
 }
