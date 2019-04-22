@@ -76,39 +76,39 @@ REST auto-configuration creates beans to enable a number of capabilities related
 - `ProviderHttpAspect` audits requests and responses passing throught the provider.
 - `RestProviderTimerAspect` logs performance data using `PerformanceLoggingAspect`.
 
-	@Configuration
-     public class BipRestAutoConfiguration {
+		@Configuration
+	     public class BipRestAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ProviderHttpAspect providerHttpAspect() {
-		return new ProviderHttpAspect();
-	}
-	@Bean
-	@ConditionalOnMissingBean
-	public BipRestGlobalExceptionHandler bipRestGlobalExceptionHandler() {
-		return new BipRestGlobalExceptionHandler();
-	}
-	@Bean
-	@ConditionalOnMissingBean
-	public RestProviderTimerAspect restProviderTimerAspect() {
-		return new RestProviderTimerAspect();
-	}
-	@Bean
-	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
-		…	
-	}
-	@Bean
-	@ConditionalOnMissingBean
-	public RestClientTemplate restClientTemplate() {
-		…
-	}
-	@Bean
-	@ConditionalOnMissingBean
-	public TokenClientHttpRequestInterceptor tokenClientHttpRequestInterceptor() {
-		return new TokenClientHttpRequestInterceptor();
-	}
-    }
+		@Bean
+		@ConditionalOnMissingBean
+		public ProviderHttpAspect providerHttpAspect() {
+			return new ProviderHttpAspect();
+		}
+		@Bean
+		@ConditionalOnMissingBean
+		public BipRestGlobalExceptionHandler bipRestGlobalExceptionHandler() {
+			return new BipRestGlobalExceptionHandler();
+		}
+		@Bean
+		@ConditionalOnMissingBean
+		public RestProviderTimerAspect restProviderTimerAspect() {
+			return new RestProviderTimerAspect();
+		}
+		@Bean
+		public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
+			…	
+		}
+		@Bean
+		@ConditionalOnMissingBean
+		public RestClientTemplate restClientTemplate() {
+			…
+		}
+		@Bean
+		@ConditionalOnMissingBean
+		public TokenClientHttpRequestInterceptor tokenClientHttpRequestInterceptor() {
+			return new TokenClientHttpRequestInterceptor();
+		}
+	    }
 
 ### gov.va.bip.framework.security.autoconfigure:
 Security auto-configuration creates beans for the security framework using JWT.
@@ -151,10 +151,10 @@ Service auto-configuration configures beans that get used in service application
 	- have a companion validator named with the form `\<ClassName\>Validator` that is in the "validators" package below where the model object is found, for example `gov.va.bip.reference.api.model.v1.validators.PersonInfoValidator.java`.
 	- Validators called by this aspect should extend `gov.va.bip.framework.validation.AbstractStandardValidator` or similar implementation.
 
-	@Configuration
-	public class BipServiceAutoConfiguration {
-	...
-	}
+		@Configuration
+		public class BipServiceAutoConfiguration {
+		...
+		}
 
 ### gov.va.bip.framework.swagger.autoconfigure:
 Swagger starter and autoconfiguration to generate and configure swagger documentation:
