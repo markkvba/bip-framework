@@ -179,6 +179,7 @@ public class RESTUtilTest {
 		strFilePath = new File(pathToKeyStore);
 		strFilePath.setReadable(false);
 		ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
+		strFilePath.setReadable(true);
 	}
 	@Test
 	public void test_getResponse_WithRetry() {
