@@ -24,11 +24,13 @@ BIP Framework aims to:
 ## How to add the Framework dependency
 Add the dependency in the application project's POM file.
 
+```xml
     <dependency>
         <groupId>gov.va.bip.framework</groupId>
         <artifactId>bip-framework-libraries</artifactId>
         <version><!-- add the appropriate version --></version>
     </dependency>
+```
 
 ## Framework usage in service applications
 

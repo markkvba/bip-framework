@@ -16,6 +16,7 @@ For general information regarding recommended development patterns for developin
 
 ## How to include BIP Framework libraries in your project
 
+```xml
      <dependency>
          <groupId>gov.va.bip.framework</groupId>
          <artifactId>bip-framework-autoconfigure</artifactId>
@@ -36,6 +37,7 @@ For general information regarding recommended development patterns for developin
          <artifactId>bip-framework-test-lib</artifactId>
          <version><!-- add the appropriate version --></version>
        </dependency>
+```
 
 ## How to download the BIP Framework maven dependencies
 There are currently three ways to make these projects available for local activites.
@@ -60,6 +62,7 @@ The base URL for the nexus repository is: https://nexus.dev.bip.va.gov/repositor
 
 You must have the BIP Nexus URL configured in the reactor (root) `pom.xml` file as shown below.
     
+```xml
 	<repositories>
 		<repository>
 			<id>nexus3</id>
@@ -67,7 +70,8 @@ You must have the BIP Nexus URL configured in the reactor (root) `pom.xml` file 
 			<url>https://nexus.dev.bip.va.gov/repository/maven-public</url>
 		</repository>
 	</repositories>
-	
+```
+
 #### Option 3 - use GitHub as a Nexus repository
 This option is a workaround if you are *not* on the VA network, and you only want the BIP Framework JAR.
 
@@ -78,6 +82,7 @@ It requires changes in the reactor POM, and in your local maven settings file, a
 
 Add the section shown below to the reactor (root) `pom.xml` of your service project. An example of this configuration can be seen in the [bip-reference reactor POM](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml).
  
+```xml
 	<repositories>
 		<repository>
 			<id>github</id>
@@ -85,11 +90,13 @@ Add the section shown below to the reactor (root) `pom.xml` of your service proj
 			<url>https://raw.github.com/department-of-veterans-affairs/bip-framework/mvn-repo</url>
 		</repository>
 	</repositories>
+```
 
 2. **Settings file**
 
 Update your local `~/.m2/settings.xml` as shown below. Replace values between `{{Text}}` with your information.
 
+```xml
 	<settings>
 	  <servers>
 	    <server>
@@ -119,6 +126,7 @@ Update your local `~/.m2/settings.xml` as shown below. Replace values between `{
 	    </server>
 	  </servers>
 	</settings>
+```
 
 ## How to deploy and host a maven repository on GitHub
 
@@ -128,7 +136,7 @@ source : http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-
 
 2. Update your application's parent pom with a `local-deploy` profile that configures your GitHub repo. For an example, look in [bip-framework-parentpom/pom.xml](https://github.com/department-of-veterans-affairs/ocp-framework/blob/master/bip-framework-parentpom/pom.xml) for the section framed by:
 
-```
+```xml
 	<profile>
 		<id>local-deploy</id>
 			...    ...
