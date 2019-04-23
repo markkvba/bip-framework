@@ -8,12 +8,11 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,10 +41,13 @@ import org.springframework.util.CollectionUtils;
 
 import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.BaseAsyncAudit;
-import gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires;
-import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.JedisPoolProps;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsMBean;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties.RedisExpires;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties.JedisPoolProps;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
 import gov.va.bip.framework.cache.interceptor.BipCacheInterceptor;
 import gov.va.bip.framework.log.BipBanner;
@@ -58,14 +60,14 @@ import redis.clients.jedis.JedisPoolConfig;
  * Cache auto configuration:
  * <ul>
  * <li> Configure and start Redis embedded server if necessary (as declared under spring profiles in application yaml).
- * See {@link BipRedisProperties}.
- * <li> Configure the Redis "Standalone" module with the host and port. See {@link BipRedisProperties}.
- * <li> Configure the Jedis Client, including SSL and Connection Pooling. See {@link BipRedisClientProperties}.
- * <li> Configure Cache TTLs and expirations. See {@link BipRedisCacheProperties}.
+ * See {@link BipRedisProps}.
+ * <li> Configure the Redis "Standalone" module with the host and port. See {@link BipRedisProps}.
+ * <li> Configure the Jedis Client, including SSL and Connection Pooling. See {@link BipRedisClientProps}.
+ * <li> Configure Cache TTLs and expirations. See {@link BipRedisCacheProps}.
  * </ul>
  */
 @Configuration
-@EnableConfigurationProperties({ BipRedisClientProperties.class, BipRedisCacheProperties.class })
+@EnableConfigurationProperties({ BipRedisProperties.class, BipRedisClientProperties.class, BipRedisCacheProperties.class })
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableCaching
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
@@ -74,16 +76,19 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipCacheAutoConfiguration.class);
 
-	/**
-	 * Cache propertiesClient derived from application propertiesClient file
-	 */
+	/** Cache properties derived from application BipRedisProperties file */
 	@Autowired
+	@Qualifier("bipRedisProperties")
+	private BipRedisProperties properties;
+
+	/** Cache propertiesClient derived from application BipRedisClientProperties file */
+	@Autowired
+	@Qualifier("bipRedisClientProperties")
 	private BipRedisClientProperties propertiesClient;
 
-	/**
-	 * Cache properties derived from application properties file
-	 */
+	/** Cache properties derived from application properties file */
 	@Autowired
+	@Qualifier("bipRedisCacheProperties")
 	private BipRedisCacheProperties propertiesCache;
 
 	/** Embedded Redis bean to make sure embedded redis is started before redis cache is created. */
@@ -98,6 +103,8 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	public void postConstruct() {
 		Defense.notNull(propertiesCache, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
 		Defense.notNull(propertiesClient, BipRedisClientProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(propertiesClient.getClientname(),
+				BipRedisClientProperties.class.getSimpleName() + ".clientName cannot be null.");
 		Defense.notNull(referenceServerRedisEmbedded, BipEmbeddedRedisServer.class.getSimpleName() + " cannot be null.");
 	}
 
@@ -141,84 +148,85 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 
-		Defense.notNull(propertiesClient.getRedisProps(),
+		Defense.notNull(properties.getRedisProps(),
 				propertiesClient.getClass().getSimpleName() + ".RedisConfig cannot be null.");
 
 		/* ======== Redis Standalone Config ======== */
 
-		Defense.hasText(propertiesClient.getRedisProps().getHost(),
+		Defense.hasText(properties.getRedisProps().getHost(),
 				propertiesClient.getClass().getSimpleName() + ".host must have a value.");
-		Defense.notNull(propertiesClient.getRedisProps().getPort(),
+		Defense.notNull(properties.getRedisProps().getPort(),
 				propertiesClient.getClass().getSimpleName() + ".port must have a value.");
-		Defense.isTrue(propertiesClient.getRedisProps().getPort() > 0,
+		Defense.isTrue(properties.getRedisProps().getPort() > 0,
 				propertiesClient.getClass().getSimpleName() + ".port must be a valid port number.");
 
 		RedisStandaloneConfiguration redisStandaloneConfig =
-				new RedisStandaloneConfiguration(propertiesClient.getRedisProps().getHost(),
-						Integer.valueOf(propertiesClient.getRedisProps().getPort()));
+				new RedisStandaloneConfiguration(properties.getRedisProps().getHost(),
+						Integer.valueOf(properties.getRedisProps().getPort()));
 
 		/* ======== Jedis Client Config ======== */
 
 		JedisPoolProps jedisPoolProps = propertiesClient.getJedisClientProps().getPoolConfig();
 
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxTotal(jedisPoolProps.maxTotal);
-		poolConfig.setMaxIdle(jedisPoolProps.maxIdle); // max
-		poolConfig.setMaxWaitMillis(jedisPoolProps.maxWaitMillis);
-		poolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.minEvictableIdleTimeMillis);
-		poolConfig.setMinIdle(jedisPoolProps.minIdle);
-		poolConfig.setBlockWhenExhausted(jedisPoolProps.blockWhenExhausted);
-		poolConfig.setEvictionPolicy(jedisPoolProps.evictionPolicy);
-		poolConfig.setEvictionPolicyClassName(jedisPoolProps.evictionPolicyClassName);
-		poolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.evictorShutdownTimeoutMillis);
-		poolConfig.setFairness(jedisPoolProps.fairness);
-		poolConfig.setJmxEnabled(jedisPoolProps.jmxEnabled);
-		poolConfig.setJmxNameBase(jedisPoolProps.jmxNameBase);
-		poolConfig.setJmxNamePrefix(jedisPoolProps.jmxNamePrefix);
-		poolConfig.setLifo(jedisPoolProps.lifo);
-		poolConfig.setNumTestsPerEvictionRun(jedisPoolProps.numTestsPerEvictionRun);
-		poolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.softMinEvictableIdleTimeMillis);
-		poolConfig.setTestOnBorrow(jedisPoolProps.testOnBorrow);
-		poolConfig.setTestOnCreate(jedisPoolProps.testOnCreate);
-		poolConfig.setTestOnReturn(jedisPoolProps.testOnReturn);
-		poolConfig.setTestWhileIdle(jedisPoolProps.testWhileIdle);
+		poolConfig.setMaxTotal(jedisPoolProps.getMaxTotal());
+		poolConfig.setMaxIdle(jedisPoolProps.getMaxIdle()); // max
+		poolConfig.setMaxWaitMillis(jedisPoolProps.getMaxWaitMillis());
+		poolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.getMinEvictableIdleTimeMillis());
+		poolConfig.setMinIdle(jedisPoolProps.getMinIdle());
+		poolConfig.setBlockWhenExhausted(jedisPoolProps.isBlockWhenExhausted());
+		poolConfig.setEvictionPolicy(jedisPoolProps.getEvictionPolicy());
+		poolConfig.setEvictionPolicyClassName(jedisPoolProps.getEvictionPolicyClassName());
+		poolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.getEvictorShutdownTimeoutMillis());
+		poolConfig.setFairness(jedisPoolProps.isFairness());
+		poolConfig.setJmxEnabled(jedisPoolProps.isJmxEnabled());
+		poolConfig.setJmxNameBase(jedisPoolProps.getJmxNameBase());
+		poolConfig.setJmxNamePrefix(jedisPoolProps.getJmxNamePrefix());
+		poolConfig.setLifo(jedisPoolProps.isLifo());
+		poolConfig.setNumTestsPerEvictionRun(jedisPoolProps.getNumTestsPerEvictionRun());
+		poolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.getSoftMinEvictableIdleTimeMillis());
+		poolConfig.setTestOnBorrow(jedisPoolProps.isTestOnBorrow());
+		poolConfig.setTestOnCreate(jedisPoolProps.isTestOnCreate());
+		poolConfig.setTestOnReturn(jedisPoolProps.isTestOnReturn());
+		poolConfig.setTestWhileIdle(jedisPoolProps.isTestWhileIdle());
 
 		JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigBuilder = JedisClientConfiguration.builder()
 				// .clientName(clientName) // TODO should this be the same as the first part of the cache key?
-				.connectTimeout(propertiesClient.getJedisClientProps().connectTimeout)
-				.readTimeout(propertiesClient.getJedisClientProps().readTimeout);
+				.connectTimeout(propertiesClient.getJedisClientProps().getConnectTimeout())
+				.readTimeout(propertiesClient.getJedisClientProps().getReadTimeout());
 
-		if (propertiesClient.getJedisClientProps().usePooling) {
+		if (propertiesClient.getJedisClientProps().isUsePooling()) {
 			JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-			jedisPoolConfig.setBlockWhenExhausted(jedisPoolProps.blockWhenExhausted);
-			jedisPoolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.evictorShutdownTimeoutMillis);
-			jedisPoolConfig.setFairness(jedisPoolProps.fairness);
-			jedisPoolConfig.setJmxEnabled(jedisPoolProps.jmxEnabled);
-			jedisPoolConfig.setJmxNameBase(jedisPoolProps.jmxNameBase);
-			jedisPoolConfig.setJmxNamePrefix(jedisPoolProps.jmxNamePrefix);
-			jedisPoolConfig.setLifo(jedisPoolProps.lifo);
-			jedisPoolConfig.setMaxIdle(jedisPoolProps.maxIdle);
-			jedisPoolConfig.setMaxTotal(jedisPoolProps.maxTotal);
-			jedisPoolConfig.setMaxWaitMillis(jedisPoolProps.maxWaitMillis);
-			jedisPoolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.minEvictableIdleTimeMillis);
-			jedisPoolConfig.setMinIdle(jedisPoolProps.minIdle);
-			jedisPoolConfig.setNumTestsPerEvictionRun(jedisPoolProps.numTestsPerEvictionRun);
-			jedisPoolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.softMinEvictableIdleTimeMillis);
-			jedisPoolConfig.setTestOnBorrow(jedisPoolProps.testOnBorrow);
-			jedisPoolConfig.setTestOnCreate(jedisPoolProps.testOnCreate);
-			jedisPoolConfig.setTestOnReturn(jedisPoolProps.testOnReturn);
-			jedisPoolConfig.setTestWhileIdle(jedisPoolProps.testWhileIdle);
-			jedisPoolConfig.setTimeBetweenEvictionRunsMillis(jedisPoolProps.timeBetweenEvictionRunsMillis);
+			jedisPoolConfig.setBlockWhenExhausted(jedisPoolProps.isBlockWhenExhausted());
+			jedisPoolConfig.setEvictorShutdownTimeoutMillis(jedisPoolProps.getEvictorShutdownTimeoutMillis());
+			jedisPoolConfig.setFairness(jedisPoolProps.isFairness());
+			jedisPoolConfig.setJmxEnabled(jedisPoolProps.isJmxEnabled());
+			jedisPoolConfig.setJmxNameBase(jedisPoolProps.getJmxNameBase());
+			jedisPoolConfig.setJmxNamePrefix(jedisPoolProps.getJmxNamePrefix());
+			jedisPoolConfig.setLifo(jedisPoolProps.isLifo());
+			jedisPoolConfig.setMaxIdle(jedisPoolProps.getMaxIdle());
+			jedisPoolConfig.setMaxTotal(jedisPoolProps.getMaxTotal());
+			jedisPoolConfig.setMaxWaitMillis(jedisPoolProps.getMaxWaitMillis());
+			jedisPoolConfig.setMinEvictableIdleTimeMillis(jedisPoolProps.getMinEvictableIdleTimeMillis());
+			jedisPoolConfig.setMinIdle(jedisPoolProps.getMinIdle());
+			jedisPoolConfig.setNumTestsPerEvictionRun(jedisPoolProps.getNumTestsPerEvictionRun());
+			jedisPoolConfig.setSoftMinEvictableIdleTimeMillis(jedisPoolProps.getSoftMinEvictableIdleTimeMillis());
+			jedisPoolConfig.setTestOnBorrow(jedisPoolProps.isTestOnBorrow());
+			jedisPoolConfig.setTestOnCreate(jedisPoolProps.isTestOnCreate());
+			jedisPoolConfig.setTestOnReturn(jedisPoolProps.isTestOnReturn());
+			jedisPoolConfig.setTestWhileIdle(jedisPoolProps.isTestWhileIdle());
+			jedisPoolConfig.setTimeBetweenEvictionRunsMillis(jedisPoolProps.getTimeBetweenEvictionRunsMillis());
 
 			jedisClientConfigBuilder.usePooling().poolConfig(jedisPoolConfig);
 		}
 
-		if (propertiesClient.getJedisClientProps().useSsl) {
+		if (propertiesClient.getJedisClientProps().isUseSsl()) {
 			jedisClientConfigBuilder
 					.useSsl()
-					// .hostnameVerifier(hostnameVerifier) // TODO don't think this is needed
-					.sslParameters(new SSLParameters(new String[] { "cipherSuites" }))
-					.sslSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
+			// .hostnameVerifier(hostnameVerifier) // TODO don't think this is needed
+//					.sslParameters(new SSLParameters(new String[] { "cipherSuites" }))
+//					.sslSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault())
+			;
 		}
 
 		JedisClientConfiguration jedisClientConfig = jedisClientConfigBuilder.build();

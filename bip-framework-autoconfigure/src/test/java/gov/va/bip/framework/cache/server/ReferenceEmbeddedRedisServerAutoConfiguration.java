@@ -1,17 +1,16 @@
 package gov.va.bip.framework.cache.server;
 
-import java.util.ArrayList;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties;
-import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.RedisConfig;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
 
 /**
- * 
+ *
  * @author rthota
  *
  */
@@ -26,12 +25,21 @@ public class ReferenceEmbeddedRedisServerAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	public BipRedisProperties bipRedisProperties() {
+		return new BipRedisProperties();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	public BipRedisClientProperties bipRedisClientProperties() {
 		BipRedisClientProperties bipRedisClientProperties = new BipRedisClientProperties();
-		bipRedisClientProperties.setRedisProps(new RedisProps());
-		bipRedisClientProperties.getRedisProps().setHost("localhost");
-		bipRedisClientProperties.setExpires(new ArrayList<>());
-		bipRedisClientProperties.setDefaultExpires(500L);
+		bipRedisClientProperties.setClientname("test-client-name");
 		return bipRedisClientProperties;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public BipRedisCacheProperties bipRedisCacheProperties() {
+		return new BipRedisCacheProperties();
 	}
 }

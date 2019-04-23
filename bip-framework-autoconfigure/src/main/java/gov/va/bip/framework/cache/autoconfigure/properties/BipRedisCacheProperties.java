@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure;
+package gov.va.bip.framework.cache.autoconfigure.properties;
 
 import java.util.List;
 
@@ -31,8 +31,8 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  * under {@code bip.framework:redis:cache:expires}.
  *
  */
-@ConfigurationProperties(prefix = "bip.framework.cache")
-@Configuration
+@ConfigurationProperties(prefix = "bip.framework.cache", ignoreInvalidFields = false, ignoreUnknownFields = false)
+@Configuration("bipRedisCacheProperties")
 public class BipRedisCacheProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);
@@ -53,9 +53,9 @@ public class BipRedisCacheProperties {
 	}
 
 	/**
-	 * The inner class {@link RedisExpires} configuration object.
+	 * Default expiration time if cache does not appear in the expires list.
 	 *
-	 * @param defaultExpires
+	 * @param defaultExpires the default expiration time
 	 */
 	public void setDefaultExpires(final Long defaultExpires) {
 		this.defaultExpires = defaultExpires;
@@ -71,9 +71,9 @@ public class BipRedisCacheProperties {
 	}
 
 	/**
-	 * The default expires length of time in milliseconds.
-	 *
-	 * @return Long
+	 * Default expiration time if cache does not appear in the expires list.
+	 * 
+	 * @return Long the default expiration time
 	 */
 	public Long getDefaultExpires() {
 		return this.defaultExpires;

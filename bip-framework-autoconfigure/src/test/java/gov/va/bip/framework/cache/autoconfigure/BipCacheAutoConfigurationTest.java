@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
 
 /**
  * Created by vgadda on 8/11/17.
@@ -30,6 +32,7 @@ import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
 public class BipCacheAutoConfigurationTest {
 
 	private static final String SPRING_CACHE_TYPE_PROPERTY_AND_VALUE = "spring.cache.type=redis";
+	private static final String BIP_REDIS_CLIENT_NAME = "bip.framework.redis.client.clientName=redis_test-client-name";
 
 	private AnnotationConfigApplicationContext context;
 
@@ -50,8 +53,11 @@ public class BipCacheAutoConfigurationTest {
 	public void testReferenceCacheConfiguration() throws Exception {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
+		TestPropertyValues.of(BIP_REDIS_CLIENT_NAME).applyTo(context);
+
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
 				TestConfigurationForAuditBeans.class);
+
 		context.refresh();
 		assertNotNull(context);
 		CacheManager cacheManager = context.getBean(CacheManager.class);
@@ -65,11 +71,12 @@ public class BipCacheAutoConfigurationTest {
 		TestPropertyValues.of("bip.framework.cache.defaultExpires=86401").applyTo(context);
 		context.register(RedisAutoConfiguration.class, BipRedisClientProperties.class);
 		context.refresh();
-		BipRedisClientProperties bipRedisClientProperties = context.getBean(BipRedisClientProperties.class);
-		BipRedisClientProperties.RedisExpires redisExpires = new gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.RedisExpires();
+		BipRedisCacheProperties bipRedisClientProperties = context.getBean(BipRedisCacheProperties.class);
+		BipRedisCacheProperties.RedisExpires redisExpires =
+				new gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties.RedisExpires();
 		redisExpires.setName("testName");
 		redisExpires.setTtl(1500L);
-		List<BipRedisClientProperties.RedisExpires> expiresList = new LinkedList<BipRedisClientProperties.RedisExpires>();
+		List<BipRedisCacheProperties.RedisExpires> expiresList = new LinkedList<BipRedisCacheProperties.RedisExpires>();
 		expiresList.add(redisExpires);
 		bipRedisClientProperties.setExpires(expiresList);
 		context.register(BipCacheAutoConfiguration.class);

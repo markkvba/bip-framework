@@ -8,9 +8,10 @@ import javax.annotation.PreDestroy;
 import javax.net.ServerSocketFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 
-import gov.va.bip.framework.cache.autoconfigure.BipRedisProperties;
+import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
 import gov.va.bip.framework.config.BipCommonSpringProfiles;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -26,20 +27,22 @@ import redis.embedded.RedisServer;
 @Profile(BipCommonSpringProfiles.PROFILE_EMBEDDED_REDIS)
 public class BipEmbeddedRedisServer {
 
-	/** The Constant LOGGER. */
+	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipEmbeddedRedisServer.class);
 
-	/**
-	 * Cache Properties Bean
-	 */
+	/** Cache Properties Bean */
 	@Autowired
+	@Qualifier("bipRedisProperties")
 	private BipRedisProperties properties;
 
-	/**
-	 * Embedded redis server object
-	 */
+	/** Embedded redis server object */
 	private RedisServer redisServer;
 
+	/**
+	 * Embedded redis server.
+	 *
+	 * @return RedisServer
+	 */
 	public RedisServer getRedisServer() {
 		return redisServer;
 	}

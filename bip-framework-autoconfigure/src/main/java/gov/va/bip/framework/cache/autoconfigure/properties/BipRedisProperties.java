@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure;
+package gov.va.bip.framework.cache.autoconfigure.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +24,8 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  * </table>
  *
  */
-@ConfigurationProperties(prefix = "bip.framework.redis")
-@Configuration
+@ConfigurationProperties(prefix = "bip.framework.redis", ignoreInvalidFields = false, ignoreUnknownFields = false)
+@Configuration(value = "bipRedisProperties")
 public class BipRedisProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisProperties.class);
