@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure.properties;
+package gov.va.bip.framework.cache.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -25,59 +25,59 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  *
  */
 @ConfigurationProperties(prefix = "bip.framework.redis", ignoreInvalidFields = false, ignoreUnknownFields = false)
-@Configuration(value = "bipRedisProperties")
+@Configuration// (value = "bipRedisProperties")
 public class BipRedisProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisProperties.class);
 
-	/** Inner class for redis embedded server config properties */
-	private RedisProps redisProps = new RedisProps();
+//	/** Inner class for redis embedded server config properties */
+//	private RedisProps redisProps = new RedisProps();
+//
+//	/**
+//	 * Set the {@link RedisProps} configuration object
+//	 *
+//	 * @param redisProps
+//	 */
+//	public void setRedisProps(final RedisProps redisProps) {
+//		this.redisProps = redisProps;
+//	}
+//
+//	/**
+//	 * Get the {@link RedisProps} configuration object
+//	 *
+//	 * @return RedisProps
+//	 */
+//	public RedisProps getRedisProps() {
+//		return this.redisProps;
+//	}
+//
+//	/**
+//	 * Inner class for a redis host and the port it runs on.
+//	 */
+//	public static class RedisProps {
 
-	/**
-	 * Set the {@link RedisProps} configuration object
-	 *
-	 * @param redisProps
-	 */
-	public void setRedisProps(final RedisProps redisProps) {
-		this.redisProps = redisProps;
+	/** Redis Host */
+	private String host = "localhost";
+
+	/** Redis port */
+	private Integer port = 6379;
+
+	public void setHost(final String host) {
+		this.host = host;
 	}
 
-	/**
-	 * Get the {@link RedisProps} configuration object
-	 *
-	 * @return RedisProps
-	 */
-	public RedisProps getRedisProps() {
-		return this.redisProps;
+	public String getHost() {
+		return host;
 	}
 
-	/**
-	 * Inner class for a redis host and the port it runs on.
-	 */
-	public static class RedisProps {
-
-		/** Redis Host */
-		private String host = "localhost";
-
-		/** Redis port */
-		private Integer port = 6379;
-
-		public void setHost(final String host) {
-			this.host = host;
-		}
-
-		public String getHost() {
-			return host;
-		}
-
-		public Integer getPort() {
-			return port;
-		}
-
-		public void setPort(final Integer port) {
-			this.port = port;
-		}
-
+	public Integer getPort() {
+		return port;
 	}
+
+	public void setPort(final Integer port) {
+		this.port = port;
+	}
+
+//	}
 
 }

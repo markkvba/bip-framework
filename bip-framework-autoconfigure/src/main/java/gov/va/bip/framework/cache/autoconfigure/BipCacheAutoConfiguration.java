@@ -12,12 +12,10 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.AnnotationCacheOperationSource;
@@ -30,6 +28,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -41,13 +40,10 @@ import org.springframework.util.CollectionUtils;
 
 import gov.va.bip.framework.audit.AuditLogSerializer;
 import gov.va.bip.framework.audit.BaseAsyncAudit;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties.JedisPoolProps;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
 import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsMBean;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties.RedisExpires;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties.JedisPoolProps;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
 import gov.va.bip.framework.cache.interceptor.BipCacheInterceptor;
 import gov.va.bip.framework.log.BipBanner;
@@ -67,7 +63,8 @@ import redis.clients.jedis.JedisPoolConfig;
  * </ul>
  */
 @Configuration
-@EnableConfigurationProperties({ BipRedisProperties.class, BipRedisClientProperties.class, BipRedisCacheProperties.class })
+@Import({ BipRedisProperties.class, BipRedisClientProperties.class, BipRedisCacheProperties.class })
+//@EnableConfigurationProperties({ BipRedisProperties.class, BipRedisClientProperties.class, BipRedisCacheProperties.class })
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableCaching
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
@@ -78,17 +75,17 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 
 	/** Cache properties derived from application BipRedisProperties file */
 	@Autowired
-	@Qualifier("bipRedisProperties")
+//	@Qualifier("bipRedisProperties")
 	private BipRedisProperties properties;
 
 	/** Cache propertiesClient derived from application BipRedisClientProperties file */
 	@Autowired
-	@Qualifier("bipRedisClientProperties")
+//	@Qualifier("bipRedisClientProperties")
 	private BipRedisClientProperties propertiesClient;
 
 	/** Cache properties derived from application properties file */
 	@Autowired
-	@Qualifier("bipRedisCacheProperties")
+//	@Qualifier("bipRedisCacheProperties")
 	private BipRedisCacheProperties propertiesCache;
 
 	/** Embedded Redis bean to make sure embedded redis is started before redis cache is created. */
@@ -103,7 +100,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	public void postConstruct() {
 		Defense.notNull(propertiesCache, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
 		Defense.notNull(propertiesClient, BipRedisClientProperties.class.getSimpleName() + " cannot be null.");
-		Defense.notNull(propertiesClient.getClientname(),
+		Defense.notNull(propertiesClient.getJedisClientProps().getClientname(),
 				BipRedisClientProperties.class.getSimpleName() + ".clientName cannot be null.");
 		Defense.notNull(referenceServerRedisEmbedded, BipEmbeddedRedisServer.class.getSimpleName() + " cannot be null.");
 	}
@@ -148,21 +145,21 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 
-		Defense.notNull(properties.getRedisProps(),
-				propertiesClient.getClass().getSimpleName() + ".RedisConfig cannot be null.");
+//		Defense.notNull(properties.getRedisProps(),
+//				propertiesClient.getClass().getSimpleName() + ".RedisConfig cannot be null.");
 
 		/* ======== Redis Standalone Config ======== */
 
-		Defense.hasText(properties.getRedisProps().getHost(),
+		Defense.hasText(properties.getHost(),
 				propertiesClient.getClass().getSimpleName() + ".host must have a value.");
-		Defense.notNull(properties.getRedisProps().getPort(),
+		Defense.notNull(properties.getPort(),
 				propertiesClient.getClass().getSimpleName() + ".port must have a value.");
-		Defense.isTrue(properties.getRedisProps().getPort() > 0,
+		Defense.isTrue(properties.getPort() > 0,
 				propertiesClient.getClass().getSimpleName() + ".port must be a valid port number.");
 
 		RedisStandaloneConfiguration redisStandaloneConfig =
-				new RedisStandaloneConfiguration(properties.getRedisProps().getHost(),
-						Integer.valueOf(properties.getRedisProps().getPort()));
+				new RedisStandaloneConfiguration(properties.getHost(),
+						Integer.valueOf(properties.getPort()));
 
 		/* ======== Jedis Client Config ======== */
 

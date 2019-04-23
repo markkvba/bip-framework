@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisProperties;
 import gov.va.bip.framework.config.BipCommonSpringProfiles;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -54,13 +54,13 @@ public class BipEmbeddedRedisServer {
 	 */
 	@PostConstruct
 	public void startRedis() throws IOException {
-		Defense.notNull(properties.getRedisProps(), "properties.getRedisConfig() is required to run/use Redis!");
+		Defense.notNull(properties, "properties is required to run/use Redis!");
 
-		if (properties.getRedisProps().getPort() == null) {
+		if (properties.getPort() == null) {
 			ServerSocket ss = null;
 			try {
 				ss = ServerSocketFactory.getDefault().createServerSocket(0);
-				properties.getRedisProps().setPort(ss.getLocalPort());
+				properties.setPort(ss.getLocalPort());
 			} finally {
 				if (ss != null) {
 					ss.close();
@@ -68,9 +68,9 @@ public class BipEmbeddedRedisServer {
 			}
 		}
 		LOGGER.info("Starting Embedded Redis. This embedded redis is only to be used in local enviroments");
-		LOGGER.info("Embedded redis starting on port {}", properties.getRedisProps().getPort());
+		LOGGER.info("Embedded redis starting on port {}", properties.getPort());
 		try {
-			redisServer = RedisServer.builder().port(properties.getRedisProps().getPort())
+			redisServer = RedisServer.builder().port(properties.getPort())
 					// .redisExecProvider(customRedisExec) //com.github.kstyrc (not com.orange.redis-embedded)
 					.setting("maxmemory 128M") // maxheap 128M
 					.setting("bind localhost") // force bind to localhost to avoid firewall pop-ups

@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure.properties;
+package gov.va.bip.framework.cache.autoconfigure;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  *
  */
 @ConfigurationProperties(prefix = "bip.framework.cache", ignoreInvalidFields = false, ignoreUnknownFields = false)
-@Configuration("bipRedisCacheProperties")
+@Configuration// ("bipRedisCacheProperties")
 public class BipRedisCacheProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);
@@ -72,7 +72,7 @@ public class BipRedisCacheProperties {
 
 	/**
 	 * Default expiration time if cache does not appear in the expires list.
-	 * 
+	 *
 	 * @return Long the default expiration time
 	 */
 	public Long getDefaultExpires() {

@@ -22,8 +22,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import gov.va.bip.framework.audit.BaseAsyncAudit;
 import gov.va.bip.framework.audit.autoconfigure.BipAuditAutoConfiguration;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
 
 /**
  * Created by vgadda on 8/11/17.
@@ -73,7 +71,7 @@ public class BipCacheAutoConfigurationTest {
 		context.refresh();
 		BipRedisCacheProperties bipRedisClientProperties = context.getBean(BipRedisCacheProperties.class);
 		BipRedisCacheProperties.RedisExpires redisExpires =
-				new gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties.RedisExpires();
+				new gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires();
 		redisExpires.setName("testName");
 		redisExpires.setTtl(1500L);
 		List<BipRedisCacheProperties.RedisExpires> expiresList = new LinkedList<BipRedisCacheProperties.RedisExpires>();

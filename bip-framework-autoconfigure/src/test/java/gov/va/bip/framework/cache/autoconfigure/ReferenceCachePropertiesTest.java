@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
-
 public class ReferenceCachePropertiesTest {
 
 	@Test

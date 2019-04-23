@@ -1,4 +1,4 @@
-package gov.va.bip.framework.cache.autoconfigure.properties;
+package gov.va.bip.framework.cache.autoconfigure;
 
 import java.time.Duration;
 
@@ -12,7 +12,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 
-import gov.va.bip.framework.cache.autoconfigure.BipCacheAutoConfiguration;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import redis.clients.jedis.JedisPoolConfig;
@@ -92,7 +91,7 @@ import redis.clients.jedis.Protocol;
  * @see org.apache.commons.pool2.impl.BaseObjectPoolConfig
  */
 @ConfigurationProperties(prefix = "bip.framework.redis.client", ignoreInvalidFields = false, ignoreUnknownFields = false)
-@Configuration("bipRedisClientProperties")
+@Configuration// ("bipRedisClientProperties")
 public class BipRedisClientProperties {
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisClientProperties.class);
 
@@ -106,25 +105,7 @@ public class BipRedisClientProperties {
 //	private BuildProperties buildProperties;
 
 	private JedisClientProps client = new JedisClientProps();
-	String clientname; // TODO cannot access Autowired from static class: buildProperties.getArtifact();
-
-	/**
-	 * The unique client name for the Standalone redis client module.
-	 *
-	 * @return client name
-	 */
-	public String getClientname() {
-		return clientname;
-	}
-
-	/**
-	 * The unique client name for the Standalone redis client module.
-	 *
-	 * @param client name
-	 */
-	public void setClientname(String clientname) {
-		this.clientname = clientname;
-	}
+//	String clientname; // TODO cannot access Autowired from static class: buildProperties.getArtifact();
 
 	/**
 	 * JedisClientProps for {@link JedisClientConfiguration} in {@link BipCacheAutoConfiguration}.
@@ -150,12 +131,32 @@ public class BipRedisClientProperties {
 	 * @author aburkholder
 	 */
 	public static class JedisClientProps {
+		String clientname = null; // TODO cannot access Autowired from static class: buildProperties.getArtifact();
+
 		Duration connectTimeout = Duration.ofSeconds(Protocol.DEFAULT_TIMEOUT);
 		Duration readTimeout = Duration.ofSeconds(Protocol.DEFAULT_TIMEOUT);
 		boolean usePooling = true;
 		private JedisPoolProps poolConfig = new JedisPoolProps();
 		boolean useSsl = true;
 		private SslProps sslProps = new SslProps();
+
+		/**
+		 * The unique client name for the Standalone redis client module.
+		 *
+		 * @return client name
+		 */
+		public String getClientname() {
+			return clientname;
+		}
+
+		/**
+		 * The unique client name for the Standalone redis client module.
+		 *
+		 * @param client name
+		 */
+		public void setClientname(String clientname) {
+			this.clientname = clientname;
+		}
 
 		/**
 		 * The Jedis connection pool configuration properties.

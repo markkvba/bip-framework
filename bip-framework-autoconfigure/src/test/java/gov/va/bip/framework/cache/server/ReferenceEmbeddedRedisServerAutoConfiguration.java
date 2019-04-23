@@ -4,9 +4,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisCacheProperties;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisClientProperties;
-import gov.va.bip.framework.cache.autoconfigure.properties.BipRedisProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisClientProperties;
+import gov.va.bip.framework.cache.autoconfigure.BipRedisProperties;
 import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
 
 /**
@@ -33,7 +33,7 @@ public class ReferenceEmbeddedRedisServerAutoConfiguration {
 	@ConditionalOnMissingBean
 	public BipRedisClientProperties bipRedisClientProperties() {
 		BipRedisClientProperties bipRedisClientProperties = new BipRedisClientProperties();
-		bipRedisClientProperties.setClientname("test-client-name");
+		bipRedisClientProperties.getJedisClientProps().setClientname("test-client-name");
 		return bipRedisClientProperties;
 	}
 
