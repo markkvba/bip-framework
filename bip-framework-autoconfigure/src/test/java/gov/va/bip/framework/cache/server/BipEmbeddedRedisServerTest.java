@@ -22,7 +22,7 @@ import redis.clients.jedis.JedisPool;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ReferenceEmbeddedRedisServerAutoConfiguration.class)
+@ContextConfiguration(classes = EmbeddedRedisServerAutoConfigurationTest.class)
 public class BipEmbeddedRedisServerTest {
 
 	@Autowired

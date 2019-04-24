@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ReferenceCachePropertiesTest {
+public class BipRedisCachePropertiesTest {
 
 	@Test
 	public void testGetters() {

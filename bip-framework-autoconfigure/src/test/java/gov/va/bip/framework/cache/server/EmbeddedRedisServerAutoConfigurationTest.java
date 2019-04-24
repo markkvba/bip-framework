@@ -14,7 +14,7 @@ import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
  *
  */
 @Configuration
-public class ReferenceEmbeddedRedisServerAutoConfiguration {
+public class EmbeddedRedisServerAutoConfigurationTest {
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -25,7 +25,9 @@ public class ReferenceEmbeddedRedisServerAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public RedisProperties redisProperties() {
-		return new RedisProperties();
+		RedisProperties redisProperties = new RedisProperties();
+		redisProperties.setPort(0);
+		return redisProperties;
 	}
 
 	@Bean
