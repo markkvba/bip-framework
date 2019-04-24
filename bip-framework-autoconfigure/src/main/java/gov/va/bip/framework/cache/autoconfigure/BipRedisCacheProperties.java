@@ -31,7 +31,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  * under {@code bip.framework:redis:cache:expires}.
  *
  */
-@ConfigurationProperties(prefix = "bip.framework.cache", ignoreInvalidFields = false, ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "bip.framework.cache")
 @Configuration
 public class BipRedisCacheProperties {
 
