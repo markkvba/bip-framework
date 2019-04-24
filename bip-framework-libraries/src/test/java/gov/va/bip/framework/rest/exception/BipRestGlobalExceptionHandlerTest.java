@@ -1,4 +1,4 @@
-package gov.va.bip.framework.client.rest.exception;
+package gov.va.bip.framework.rest.exception;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -48,6 +48,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import gov.va.bip.framework.AbstractBaseLogTester;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
 import gov.va.bip.framework.exception.BipRuntimeException;
@@ -56,8 +57,8 @@ import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
 import gov.va.bip.framework.rest.exception.BipRestGlobalExceptionHandler;
 
-public class BipRestGlobalExceptionHandlerTest {
-
+public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
+	
 	BipRestGlobalExceptionHandler bipRestGlobalExceptionHandler = new BipRestGlobalExceptionHandler();
 
 	DummyObjectToBeValidated dummyObjectToBeValidated;
@@ -77,6 +78,14 @@ public class BipRestGlobalExceptionHandlerTest {
 		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(),
 				MessageKeys.NO_KEY, new String[] {});
 		assertTrue(returnValue.equals("NO_KEY"));
+	}
+	
+	@Test
+	public void deriveMessageNoMessageTest() {
+		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(),
+				MessageKeys.WARN_KEY, new String[] {});
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
 	}
 
 	@Test
@@ -306,6 +315,14 @@ public class BipRestGlobalExceptionHandlerTest {
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleBipPartnerCheckedException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+	}
+	
+	@Test
+	public void standardHandlerWithWarnTest() {
+		ResponseEntity<Object> response =
+				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "standardHandler", new Exception(),
+						MessageKeys.NO_KEY, MessageSeverity.WARN, HttpStatus.OK, null);
+		assertTrue(response.getStatusCode().equals(HttpStatus.OK));
 	}
 
 	static class DummyObjectToBeValidated {
