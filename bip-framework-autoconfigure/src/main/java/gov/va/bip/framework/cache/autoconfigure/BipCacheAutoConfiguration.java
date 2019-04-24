@@ -86,10 +86,6 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@Autowired(required = false)
 	private BipEmbeddedRedisServer referenceServerRedisEmbedded;
 
-	/* Here for debug, to view RedisProperties and prove is properly initialized */
-//	@/A/u/t/o/w/i/r/e/d
-//	/p/r/i/v/a/t/e/ /R/e/d/i/s/P/r/o/p/e/r/t/i/e/s/ /r/e/d/i/s/P/r/o/p/e/r/t/i/e/s/;
-
 	/**
 	 * Post construction validations.
 	 */

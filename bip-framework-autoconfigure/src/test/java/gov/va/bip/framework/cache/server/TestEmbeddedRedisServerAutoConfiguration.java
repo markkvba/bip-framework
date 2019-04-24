@@ -14,7 +14,7 @@ import gov.va.bip.framework.cache.autoconfigure.server.BipEmbeddedRedisServer;
  *
  */
 @Configuration
-public class EmbeddedRedisServerAutoConfigurationTest {
+public class TestEmbeddedRedisServerAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
