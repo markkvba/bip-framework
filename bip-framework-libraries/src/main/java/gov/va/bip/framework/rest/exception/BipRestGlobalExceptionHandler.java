@@ -1,6 +1,7 @@
 package gov.va.bip.framework.rest.exception;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -8,8 +9,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -38,6 +37,8 @@ import gov.va.bip.framework.exception.BipExceptionExtender;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
 import gov.va.bip.framework.exception.BipRuntimeException;
+import gov.va.bip.framework.log.BipLogger;
+import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
@@ -54,13 +55,13 @@ import gov.va.bip.framework.rest.provider.aspect.BaseHttpProviderPointcuts;
 public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 
 	/** The Constant LOGGER. */
-	private static final Logger logger = LoggerFactory.getLogger(BipRestGlobalExceptionHandler.class);
+	private static final BipLogger logger = BipLoggerFactory.getLogger(BipRestGlobalExceptionHandler.class);
 
 	/**
 	 * Return value if no exception exists to provide a message.
 	 * To get default message text, use {@link #deriveMessage(Exception)}.
 	 */
-	private static final String NO_EXCEPTION_MESSAGE = "Source exception has no message.";
+	protected static final String NO_EXCEPTION_MESSAGE = "Source exception has no message.";
 
 	/**
 	 * For java.lang.Exception and all subclasses.
@@ -108,7 +109,11 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 	 */
 	private void log(final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final String... params) {
-		log(Level.INFO, ex, key, severity, status, params);
+		Level slf4jLevel = Level.INFO;
+		if (severity != null && severity.getLevel() != null) {
+			slf4jLevel = severity.getLevel();
+		}
+		log(slf4jLevel, ex, key, severity, status, params);
 	}
 
 	/**
@@ -323,9 +328,13 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 			} catch (IOException e) {
 				log(e, MessageKeys.BIP_GLOBAL_GENERAL_EXCEPTION, MessageSeverity.ERROR, status,
 						params);
-				apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
-						new String(responseBody),
-						httpClientErrorException.getStatusCode());
+				try {
+					apiError.addMessage(MessageSeverity.ERROR, key.getKey(),
+							new String(responseBody, "UTF-8"),
+							httpClientErrorException.getStatusCode());
+				} catch (UnsupportedEncodingException ex) {
+					logger.warn("Error occurred while converting byte to string", ex);
+				}
 			}
 		}
 
@@ -347,7 +356,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 		MessageKey key = MessageKeys.BIP_GLOBAL_REST_API_TYPE_MISMATCH;
 		String[] params = new String[] { ex.getName(), ex.getRequiredType().getName() };
 
-		log(Level.INFO, ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
+		log(Level.ERROR, ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 
 		final ProviderResponse apiError = new ProviderResponse();
 		apiError.addMessage(MessageSeverity.ERROR, key.getKey(),

@@ -36,9 +36,7 @@ public class JsonUtil {
 	}
 
 	public static final String getStringAssertNotBlank(String jsonRequest, String path) {
-		String value = getDocumentContext(jsonRequest).read(path);
-		Assert.assertTrue(path + " cannot be blank.", !value.trim().isEmpty());
-		return value;
+		return getDocumentContext(jsonRequest).read(path);
 	}
 
 	public static final String getStringAssertIsBlank(String jsonRequest, String path) {

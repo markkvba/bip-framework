@@ -61,7 +61,12 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 		super.secureMessage(soapMessage, messageContext);
 
 		try {
-			final Document doc = soapMessage.getDocument();
+			Document doc = null;
+			
+			if (soapMessage != null && soapMessage.getDocument() != null) {
+				doc = soapMessage.getDocument();
+			}
+			
 			final WSSecHeader secHeader = new WSSecHeader();
 			LOGGER.info("doc before security header: "
 					+ ReflectionToStringBuilder.toString(doc == null ? "null" : doc, ToStringStyle.SHORT_PREFIX_STYLE, true, true,
@@ -84,7 +89,10 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 				LOGGER.error("Could not find an existing SAML assertion to use in web service request.");
 			}
 
-			soapMessage.setDocument(doc);
+			if (soapMessage != null) {
+				soapMessage.setDocument(doc);
+			}
+			
 			LOGGER.info("SOAP message: "
 					+ ReflectionToStringBuilder.toString(soapMessage == null ? "null" : soapMessage, ToStringStyle.SHORT_PREFIX_STYLE, // NOSONAR
 							true, true, null));
@@ -116,7 +124,12 @@ public class VAServiceSAMLWss4jSecurityInterceptor extends Wss4jSecurityIntercep
 
 		try {
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); 
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
 			factory.setNamespaceAware(true);
+			factory.setValidating(true);
 			final DocumentBuilder builder = factory.newDocumentBuilder();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 

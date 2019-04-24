@@ -91,7 +91,7 @@ public class AuditHttpRequestResponse {
 				getHttpRequestAuditData(httpServletRequest, requestAuditData);
 			}
 
-			baseAsyncAudit.writeRequestAuditLog(request, requestAuditData, auditEventData, null, null);
+			baseAsyncAudit.writeRequestAuditLog(request, requestAuditData, auditEventData, MessageSeverity.INFO, null);
 		}
 
 		/**
@@ -141,16 +141,18 @@ public class AuditHttpRequestResponse {
 						partHeaders.put(headerName, value);
 					}
 
-					inputstream = part.getInputStream();
-
-					multipartHeaders.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
+					try {
+						inputstream = part.getInputStream();
+						multipartHeaders
+								.add(partHeaders.toString() + ", " + BaseAsyncAudit.convertBytesToString(inputstream));
+					} finally {
+						BaseAsyncAudit.closeInputStreamIfRequired(inputstream);
+					}
 				}
 			} catch (final Exception ex) {
 				LOGGER.error(BipBanner.newBanner(BipConstants.INTERCEPTOR_EXCEPTION, Level.ERROR),
 						"Error occurred while reading the upload file. {}", ex);
-			} finally {
-				BaseAsyncAudit.closeInputStreamIfRequired(inputstream);
-			}
+			} 
 			return multipartHeaders;
 		}
 
@@ -247,7 +249,6 @@ public class AuditHttpRequestResponse {
 	 */
 	protected ResponseEntity<ProviderResponse> handleInternalException(final String adviceName, final String attemptingTo,
 			final AuditEventData auditEventData, final Throwable throwable) {
-		ResponseEntity<ProviderResponse> entity = null;
 		try {
 			MessageKeys key = MessageKeys.BIP_AUDIT_ASPECT_ERROR_UNEXPECTED;
 			final BipRuntimeException bipRuntimeException = new BipRuntimeException(key,
@@ -264,9 +265,8 @@ public class AuditHttpRequestResponse {
 			return new ResponseEntity<>(providerResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		} catch (Throwable e) { // NOSONAR intentionally catching throwable
-			entity = handleAnyRethrownExceptions(adviceName, throwable, e);
+			return handleAnyRethrownExceptions(adviceName, throwable, e);
 		}
-		return entity;
 	}
 
 	/**
