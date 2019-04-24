@@ -32,7 +32,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  *
  */
 @ConfigurationProperties(prefix = "bip.framework.cache", ignoreInvalidFields = false, ignoreUnknownFields = false)
-@Configuration// ("bipRedisCacheProperties")
+@Configuration
 public class BipRedisCacheProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);

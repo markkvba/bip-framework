@@ -67,7 +67,7 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		TestPropertyValues.of("bip.framework.cache.defaultExpires=86401").applyTo(context);
-		context.register(RedisAutoConfiguration.class, BipRedisClientProperties.class);
+		context.register(RedisAutoConfiguration.class, BipRedisCacheProperties.class);
 		context.refresh();
 		BipRedisCacheProperties bipRedisClientProperties = context.getBean(BipRedisCacheProperties.class);
 		BipRedisCacheProperties.RedisExpires redisExpires =

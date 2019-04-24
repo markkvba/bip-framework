@@ -8,10 +8,9 @@ import javax.annotation.PreDestroy;
 import javax.net.ServerSocketFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Profile;
 
-import gov.va.bip.framework.cache.autoconfigure.BipRedisProperties;
 import gov.va.bip.framework.config.BipCommonSpringProfiles;
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -32,8 +31,7 @@ public class BipEmbeddedRedisServer {
 
 	/** Cache Properties Bean */
 	@Autowired
-	@Qualifier("bipRedisProperties")
-	private BipRedisProperties properties;
+	private RedisProperties properties;
 
 	/** Embedded redis server object */
 	private RedisServer redisServer;
@@ -54,9 +52,9 @@ public class BipEmbeddedRedisServer {
 	 */
 	@PostConstruct
 	public void startRedis() throws IOException {
-		Defense.notNull(properties, "properties is required to run/use Redis!");
+		Defense.notNull(properties, properties.getClass().getSimpleName() + " cannot be null");
 
-		if (properties.getPort() == null) {
+		if (properties.getPort() < 1) {
 			ServerSocket ss = null;
 			try {
 				ss = ServerSocketFactory.getDefault().createServerSocket(0);
