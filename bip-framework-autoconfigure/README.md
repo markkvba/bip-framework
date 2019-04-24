@@ -1,6 +1,6 @@
 ## What is this project for?
 
-BIP Framework Autoconfigure Project is a suite of POM files that provides application services with starter dependencies for the BIP platform. 
+BIP Framework Autoconfigure Project is a suite of POM files that provides application services with starter dependencies for the BIP platform.
 
 ## Overview of the packages
 ### gov.va.bip.framework.audit.autoconfigure:
@@ -21,9 +21,13 @@ Audit auto-configuration that provides the serializer bean and enables async exe
 Redis cache auto-configurationthat provides property-driven beans to set up the Redis connection, start the Redis Embedded Server (if in a spring profile that requires it), and expose a JMX bean for developers to clear the cache with.
 
 Caches are configured for a specific naming scheme of:
-	*appName*Service\_@project.name@\_@project.version@
+```	*appName*Service\_@project.name@\_@project.version@```
 
-Configuration is declared as below. Beans created in this class refer to the other classes found in the package.
+Redis attributes are configured in the Service Application's application YAML file under `spring.redis` properties. Likewise, cache attributes for the application are configured in the application YAML under the `bip.framework.cach.**` property. See properties and comments under the `spring:redis:**` and he `bip.framework:cach:**` sections in [bip-reference-person.yml](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/bip-reference-person/src/main/resources/bip-reference-person.yml).
+
+Any properties that do not appear in the appropriate hierarchy will be silently ignored, so default values, or nulls will be substituted for properties that were believed to be configured.
+
+Auto-configuration is declared as below. Beans created in this class refer to the other classes found in the package.
 
 	@Configuration
 	@EnableConfigurationProperties(BipCacheProperties.class)
@@ -35,17 +39,7 @@ Configuration is declared as below. Beans created in this class refer to the oth
 	...
 	}
 
-#### Clearing the cache
-The cache auto-configuration registers `BipCacheOpsMBean` and its implementation as a spring JMX management bean (enabled by the `@EnableMBeanExport` annotation). This bean allows developers to clear the cache on the fly when testing code that must bypass the cache, and can be enhanced to provide other cache management activities. Usage of this bean is:
-1. Start the spring boot service app (in STS or from command line)
-2. Open $JAVA_HOME/bin/jconsole (JAVA_HOME must point to a full JDK, not SE, as jconsole is only available in the full JDK)
-3. When jconsole opens:
-	* In the _New Connection_ dialog, select _Local Process > gov.va.bip.person.ReferencePersonApplication_ and click the _Connect_ button
-	* If asked, allow _Insecure connection_
-	* When the console comes up, select the _MBeans_ tab
-	* In the list pane on the left, look under _gov.va.bip.cache > Support > cacheOps > Operations > clearAllCaches_, and click on the _clearAllCaches_ entry
-	* In the right pane under _Operation Invocation_, click the _clearAllCaches()_ button
-	* After a moment, a "Method successfully invoked" message should pop up, indicating that all cache entries have been cleared
+Developers needing to clear the cache for local testing purposes have a tool available, as outlined in [Clearing the Redis Cache](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/local-dev#clearing-the-redis-cache)
 
 ### gov.va.bip.framework.feign.autoconfigure:
 Feign client auto-configuration creates a number of beans to support RESTful client calls through the feign library:
