@@ -55,15 +55,15 @@ import gov.va.bip.framework.exception.BipRuntimeException;
 import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
-import gov.va.bip.framework.rest.exception.BipRestGlobalExceptionHandler;
 
 public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
-	
+
 	BipRestGlobalExceptionHandler bipRestGlobalExceptionHandler = new BipRestGlobalExceptionHandler();
 
 	DummyObjectToBeValidated dummyObjectToBeValidated;
 
 	private static final MessageKey TEST_KEY = MessageKeys.NO_KEY;
+	private static final String TEST_MESSAGE = "Test message";
 
 	@Test
 	public void handleIllegalArgumentExceptionTest() {
@@ -74,25 +74,53 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 	}
 
 	@Test
-	public void deriveMessageTest() {
-		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(),
-				MessageKeys.NO_KEY, new String[] {});
-		assertTrue(returnValue.equals("NO_KEY"));
-	}
-	
-	@Test
-	public void deriveMessageNoMessageTest() {
-		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(),
-				MessageKeys.WARN_KEY, new String[] {});
-		System.out.println("returnValue:" + returnValue);
-		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
+	public void handleIllegalStateExceptionTest() {
+		HttpServletRequest req = mock(HttpServletRequest.class);
+		IllegalStateException ex = new IllegalStateException("test illegal state exception message");
+		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleIllegalStateException(req, ex);
+		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
 
 	@Test
-	public void getMessageFromWrappedExceptionTest() {
-		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "getMessageFromWrappedException",
-				new Exception(new Exception("wrapped message")));
-		assertTrue(returnValue.equals("wrapped message"));
+	public void deriveMessageTests() {
+		// null exception
+		String returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", (Exception) null);
+		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
+
+		// exception without cause
+		returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage",
+				new BipRuntimeException(MessageKeys.NO_KEY, MessageSeverity.DEBUG, HttpStatus.BAD_REQUEST));
+		assertTrue(returnValue.equals("NO_KEY"));
+
+		// exception without cause or message
+		returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception());
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
+
+		// exception with message; cause that has a message
+		Exception cause = new IllegalStateException(TEST_MESSAGE);
+		returnValue =
+				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(TEST_MESSAGE, cause));
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(TEST_MESSAGE));
+
+		// exception with blank space message; cause that has a message
+		cause = new IllegalStateException(TEST_MESSAGE);
+		returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception("  ", cause));
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
+
+		// exception without message; cause that has a message
+		cause = new IllegalStateException(TEST_MESSAGE);
+		returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(cause));
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(TEST_MESSAGE));
+
+		// exception without message; cause that does not have a message
+		cause = new IllegalStateException("");
+		returnValue = ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "deriveMessage", new Exception(cause));
+		System.out.println("returnValue:" + returnValue);
+		assertTrue(returnValue.contains(BipRestGlobalExceptionHandler.NO_EXCEPTION_MESSAGE));
 	}
 
 	@Test
@@ -132,8 +160,14 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 		MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpServletRequest));
 
+		/* Test with request and exception */
 		ResponseEntity<Object> response = brgeh.handleMethodArgumentNotValidException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		annotationConfigApplicationContext.close();
+
+		/* Test with request and no exception */
+		response = brgeh.handleMethodArgumentNotValidException(req, (MethodArgumentNotValidException) null);
+		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 		annotationConfigApplicationContext.close();
 	}
 
@@ -148,8 +182,14 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		HttpClientErrorException ex = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text", headers,
 				"test body".getBytes(), Charset.defaultCharset());
+
+		/* With request and exception */
 		ResponseEntity<Object> response = bipRestGlobalExceptionHandler.handleHttpClientErrorException(req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+
+		/* With request and no exception */
+		response = bipRestGlobalExceptionHandler.handleHttpClientErrorException(req, (HttpClientErrorException) null);
+		assertTrue(response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 	}
 
 	@Test
@@ -316,7 +356,7 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "handleBipPartnerCheckedException", req, ex);
 		assertTrue(response.getStatusCode().equals(HttpStatus.BAD_REQUEST));
 	}
-	
+
 	@Test
 	public void standardHandlerWithWarnTest() {
 		ResponseEntity<Object> response =
