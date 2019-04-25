@@ -70,8 +70,6 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 
 	/** Domain under which JMX beans are exposed */
 	public static final String JMX_DOMAIN = "gov.va.bip";
-	/** Property prefix for configuration for the server type */
-	public static final String PREFIX_SPRING_REDIS = "spring.redis";
 	/** ConditionalOnProperty property name */
 	public static final String CONDITIONAL_SPRING_REDIS = "spring.cache.type";
 	/** The cache server type */
