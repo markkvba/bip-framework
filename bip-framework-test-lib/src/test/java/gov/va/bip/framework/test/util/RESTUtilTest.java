@@ -43,7 +43,6 @@ public class RESTUtilTest {
 	private static final String URL_PERSON = "/person";
 	private static final String LOCALHOST_URL_PERSON = "http://localhost:9999/person";
 	private static final String LOCALHOST_MULTIPART_URL_PERSON = "http://localhost:9999/multipart/person";
-	private static final String LOCALHOST_URL_DOESNOTEXISTS = "http://localhost:9999/urldoesnotexits";
 	private static final String SUBMIT_PAYLOAD_TXT = "submitpayload.txt";
 
 	@BeforeClass
