@@ -50,8 +50,7 @@ import gov.va.bip.framework.test.service.RESTConfigService;
  * @author sravi
  */
 
-public class RESTUtil { 
-	
+public class RESTUtil {
 
 	private static final String DOCUMENTS_FOLDER_NAME = "documents";
 	private static final String PAYLOAD_FOLDER_NAME = "payload";
@@ -59,7 +58,7 @@ public class RESTUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTUtil.class);
 
 	// stores request headers
-	private MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>(); 
+	private MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>();
 	protected String jsonText = new String();
 	private ResponseEntity<String> response = null;
 	private int httpResponseCode;
@@ -68,7 +67,7 @@ public class RESTUtil {
 	public RESTUtil() {
 		this.restTemplate = getRestTemplate();
 	}
-	
+
 	/**
 	 * Reads file content for a given file resource using URL object.
 	 *
@@ -104,14 +103,14 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Gets  header object.
+	 * Gets header object.
 	 *
 	 * @return mapHeader
 	 */
 	public MultiValueMap<String, String> getRequest() {
 		return requestHeaders;
 	}
-	
+
 	/**
 	 * Invokes REST end point for a GET method using REST Template API and return
 	 * response JSON object.
@@ -121,64 +120,64 @@ public class RESTUtil {
 	 */
 	public String getResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
-		HttpEntity<?> request = new HttpEntity<>(headers);				
-		return executeAPI(serviceURL, request, HttpMethod.GET);	
+		HttpEntity<?> request = new HttpEntity<>(headers);
+		return executeAPI(serviceURL, request, HttpMethod.GET);
 	}
-	
+
 	/**
-	 * Invokes REST end point for a POST method using  REST Template API and return
+	 * Invokes REST end point for a POST method using REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
 	 */
-	
+
 	public String postResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
 		HttpEntity<?> request = new HttpEntity<>(jsonText, headers);
 		return executeAPI(serviceURL, request, HttpMethod.POST);
 	}
-	
+
 	/**
-	 * Invokes REST end point for a PUT method using  REST Template API and return
+	 * Invokes REST end point for a PUT method using REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
 	 */
-	
+
 	public String putResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
-		HttpEntity<?> request = new HttpEntity<>(headers);				
-		return executeAPI(serviceURL, request, HttpMethod.PUT);	
+		HttpEntity<?> request = new HttpEntity<>(headers);
+		return executeAPI(serviceURL, request, HttpMethod.PUT);
 	}
+
 	/**
-	 * Invokes REST end point for a DELETE method using  REST Template API and return
+	 * Invokes REST end point for a DELETE method using REST Template API and return
 	 * response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
 	 */
-	
+
 	public String deleteResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
-		HttpEntity<?> request = new HttpEntity<>(headers);		
-		return executeAPI(serviceURL, request, HttpMethod.DELETE);	
+		HttpEntity<?> request = new HttpEntity<>(headers);
+		return executeAPI(serviceURL, request, HttpMethod.DELETE);
 	}
-	
+
 	private String executeAPI(final String serviceURL, HttpEntity<?> request, HttpMethod httpMethod) {
 		try {
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
 			return response.getBody();
-		}
-		catch(HttpClientErrorException clientError) {
+		} catch (HttpClientErrorException clientError) {
 			LOGGER.error("Http client exception is thrown", clientError);
 			httpResponseCode = clientError.getRawStatusCode();
 			return clientError.getResponseBodyAsString();
-		}		
+		}
 	}
-	
+
 	/**
 	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
@@ -195,7 +194,7 @@ public class RESTUtil {
 					.getResource(PAYLOAD_FOLDER_NAME + "/" + submitPayloadPath);
 			final File filePath = new File(urlFilePath.toURI());
 			final File filePathSubmitPayload = new File(urlSubmitPayload.toURI());
-			String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");		
+			String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 			body.add("file", filePath);
 			body.add(SUBMIT_PAYLOAD, submitPayload);
@@ -205,12 +204,12 @@ public class RESTUtil {
 			return null;
 		}
 	}
-	
+
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
-			final byte[] submitPayload) {		
+			final byte[] submitPayload) {
 		try {
 			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
-			final File filePath = new File(urlFilePath.toURI());			
+			final File filePath = new File(urlFilePath.toURI());
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 			body.add("file", filePath);
 			body.add(SUBMIT_PAYLOAD, submitPayload);
@@ -221,16 +220,17 @@ public class RESTUtil {
 		}
 
 	}
-	
+
 	private String executeMultipartAPI(String serviceURL, MultiValueMap<String, Object> body) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
-		return executeAPI(serviceURL, request, HttpMethod.POST);		
+		return executeAPI(serviceURL, request, HttpMethod.POST);
 	}
-	
+
 	/**
-	 * Loads the KeyStore and password in to rest Template API so all the API's are SSL enabled.
+	 * Loads the KeyStore and password in to rest Template API so all the API's are
+	 * SSL enabled.
 	 */
 
 	private RestTemplate getRestTemplate() {
@@ -243,58 +243,61 @@ public class RESTUtil {
 			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
 				keyStore = KeyStore.getInstance("jks");
 				keyStore.load(instream, password.toCharArray());
-				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray()).
-						loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-				
-			    SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-			    HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-			    apiTemplate = new RestTemplate(requestFactory);				
+				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray())
+						.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+
+				SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
+						NoopHostnameVerifier.INSTANCE);
+				HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+				ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+				apiTemplate = new RestTemplate(requestFactory);
 			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e); 
-			}			
+				LOGGER.error("Issue with the certificate or password", e);
+			}
 		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
 		return apiTemplate;
 	}
-		
+
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
 		String readTimeout = "30000";
-		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory =
-				new HttpComponentsClientHttpRequestFactory(getHttpClientBuilder().build());
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(
+				getHttpClientBuilder().build());
 		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
 		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
 		return clientHttpRequestFactory;
 	}
-	
+
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
 		String maxTotalPool = "15";
 		String defaultMaxPerRoutePool = "5";
 		String validateAfterInactivityPool = "5000";
-		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR CloseableHttpClient#close should automatically 
-        // shut down the connection pool only if exclusively owned by the client
+		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR
+																												// CloseableHttpClient#close
+																												// should
+																												// automatically
+		// shut down the connection pool only if exclusively owned by the client
 		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
 		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
 		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
 		return poolingConnectionManager;
 	}
-	
+
 	private HttpClientBuilder getHttpClientBuilder() {
 		String connectionBufferSize = "4128";
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-				.setBufferSize(Integer.valueOf(connectionBufferSize))
-				.build();
+				.setBufferSize(Integer.valueOf(connectionBufferSize)).build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
-	
+
 		return clientBuilder;
 	}
-	
+
 	/**
 	 * Loads the expected results from source folder and returns as string.
 	 *
@@ -323,12 +326,11 @@ public class RESTUtil {
 		String content = null;
 		final File file = filename;
 		FileReader reader = new FileReader(file);
-		try  {			
+		try {
 			final char[] chars = new char[(int) file.length()];
 			reader.read(chars);
 			content = new String(chars);
-		} 
-		finally {
+		} finally {
 			reader.close();
 		}
 		return content;
@@ -341,10 +343,8 @@ public class RESTUtil {
 	 * @param intStatusCode
 	 */
 	public void validateStatusCode(final int intStatusCode) {
-	   assertThat(httpResponseCode, equalTo(intStatusCode));
-		
+		assertThat(httpResponseCode, equalTo(intStatusCode));
+
 	}
 
-	
 }
-

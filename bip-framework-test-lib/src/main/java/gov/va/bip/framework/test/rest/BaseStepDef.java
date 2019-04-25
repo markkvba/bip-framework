@@ -96,6 +96,7 @@ public class BaseStepDef {
 		resUtil.setUpRequest(headerMap);
 		strResponse = resUtil.putResponse(strURL);
 	}
+
 	/**
 	 * Sets the bearer token and delegates put API call to rest util.
 	 * 
@@ -126,12 +127,14 @@ public class BaseStepDef {
 	 * @param fileName
 	 * @param submitPayloadPath
 	 */
-	public void invokeAPIUsingPostWithMultiPart(final String strURL, final String fileName, final String submitPayloadPath) {
+	public void invokeAPIUsingPostWithMultiPart(final String strURL, final String fileName,
+			final String submitPayloadPath) {
 		resUtil.setUpRequest(headerMap);
 		strResponse = resUtil.postResponseWithMultipart(strURL, fileName, submitPayloadPath);
 	}
 
-	public void invokeAPIUsingPostWithMultiPart(final String strURL, final String fileName, final byte[] submitPayloadPath) {
+	public void invokeAPIUsingPostWithMultiPart(final String strURL, final String fileName,
+			final byte[] submitPayloadPath) {
 		resUtil.setUpRequest(headerMap);
 		strResponse = resUtil.postResponseWithMultipart(strURL, fileName, submitPayloadPath);
 	}
@@ -160,7 +163,8 @@ public class BaseStepDef {
 	}
 
 	/**
-	 * Invokes bearer token service to get token and sets as authorization key in header map.
+	 * Invokes bearer token service to get token and sets as authorization key in
+	 * header map.
 	 */
 	private void setBearerToken() {
 		bearerTokenService = BearerTokenService.getInstance();
@@ -204,7 +208,7 @@ public class BaseStepDef {
 				tblHeader.put((String) entry.getKey(), (String) entry.getValue());
 			}
 		} finally {
-			if (is !=null) {
+			if (is != null) {
 				is.close();
 			}
 		}
@@ -221,11 +225,14 @@ public class BaseStepDef {
 			final String prettyStrExpectedResponse = mapper.writerWithDefaultPrettyPrinter()
 					.writeValueAsString(strExpectedResponseJson);
 			final Object strResponseJson = mapper.readValue(strResponse, Object.class);
-			final String prettyStrResponseJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(strResponseJson);
+			final String prettyStrResponseJson = mapper.writerWithDefaultPrettyPrinter()
+					.writeValueAsString(strResponseJson);
 			isMatch = prettyStrResponseJson.contains(prettyStrExpectedResponse);
-			Assert.assertEquals("Actual and expected response are not equal -"+ "Actual Response"+ prettyStrResponseJson +  "\n Expected Response" + prettyStrExpectedResponse ,prettyStrResponseJson, prettyStrExpectedResponse);	
-			} 
-		catch (final IOException ioe) {
+			Assert.assertEquals(
+					"Actual and expected response are not equal -" + "Actual Response" + prettyStrResponseJson
+							+ "\n Expected Response" + prettyStrExpectedResponse,
+					prettyStrResponseJson, prettyStrExpectedResponse);
+		} catch (final IOException ioe) {
 			LOGGER.error(ioe.getMessage(), ioe);
 		}
 		return isMatch;
@@ -259,7 +266,7 @@ public class BaseStepDef {
 	 * 
 	 * @param scenario
 	 */
-	public void postProcess(final Scenario scenario) { 
+	public void postProcess(final Scenario scenario) {
 		String strResponseFile = null;
 		try {
 			strResponseFile = "target/TestResults/Response/" + scenario.getName() + ".Response";
