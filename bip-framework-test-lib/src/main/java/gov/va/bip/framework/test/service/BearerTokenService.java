@@ -1,5 +1,7 @@
 package gov.va.bip.framework.test.service;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +35,15 @@ public class BearerTokenService {
 	public static String getTokenByHeaderFile(final String headerFile) {
 		return getToken(headerFile);
 	}
-    /**
-     * Makes API call to bearer token service and returns the token as string.
-     * @param headerFile
-     * @return
-     */
+
+	/**
+	 * Makes API call to bearer token service and returns the token as string.
+	 * 
+	 * @param headerFile
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws IOException
+	 */
 	public static String getToken(final String headerFile) {
 		final RESTConfigService restConfig = RESTConfigService.getInstance();
 		final String baseUrl = restConfig.getProperty("baseURL", true);

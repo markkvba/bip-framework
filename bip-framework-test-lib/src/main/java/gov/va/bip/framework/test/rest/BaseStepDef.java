@@ -3,6 +3,7 @@ package gov.va.bip.framework.test.rest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,8 @@ public class BaseStepDef {
 	 * 
 	 * @param strURL
 	 * @param isAuth
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	public void invokeAPIUsingGet(final String strURL, final boolean isAuth) {
 		if (isAuth) {
@@ -79,6 +82,8 @@ public class BaseStepDef {
 	 * 
 	 * @param strURL
 	 * @param isAuth
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	public void invokeAPIUsingPost(final String strURL, final boolean isAuth) {
 		if (isAuth) {
@@ -101,6 +106,8 @@ public class BaseStepDef {
 	 * 
 	 * @param strURL
 	 * @param isAuth
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	public void invokeAPIUsingPut(final String strURL, final boolean isAuth) {
 		if (isAuth) {
@@ -141,6 +148,8 @@ public class BaseStepDef {
 	 * 
 	 * @param strURL
 	 * @param isAuth
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	public void invokeAPIUsingDelete(final String strURL, final boolean isAuth) {
 		if (isAuth) {
@@ -161,6 +170,9 @@ public class BaseStepDef {
 
 	/**
 	 * Invokes bearer token service to get token and sets as authorization key in header map.
+	 * 
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	private void setBearerToken() {
 		bearerTokenService = BearerTokenService.getInstance();

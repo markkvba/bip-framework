@@ -231,6 +231,9 @@ public class RESTUtil {
 	
 	/**
 	 * Loads the KeyStore and password in to rest Template API so all the API's are SSL enabled.
+	 * 
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 
 	private RestTemplate getRestTemplate() {

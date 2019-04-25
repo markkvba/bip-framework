@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.net.HttpHeaders;
 
+import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.RESTConfigService;
 
 public class RESTUtilTest {
@@ -44,7 +44,6 @@ public class RESTUtilTest {
 	private static final String URL_PERSON = "/person";
 	private static final String LOCALHOST_URL_PERSON = "http://localhost:9999/person";
 	private static final String LOCALHOST_MULTIPART_URL_PERSON = "http://localhost:9999/multipart/person";
-	private static final String LOCALHOST_URL_DOESNOTEXISTS = "http://localhost:9999/urldoesnotexits";
 	private static final String SUBMIT_PAYLOAD_TXT = "submitpayload.txt";
 
 	@BeforeClass
@@ -148,37 +147,32 @@ public class RESTUtilTest {
 			Field instanceOfRESTConfigService = RESTConfigService.class.getDeclaredField("instance");
 			instanceOfRESTConfigService.setAccessible(true);
 			instanceOfRESTConfigService.set(null, config);
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
+			ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchFieldException | BipTestLibRuntimeException e) {
 			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail("Exception not expected!");
 		}
-		ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
 	}
+
 	@Test
 	public void _testGetRestTemplateSuccess() {
-		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		String pathToKeyStore = null;
+		try {
+			pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		} catch (BipTestLibRuntimeException e) {
+			e.printStackTrace();
+			fail("Exception not expected!");
+		}
 		File strFilePath;
 		strFilePath = new File(pathToKeyStore);
 		strFilePath.setReadable(false);
-		ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
+		try {
+			ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
+		} catch (BipTestLibRuntimeException e) {
+			e.printStackTrace();
+			fail("Exception not expected!");
+		}
 		strFilePath.setReadable(true);
 	}
 	@Test

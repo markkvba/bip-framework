@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
+import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.BearerTokenService;
 
 public class BearerTokenServiceTest {
@@ -41,13 +43,20 @@ public class BearerTokenServiceTest {
 
 	@Test
 	public void test_getToken_Success() {
-		String token = BearerTokenService.getInstance().getBearerToken();
+		String token = null;
+		try {
+			token = BearerTokenService.getInstance().getBearerToken();
+		} catch (BipTestLibRuntimeException e) {
+			e.printStackTrace();
+			fail("Exception not expected!");
+		}
 		assertThat(true, equalTo(!token.isEmpty()));
 	}
 
 	@Test
 	public void test_getTokenByHeaderFile_Success() {
-		String token = BearerTokenService.getTokenByHeaderFile("token.Request");
+		String token = null;
+		token = BearerTokenService.getTokenByHeaderFile("token.Request");
 		assertThat(true, equalTo(!token.isEmpty()));
 	}
 

@@ -1,11 +1,14 @@
 package gov.va.bip.framework.test.service;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
 
 import org.apache.commons.lang3.StringUtils;
 
+import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.util.PropertiesUtil;
 
 /**
@@ -55,6 +58,8 @@ public class RESTConfigService {
 	 * Get the configured single instance of the REST controller.
 	 *
 	 * @return RESTConfigService
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
 	public static RESTConfigService getInstance() {
 		if (instance == null) {
@@ -67,6 +72,9 @@ public class RESTConfigService {
 				url = "config/vetservices-inttest.properties";
 			}
 			final URL urlConfigFile = RESTConfigService.class.getClassLoader().getResource(url);
+			if (urlConfigFile == null) {
+				throw new BipTestLibRuntimeException("Could not find resource with url for loading configuration : " + url);
+			}
 			instance.prop = PropertiesUtil.readFile(urlConfigFile);
 		}
 
@@ -105,6 +113,11 @@ public class RESTConfigService {
 		} else {
 			value = prop.getProperty(pName);
 		}
+
+		if (value == null) {
+			new BipTestLibRuntimeException("Could not find property : " + pName);
+		}
+
 		return value;
 	}
 
