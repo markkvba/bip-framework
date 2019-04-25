@@ -119,7 +119,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 	private void log(final Exception ex, final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final String... params) {
 		Level slf4jLevel = Level.INFO;
-		if (severity != null && severity.getLevel() != null) {
+		if (severity != null) {
 			slf4jLevel = severity.getLevel();
 		}
 		log(slf4jLevel, ex, key, severity, status, params);
