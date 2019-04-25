@@ -18,12 +18,13 @@ Audit auto-configuration that provides the serializer bean and enables async exe
 	}
 
 ### gov.va.bip.framework.cache.autoconfigure:
-Redis cache auto-configurationthat provides property-driven beans to set up the Redis connection, start the Redis Embedded Server (if in a spring profile that requires it), and expose a JMX bean for developers to clear the cache with.
+Redis cache auto-configuration that provides property-driven beans to set up the Redis connection, start the Redis Embedded Server (if in a spring profile that requires it), and expose a JMX bean for developers to clear the cache with.
 
-Caches are configured for a specific naming scheme of:
-```	*appName*Service\_@project.name@\_@project.version@```
+Caches are configured for a specific naming scheme of: `cacheName_ProjectName_MavenVersion`; the actual properties entry might look something like *`appName`*`Service\_@project.name@\_@project.version@`
 
-Redis attributes are configured in the Service Application's application YAML file under `spring.redis` properties. Likewise, cache attributes for the application are configured in the application YAML under the `bip.framework.cach.**` property. See properties and comments under the `spring:redis:**` and he `bip.framework:cach:**` sections in [bip-reference-person.yml](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/bip-reference-person/src/main/resources/bip-reference-person.yml).
+Redis attributes are configured in the Service Application's application YAML file under `spring.redis` properties. See also [Redis configuration](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/docs/cache-management.md#redis-configuration).
+
+Cache-specific attributes for the application are configured in the application YAML under the `bip.framework.cache.**` property. See properties and comments under the `spring:redis:**` and he `bip.framework:cach:**` sections in [bip-reference-person.yml](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/bip-reference-person/src/main/resources/bip-reference-person.yml).
 
 Any properties that do not appear in the appropriate hierarchy will be silently ignored, so default values, or nulls will be substituted for properties that were believed to be configured.
 
