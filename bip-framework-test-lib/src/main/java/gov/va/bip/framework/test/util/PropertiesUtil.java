@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 public class PropertiesUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtil.class);
 
+	/**
+	 * Empty private constructor that should not initialized.
+	 */
 	private PropertiesUtil() {
 		throw new UnsupportedOperationException("PropertiesUtil is a static class. Do not instantiate it.");
 	}

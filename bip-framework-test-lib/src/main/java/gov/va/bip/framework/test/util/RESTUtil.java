@@ -52,18 +52,54 @@ import gov.va.bip.framework.test.service.RESTConfigService;
 
 public class RESTUtil {
 
+	/**
+	 * Constant for document folder name
+	 */
 	private static final String DOCUMENTS_FOLDER_NAME = "documents";
+
+	/**
+	 * Constant for payload folder name
+	 */
 	private static final String PAYLOAD_FOLDER_NAME = "payload";
+
+	/**
+	 * Constant for submit folder name
+	 */
 	private static final String SUBMIT_PAYLOAD = "submitPayload";
+
+	/**
+	 * Logger
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTUtil.class);
 
-	// stores request headers
+	/**
+	 * stores request headers
+	 */
 	private MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>();
+
+	/**
+	 * Holds json that represents header info
+	 */
 	protected String jsonText = new String();
+
+	/**
+	 * Holds API response object.
+	 */
 	private ResponseEntity<String> response = null;
+
+	/**
+	 * API response status code
+	 */
 	private int httpResponseCode;
+
+	/**
+	 * Spring REST template object to invoke all API calls.
+	 */
 	private RestTemplate restTemplate;
 
+	/**
+	 * Constructor to initialize objects.
+	 */
 	public RESTUtil() {
 		this.restTemplate = getRestTemplate();
 	}
@@ -166,8 +202,19 @@ public class RESTUtil {
 		return executeAPI(serviceURL, request, HttpMethod.DELETE);
 	}
 
+	/**
+	 * Private method that is invoked by different http methods. It uses
+	 * RESTTemplate generic exchange method for various HTTP methods such as
+	 * GET,POST,PUT,DELETE
+	 * 
+	 * @param serviceURL
+	 * @param request
+	 * @param httpMethod
+	 * @return
+	 */
 	private String executeAPI(final String serviceURL, HttpEntity<?> request, HttpMethod httpMethod) {
 		try {
+			// request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
 			return response.getBody();
@@ -204,6 +251,14 @@ public class RESTUtil {
 			return null;
 		}
 	}
+	/**
+	 * Invokes REST end point for a multipart method using REST Template API and
+	 * return response json object.
+	 * @param serviceURL
+	 * @param fileName
+	 * @param submitPayload
+	 * @return
+	 */
 
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
 			final byte[] submitPayload) {
@@ -220,7 +275,13 @@ public class RESTUtil {
 		}
 
 	}
-
+    /**
+     * Private method that is invoked by multipart methods. It uses
+     * RESTTemplate generic exchange method for multipart HTTP methods.
+     * @param serviceURL
+     * @param body
+     * @return
+     */
 	private String executeMultipartAPI(String serviceURL, MultiValueMap<String, Object> body) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -261,6 +322,12 @@ public class RESTUtil {
 		return apiTemplate;
 	}
 
+	/**
+	 * Creates HttpComponentsClientHttpRequestFactory with different settings such
+	 * as connectionTimeout, readTimeout
+	 * 
+	 * @return
+	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
 		String readTimeout = "30000";
@@ -271,6 +338,11 @@ public class RESTUtil {
 		return clientHttpRequestFactory;
 	}
 
+	/**
+	 * Creates PoolingHttpClientConnectionManager with various settings.
+	 * 
+	 * @return
+	 */
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
 		String maxTotalPool = "15";
 		String defaultMaxPerRoutePool = "5";
@@ -286,6 +358,12 @@ public class RESTUtil {
 		return poolingConnectionManager;
 	}
 
+	/**
+	 * Creates HttpClientBuilder and sets PoolingHttpClientConnectionManager,
+	 * ConnectionConfig
+	 * 
+	 * @return
+	 */
 	private HttpClientBuilder getHttpClientBuilder() {
 		String connectionBufferSize = "4128";
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
@@ -322,6 +400,13 @@ public class RESTUtil {
 		return strExpectedResponse;
 	}
 
+	/**
+	 * Utility method to read file. The parameter holds absolute path.
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
 	protected String readFile(final File filename) throws IOException {
 		String content = null;
 		final File file = filename;

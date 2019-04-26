@@ -17,13 +17,29 @@ import gov.va.bip.framework.test.util.RESTUtil;
 
 public class BearerTokenService {
 
+	/**
+	 * A service object that deals with bearer token. BearerTokenService fetch token
+	 * before every API call.
+	 */
 	private static BearerTokenService instance = null;
+
+	/**
+	 * String that holds bearerToken
+	 */
 	private String bearerToken = "";
 
+	/**
+	 * Empty private constructor that should not initialized.
+	 */
 	private BearerTokenService() {
 
 	}
 
+	/**
+	 * Function that initializes BearerTokenService as singleton object.
+	 * 
+	 * @return
+	 */
 	public static BearerTokenService getInstance() {
 
 		if (instance == null) {
@@ -33,6 +49,12 @@ public class BearerTokenService {
 		return instance;
 	}
 
+	/**
+	 * Invokes bearer token API with header information loaded from give filepath.
+	 * 
+	 * @param headerFile
+	 * @return
+	 */
 	public static String getTokenByHeaderFile(final String headerFile) {
 		return getToken(headerFile);
 	}
@@ -55,6 +77,11 @@ public class BearerTokenService {
 		return restUtility.postResponse(baseUrl + tokenUrl);
 	}
 
+	/**
+	 * Returns bearer token
+	 * 
+	 * @return
+	 */
 	public String getBearerToken() {
 		return bearerToken;
 	}

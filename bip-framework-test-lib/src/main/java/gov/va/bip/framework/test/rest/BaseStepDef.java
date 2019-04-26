@@ -28,13 +28,44 @@ import gov.va.bip.framework.test.util.RESTUtil;
  */
 
 public class BaseStepDef {
+	/**
+	 * Utility to handle Rest API calls
+	 */
 	protected RESTUtil resUtil = null;
+
+	/**
+	 * Map that holds key value pair for http headers.
+	 */
 	protected Map<String, String> headerMap = null;
+
+	/**
+	 * Holds api response of Rest API call. This is usually json response string.
+	 */
 	protected String strResponse = null;
+
+	/**
+	 * Utility for RESTConfigService to read REST API config
+	 */
 	protected RESTConfigService restConfig = null;
+
+	/**
+	 * A service object that deals with bearer token. BearerTokenService fetch token
+	 * before every API call.
+	 */
 	private BearerTokenService bearerTokenService = null;
 
+	/**
+	 * Logger object
+	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseStepDef.class);
+	/**
+	 * Constants for JSON response
+	 */
+	private static final String RESPONSE_PATH = "target/TestResults/Response/";
+
+	/**
+	 * Initialize services and utility
+	 */
 
 	public void initREST() {
 		resUtil = new RESTUtil();
@@ -133,6 +164,13 @@ public class BaseStepDef {
 		strResponse = resUtil.postResponseWithMultipart(strURL, fileName, submitPayloadPath);
 	}
 
+	/**
+	 * Delegates Multipart API call without bearer token to rest util.
+	 * 
+	 * @param strURL
+	 * @param fileName
+	 * @param submitPayloadPath
+	 */
 	public void invokeAPIUsingPostWithMultiPart(final String strURL, final String fileName,
 			final byte[] submitPayloadPath) {
 		resUtil.setUpRequest(headerMap);
@@ -216,6 +254,12 @@ public class BaseStepDef {
 		passHeaderInformation(tblHeader);
 	}
 
+	/**
+	 * Compares REST API call response with given string.
+	 * 
+	 * @param strResFile
+	 * @return
+	 */
 	public boolean compareExpectedResponseWithActual(final String strResFile) {
 		boolean isMatch = false;
 		try {
@@ -269,7 +313,7 @@ public class BaseStepDef {
 	public void postProcess(final Scenario scenario) {
 		String strResponseFile = null;
 		try {
-			strResponseFile = "target/TestResults/Response/" + scenario.getName() + ".Response";
+			strResponseFile = RESPONSE_PATH + scenario.getName() + ".Response";
 			FileUtils.writeStringToFile(new File(strResponseFile), strResponse, StandardCharsets.UTF_8);
 		} catch (final Exception ex) {
 			LOGGER.error("Failed:Unable to write response to a file", ex);
