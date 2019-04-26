@@ -38,6 +38,8 @@ import gov.va.bip.framework.test.util.PropertiesUtil;
 public class RESTConfigService {
 	
 
+
+	private static final String COULD_NOT_FIND_PROPERTY_STRING = "Could not find property : ";
 	/** The singleton instance of this class */
 	private static RESTConfigService instance = null;
 	/** The singleton instance of the configuration for the module in which this artifact is a dependency */
@@ -108,14 +110,20 @@ public class RESTConfigService {
 		if (isCheckSystemProp) {
 			value = System.getProperty(pName);
 			if (StringUtils.isBlank(value)) {
+				if (prop == null) {
+					throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + pName);
+				}
 				value = prop.getProperty(pName);
 			}
 		} else {
+			if (prop == null) {
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + pName);
+			}
 			value = prop.getProperty(pName);
 		}
 
 		if (value == null) {
-			new BipTestLibRuntimeException("Could not find property : " + pName);
+			throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + pName);
 		}
 
 		return value;
