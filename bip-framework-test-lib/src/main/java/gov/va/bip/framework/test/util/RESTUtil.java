@@ -123,6 +123,7 @@ public class RESTUtil {
 			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
 			if (urlFilePath == null) {
 				LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
+				throw new BipTestLibRuntimeException("Requested File Doesn't Exist: request/" + strRequestFile);
 			} else {
 				// Note - Enhance the code so if Header.Accept is xml, then it
 				// should use something like convertToXML function
