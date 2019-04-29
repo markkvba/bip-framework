@@ -5,8 +5,10 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
+import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.util.RESTUtil;
 /**
  * It Fetches token from the token API. The token will be used as a header while invoking actual end points.
@@ -16,6 +18,9 @@ import gov.va.bip.framework.test.util.RESTUtil;
 
 public class BearerTokenService {
 
+	private static final String TOKEN_URL_PROPERTY_KEY = "tokenUrl";
+	private static final String COULD_NOT_FIND_PROPERTY_STRING = "Could not find property : ";
+	private static final String BASE_URL_PROPERTY_KEY = "baseURL";
 	private static BearerTokenService instance = null;
 	private String bearerToken = "";
 	
@@ -46,8 +51,13 @@ public class BearerTokenService {
 	 */
 	public static String getToken(final String headerFile) {
 		final RESTConfigService restConfig = RESTConfigService.getInstance();
-		final String baseUrl = restConfig.getProperty("baseURL", true);
-		final String tokenUrl = restConfig.getProperty("tokenUrl");
+		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY);
+		if (StringUtils.isBlank(baseUrl) || StringUtils.isBlank(tokenUrl)) {
+			String propertyNotFound = StringUtils.isBlank(baseUrl) ? BASE_URL_PROPERTY_KEY : "";
+			propertyNotFound = propertyNotFound + ", " + (StringUtils.isBlank(tokenUrl) ? TOKEN_URL_PROPERTY_KEY : "");
+			throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + propertyNotFound);
+		}
 		final Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
 		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());

@@ -41,6 +41,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.RESTConfigService;
 
 /**
@@ -53,9 +54,13 @@ import gov.va.bip.framework.test.service.RESTConfigService;
 public class RESTUtil { 
 	
 
+
+	private static final String SSL_KEY_STORE_PASSWORD_PROPERTY_KEY = "javax.net.ssl.keyStorePassword";
 	private static final String DOCUMENTS_FOLDER_NAME = "documents";
 	private static final String PAYLOAD_FOLDER_NAME = "payload";
 	private static final String SUBMIT_PAYLOAD = "submitPayload";
+	private static final String COULD_NOT_FIND_PROPERTY_STRING = "Could not find property : ";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTUtil.class);
 
 	// stores request headers
@@ -241,8 +246,10 @@ public class RESTUtil {
 		RestTemplate apiTemplate = new RestTemplate();
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
 			KeyStore keyStore = null;
-			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-
+			String password = RESTConfigService.getInstance().getProperty(SSL_KEY_STORE_PASSWORD_PROPERTY_KEY, true);
+			if (StringUtils.isBlank(password)) {
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + SSL_KEY_STORE_PASSWORD_PROPERTY_KEY);
+			}
 			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
 				keyStore = KeyStore.getInstance("jks");
 				keyStore.load(instream, password.toCharArray());
@@ -254,7 +261,8 @@ public class RESTUtil {
 			    ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 			    apiTemplate = new RestTemplate(requestFactory);				
 			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e); 
+				LOGGER.error("Issue with the certificate or password", e);
+				throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
 			}			
 		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
