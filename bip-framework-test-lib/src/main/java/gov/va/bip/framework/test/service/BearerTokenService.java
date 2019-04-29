@@ -74,7 +74,7 @@ public class BearerTokenService {
 	public static String getToken(final String headerFile) {
 		final RESTConfigService restConfig = RESTConfigService.getInstance();
 		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
-		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
 		if (StringUtils.isBlank(baseUrl) || StringUtils.isBlank(tokenUrl)) {
 			String propertyNotFound = StringUtils.isBlank(baseUrl) ? BASE_URL_PROPERTY_KEY : "";
 			propertyNotFound = propertyNotFound + ", " + (StringUtils.isBlank(tokenUrl) ? TOKEN_URL_PROPERTY_KEY : "");
