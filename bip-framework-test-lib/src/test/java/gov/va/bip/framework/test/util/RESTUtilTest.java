@@ -9,6 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 
@@ -127,13 +128,13 @@ public class RESTUtilTest {
 		boolean isBodyEmpty = restUtil.jsonText.isEmpty();
 		assertThat(true, equalTo(isBodyEmpty));
 	}
-     
+
 	@Test
 	public void test_getResponse_validKeyStore() {
 		String response = restUtil.getResponse(LOCALHOST_URL_PERSON);
 		assertThat(true, equalTo(!response.isEmpty()));
 	}
-	
+
 	@Test
 	public void testGetRestTemplate() {
 		Constructor<RESTConfigService> constructor;
@@ -184,7 +185,11 @@ public class RESTUtilTest {
 	@Test
 	public void test_setUpRequest_WithBody_Failed() {
 		Map<String, String> mapHeader = new HashMap<String, String>();
-		restUtil.setUpRequest("nonexistsfile.request", mapHeader);
+		try {
+			restUtil.setUpRequest("nonexistsfile.request", mapHeader);
+		} catch (BipTestLibRuntimeException e) {
+			assertTrue(e.getMessage().contains("Requested File Doesn't Exist: request/"));
+		}
 		boolean isBodyEmpty = restUtil.jsonText.isEmpty();
 		assertThat(true, equalTo(isBodyEmpty));
 	}
