@@ -3,6 +3,7 @@ package gov.va.bip.framework.cache.autoconfigure;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
 import gov.va.bip.framework.log.BipLogger;
@@ -33,6 +34,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  */
 @ConfigurationProperties(prefix = "bip.framework.cache")
 @Configuration
+@RefreshScope
 public class BipRedisCacheProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);

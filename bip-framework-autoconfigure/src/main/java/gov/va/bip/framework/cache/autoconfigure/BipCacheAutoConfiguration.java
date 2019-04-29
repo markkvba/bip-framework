@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -26,12 +27,19 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.CacheInterceptor;
 import org.springframework.cache.interceptor.CacheOperationSource;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.jmx.support.RegistrationPolicy;
 import org.springframework.util.CollectionUtils;
 
@@ -58,7 +66,7 @@ import gov.va.bip.framework.validation.Defense;
  * </ul>
  */
 @Configuration
-@EnableConfigurationProperties(BipRedisCacheProperties.class)
+@EnableConfigurationProperties({BipRedisCacheProperties.class, BipRedisRefreshProperties.class})
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableCaching
 @ConditionalOnProperty(name = BipCacheAutoConfiguration.CONDITIONAL_SPRING_REDIS,
@@ -83,15 +91,25 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@SuppressWarnings("unused")
 	@Autowired(required = false)
 	private BipEmbeddedRedisServer referenceServerRedisEmbedded;
+	
+	@Autowired
+    private BipRedisRefreshProperties redisRefreshProps;
+	
+	@Autowired
+    private Environment environment;
+	
+	@Autowired
+	private JedisConnectionFactory jedisConnectionFactory;
 
 	/**
 	 * Post construction validations.
 	 */
 	@PostConstruct
 	public void postConstruct() {
+		LOGGER.info("postConstruct invoked here");
 		Defense.notNull(propertiesCache, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
 	}
-
+	
 	/**
 	 * JMX MBean that exposes cache management operations.
 	 *
@@ -123,6 +141,35 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	public BaseAsyncAudit baseAsyncAudit() {
 		return new BaseAsyncAudit();
 	}
+	
+	//Create a new Bean definition for JedisConnectionFactory
+	@Bean
+	@RefreshScope
+	public JedisConnectionFactory redisConnectionFactory() {
+		LOGGER.info("redisConnectionFactory invoked here");
+		LOGGER.info("RedisProperties: " + redisRefreshProps.toString());
+		LOGGER.info("RedisProperties Host: " + redisRefreshProps.getHost());
+		LOGGER.info("environment.getProperty(spring.redis.host)" + environment.getProperty("spring.redis.host"));
+		LOGGER.info("propertiesCache.getDefaultExpires()" + propertiesCache.getDefaultExpires());
+	    //Create the Builder for JedisClientConfiguration
+	    JedisClientConfiguration.JedisClientConfigurationBuilder builder = JedisClientConfiguration
+	            .builder();
+
+	    if(redisRefreshProps.isSsl()) builder.useSsl();
+
+	    //Final JedisClientConfiguration
+	    JedisClientConfiguration clientConfig = builder.usePooling().build();
+
+	    //TODO: Later: Add configurations for connection pool sizing.
+
+	    //Create RedisStandAloneConfiguration
+	    RedisStandaloneConfiguration redisConfig =
+	            new RedisStandaloneConfiguration(redisRefreshProps.getHost(), redisRefreshProps.getPort());
+
+	    //Create JedisConnectionFactory
+	    JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisConfig, clientConfig);
+	    return jedisConnectionFactory;
+	}
 
 	/**
 	 * Create the default cache configuration, with TTL set as declared by {@code reference:cache:defaultExpires} in the
@@ -132,6 +179,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public RedisCacheConfiguration redisCacheConfiguration() {
+		LOGGER.info("redisCacheConfiguration invoked here");
 		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(propertiesCache.getDefaultExpires()));
 	}
 
@@ -143,6 +191,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
+		LOGGER.info("redisCacheConfigurations invoked here");
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
 		if (!CollectionUtils.isEmpty(propertiesCache.getExpires())) {
@@ -166,8 +215,9 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	 * @return CacheManager
 	 */
 	@Bean
-	// @Override
+	@RefreshScope
 	public CacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory) {
+		LOGGER.info("cacheManager invoked here");
 		return RedisCacheManager
 				.builder(redisConnectionFactory)
 				.cacheDefaults(this.redisCacheConfiguration())
@@ -193,6 +243,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public CacheInterceptor cacheInterceptor() {
+		LOGGER.info("cacheInterceptor invoked here");
 		CacheInterceptor interceptor = new BipCacheInterceptor();
 		interceptor.setCacheOperationSources(cacheOperationSource());
 		return interceptor;
@@ -206,6 +257,7 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 	@Bean
 	@Override
 	public KeyGenerator keyGenerator() {
+		LOGGER.info("keyGenerator invoked here");
 		return new KeyGenerator() { // NOSONAR lambda expressions do not accept optional params
 			@Override
 			public Object generate(final Object o, final Method method, final Object... objects) {
@@ -221,6 +273,20 @@ public class BipCacheAutoConfiguration extends CachingConfigurerSupport {
 			}
 		};
 	}
+	
+	/**
+	 * On application event.
+	 *
+	 * @param event the event
+	 */
+	@EventListener
+    public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
+        LOGGER.info("Reconfiguring caches after refresh event");
+        LOGGER.info("event.getName() {}", event.getName());
+        LOGGER.info("event.getSource() {}", event.getSource());
+        
+        jedisConnectionFactory.destroy();
+    }
 
 	@Bean
 	@Override
