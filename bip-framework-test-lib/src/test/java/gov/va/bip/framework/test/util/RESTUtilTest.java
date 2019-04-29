@@ -284,7 +284,7 @@ public class RESTUtilTest {
 		try {
 			strFilePath = new File(urlFilePath.toURI());
 			strFilePath.setReadable(false);
-			String response = restUtil.readExpectedResponse("badfile.response");
+			String response = restUtil.readExpectedResponse("badfile1.response");
 			strFilePath.setReadable(true);
 			assertThat(null, equalTo(response));
 		} catch (URISyntaxException e) {
