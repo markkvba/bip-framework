@@ -78,7 +78,9 @@ public class RESTConfigService {
 				url = "config/vetservices-inttest.properties";
 			}
 			final URL urlConfigFile = RESTConfigService.class.getClassLoader().getResource(url);
-			instance.prop = PropertiesUtil.readFile(urlConfigFile);
+			if (urlConfigFile != null) {
+				instance.prop = PropertiesUtil.readFile(urlConfigFile);
+			}
 		}
 
 		return instance;
