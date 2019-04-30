@@ -53,9 +53,6 @@ import gov.va.bip.framework.test.service.RESTConfigService;
 
 public class RESTUtil {
 
-
-	private static final String SSL_KEY_STORE_PASSWORD_PROPERTY_KEY = "javax.net.ssl.keyStorePassword";
-
 	/**
 	 * Constant for document folder name
 	 */
@@ -301,16 +298,17 @@ public class RESTUtil {
 	 */
 
 	private RestTemplate getRestTemplate() {
-		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		// Create a new instance of the {@link RestTemplate} using default settings.
 		RestTemplate apiTemplate = new RestTemplate();
+		
+		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
-			KeyStore keyStore = null;
-			String password = RESTConfigService.getInstance().getProperty(SSL_KEY_STORE_PASSWORD_PROPERTY_KEY, true);
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
 			if (StringUtils.isBlank(password)) {
-				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + SSL_KEY_STORE_PASSWORD_PROPERTY_KEY);
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
 			}
 			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
-				keyStore = KeyStore.getInstance("jks");
+				KeyStore keyStore = KeyStore.getInstance("jks");
 				keyStore.load(instream, password.toCharArray());
 				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray())
 						.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
@@ -319,7 +317,7 @@ public class RESTUtil {
 						NoopHostnameVerifier.INSTANCE);
 				HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
 				ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-				apiTemplate = new RestTemplate(requestFactory);
+				apiTemplate.setRequestFactory(requestFactory);
 			} catch (Exception e) {
 				LOGGER.error("Issue with the certificate or password", e);
 				throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
@@ -339,11 +337,11 @@ public class RESTUtil {
 	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
-		String readTimeout = "30000";
+		int readTimeout = 30000;
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(
 				getHttpClientBuilder().build());
 		clientHttpRequestFactory.setConnectTimeout(connectionTimeout);
-		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
+		clientHttpRequestFactory.setReadTimeout(readTimeout);
 		return clientHttpRequestFactory;
 	}
 
@@ -353,17 +351,17 @@ public class RESTUtil {
 	 * @return
 	 */
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
-		String maxTotalPool = "15";
-		String defaultMaxPerRoutePool = "5";
-		String validateAfterInactivityPool = "5000";
+		int maxTotalPool = 15;
+		int defaultMaxPerRoutePool = 5;
+		int validateAfterInactivityPool = 5000;
 		PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager(); // NOSONAR
 		// CloseableHttpClient#close
 		// should
 		// automatically
 		// shut down the connection pool only if exclusively owned by the client
-		poolingConnectionManager.setMaxTotal(Integer.valueOf(maxTotalPool));
-		poolingConnectionManager.setDefaultMaxPerRoute(Integer.valueOf(defaultMaxPerRoutePool));
-		poolingConnectionManager.setValidateAfterInactivity(Integer.valueOf(validateAfterInactivityPool));
+		poolingConnectionManager.setMaxTotal(maxTotalPool);
+		poolingConnectionManager.setDefaultMaxPerRoute(defaultMaxPerRoutePool);
+		poolingConnectionManager.setValidateAfterInactivity(validateAfterInactivityPool);
 		return poolingConnectionManager;
 	}
 
@@ -374,9 +372,9 @@ public class RESTUtil {
 	 * @return
 	 */
 	private HttpClientBuilder getHttpClientBuilder() {
-		String connectionBufferSize = "4128";
+		int connectionBufferSize = 4128;
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-				.setBufferSize(Integer.valueOf(connectionBufferSize)).build();
+				.setBufferSize(connectionBufferSize).build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
