@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
@@ -22,9 +23,11 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -379,6 +382,19 @@ public class RESTUtil {
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
+		
+		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
+			@Override
+			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
+				if (exception instanceof org.apache.http.NoHttpResponseException) {
+					LOGGER.warn("No response from server on " + executionCount + " call");
+					return true;
+				}
+				return super.retryRequest(exception, executionCount, context);
+			}
+
+		});
 
 		return clientBuilder;
 	}
