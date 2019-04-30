@@ -12,7 +12,7 @@
 	<appender name="BIP_FRAMEWORK_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
-				<provider class="gov.va.bip.framework.logging.logback.MaskingMessageProvider">
+				<provider class="gov.va.bip.framework.logging.autoconfigure.MaskingMessageProvider">
 		          <rules>
 		            <rule>
 		              <name>credit card</name>
