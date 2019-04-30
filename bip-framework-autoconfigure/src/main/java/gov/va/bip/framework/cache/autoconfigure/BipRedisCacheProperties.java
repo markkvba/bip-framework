@@ -2,8 +2,6 @@ package gov.va.bip.framework.cache.autoconfigure;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -14,32 +12,27 @@ import gov.va.bip.framework.log.BipLoggerFactory;
 
 /**
  * Properties used to configure the Redis Cache.
- *
- * Properties used to configure the Redis "Standalone" module, and the EmbeddedRedisServer.
  * <p>
- * For Redis "Standalone" and EmbeddedRedisServer configuration see {@link BipRedisProperties}.<br/>
- * For Redis Client configuration, see {@link BipRedisClientProperties}.<br/>
- * <p>
- * The Application YAML (e.g. <tt>bip-<i>your-app-name</i>.yml</tt>) can
- * override property values by adding them to the {@code bip.framework:redis:cache}
- * section:
+ * For each cache used by the application, the Application YAML
+ * (e.g. <tt>bip-<i>your-app-name</i>.yml</tt>) must declare
+ * properties under {@code bip.framework:cache}:
  * <p>
  * <table border="1px">
- * <tr><th colspan="3">Properties under: {@code bip.framework:redis:cache}</th></tr>
+ * <tr><th colspan="3">Properties under: {@code bip.framework:cache}</th></tr>
  * <tr><th>Property Name</th><th>Default Value</th><th>Type</th></tr>
  * <tr><td>defaultExpires</td><td>86400</td><td>Long</td></tr>
  * <tr><td>expires</td><td>null</td><td>List&lt;RedisExpires&gt;</td></tr>
  * </table>
  * <p>
  * The {@link RedisExpires} list is populated from list entries in the application yaml
- * under {@code bip.framework:redis:cache:expires}.
+ * under {@code bip.framework:cache:expires}.
  *
  */
 @RefreshScope
 @Configuration
 @ConfigurationProperties(prefix = "bip.framework.cache")
 public class BipRedisCacheProperties {
-
+	/** Class logger */
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);
 
 	/** List of inner class {@link RedisExpires} configuration objects */
@@ -47,11 +40,6 @@ public class BipRedisCacheProperties {
 
 	/** The default expiration time */
 	private Long defaultExpires = 86400L;
-
-	@PostConstruct
-	public void postConstruct() {
-		LOGGER.debug("Post Construct called.");
-	}
 
 	/**
 	 * The inner class {@link RedisExpires} configuration object.
@@ -141,5 +129,4 @@ public class BipRedisCacheProperties {
 			this.ttl = ttl;
 		}
 	}
-
 }

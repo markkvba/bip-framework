@@ -28,6 +28,17 @@ import gov.va.bip.framework.validation.Defense;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
+/**
+ * Imported by {@link BipCacheAutoConfiguration} so it can participate in the autoconfiguration bootstrap.
+ * <p>
+ * Configures:
+ * <ul>
+ * <li> RedisStandaloneConfiguration - the redis "Standalone" module (host, port, db index, password)
+ * <li> JedisClientConfiguration (timeouts, connection pool, SSL)
+ * </ul>
+ *
+ * @author aburkholder
+ */
 @Configuration
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableConfigurationProperties({ RedisProperties.class })
@@ -35,6 +46,7 @@ public class BipJedisConnectionConfig {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipJedisConnectionConfig.class);
 
+	/** Build properties to provide a unique "clientName" for the JedisClientConfiguration */
 	@Autowired
 	BuildProperties buildProperties;
 
@@ -46,9 +58,14 @@ public class BipJedisConnectionConfig {
 	@Autowired
 	private JedisConnectionFactory jedisConnectionFactory;
 
+	/**
+	 * Ensure autowiring succeeded.
+	 */
 	@PostConstruct
 	public void postConstruct() {
+		Defense.notNull(buildProperties);
 		Defense.notNull(redisProperties);
+		Defense.notNull(jedisConnectionFactory);
 	}
 
 	/**

@@ -38,6 +38,14 @@ import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 import gov.va.bip.framework.validation.Defense;
 
+/**
+ * Imported by {@link BipCacheAutoConfiguration} so it can participate in the autoconfiguration bootstrap.
+ * <p>
+ * Configures the TTLs and expiration times for individual caches, as declared in the application YAML
+ * under {@code bip.framework.cache}.
+ *
+ * @author aburkholder
+ */
 @Configuration
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableConfigurationProperties({ BipRedisCacheProperties.class })
@@ -161,6 +169,9 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 		};
 	}
 
+	/**
+	 * Logging for cache operation errors using the {@link CacheErrorHandler} strategy.
+	 */
 	@Bean
 	@Override
 	public CacheErrorHandler errorHandler() {

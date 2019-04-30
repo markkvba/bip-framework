@@ -1,6 +1,5 @@
 package gov.va.bip.framework.cache.autoconfigure;
 
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
@@ -22,12 +21,19 @@ import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
 
 /**
+ * This configuration runs only when the application property
+ * {@code spring.cache.type} is set to the value {@code redis}.
+ * <p>
  * Cache auto configuration:
  * <ul>
- * <li> Configure and start Redis embedded server if necessary (as declared under spring profiles in application yaml).
- * <li> Configure the Redis "Standalone" module with the host and port.
- * <li> Configure the Jedis Client, including SSL and Connection Pooling.
- * <li> Configure Cache TTLs and expirations.
+ * <li> Configures and starts {@link BipEmbeddedRedisServer} if necessary (as declared under spring profiles in application yaml).
+ * <li> In {@link BipJedisConnectionConfig}, configures the JedisConnectionFactory, consisting of:
+ * <ul>
+ * <li> RedisStandaloneConfiguration - the redis "Standalone" module (host, port, db index, password)
+ * <li> JedisClientConfiguration (timeouts, connection pool, SSL)
+ * </ul>
+ * <li> Configure {@link BipCachesConfig} (CacheManager, and individual cache TTLs and expirations, and cache GET audits).
+ * <li> Configure a JMX MBean, accessible under {@code gov.va.bip.cache}
  * </ul>
  */
 @Configuration
@@ -53,25 +59,6 @@ public class BipCacheAutoConfiguration {
 	@SuppressWarnings("unused")
 	@Autowired(required = false)
 	private BipEmbeddedRedisServer referenceServerRedisEmbedded;
-
-	/**
-	 * Unwrap the actual object from a JDK or CGLib proxy object.
-	 *
-	 * @param proxy the proxy object
-	 * @return the object wrapped by the proxy
-	 */
-	@SuppressWarnings({ "unchecked" }) // TODO
-	static <T> T getTargetObject(Object proxy) {
-		while ((AopUtils.isJdkDynamicProxy(proxy))) {
-			try {
-				return (T) getTargetObject(((org.springframework.aop.framework.Advised) proxy).getTargetSource().getTarget());
-			} catch (Exception e) {
-				// do nothing
-				LOGGER.error("Could not cast proxy to Advised.", e);
-			}
-		}
-		return (T) proxy; // expected to be cglib proxy then, which is simply a specialized class
-	}
 
 	/**
 	 * JMX MBean that exposes cache management operations.
