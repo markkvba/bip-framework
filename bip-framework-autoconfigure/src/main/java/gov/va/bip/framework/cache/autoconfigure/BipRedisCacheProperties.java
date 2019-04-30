@@ -2,6 +2,9 @@ package gov.va.bip.framework.cache.autoconfigure;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -32,9 +35,9 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  * under {@code bip.framework:redis:cache:expires}.
  *
  */
-@ConfigurationProperties(prefix = "bip.framework.cache")
-@Configuration
 @RefreshScope
+@Configuration
+@ConfigurationProperties(prefix = "bip.framework.cache")
 public class BipRedisCacheProperties {
 
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);
@@ -45,12 +48,18 @@ public class BipRedisCacheProperties {
 	/** The default expiration time */
 	private Long defaultExpires = 86400L;
 
+	@PostConstruct
+	public void postConstruct() {
+		LOGGER.debug("Post Construct called.");
+	}
+
 	/**
 	 * The inner class {@link RedisExpires} configuration object.
 	 *
 	 * @param expires
 	 */
 	public void setExpires(final List<RedisExpires> expires) {
+		LOGGER.debug("Setting expires to " + ReflectionToStringBuilder.toString(expires));
 		this.expires = expires;
 	}
 
