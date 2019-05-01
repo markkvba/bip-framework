@@ -75,17 +75,26 @@ public class BearerTokenService {
 		final RESTConfigService restConfig = RESTConfigService.getInstance();
 		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
 		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
-		if (StringUtils.isBlank(baseUrl) || StringUtils.isBlank(tokenUrl)) {
-			String propertyNotFound = StringUtils.isBlank(baseUrl) ? BASE_URL_PROPERTY_KEY : "";
-			propertyNotFound = propertyNotFound + ", " + (StringUtils.isBlank(tokenUrl) ? TOKEN_URL_PROPERTY_KEY : "");
-			throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + propertyNotFound);
-		}
+		handleNullUrls(baseUrl, tokenUrl);
 		final Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
 		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
 		RESTUtil restUtility = new RESTUtil();
 		restUtility.setUpRequest(headerFile, headerMap);
 		return restUtility.postResponse(baseUrl + tokenUrl);
+	}
+
+	private static void handleNullUrls(final String baseUrl, final String tokenUrl) {
+		if (StringUtils.isBlank(baseUrl) || StringUtils.isBlank(tokenUrl)) {
+			String propertyNotFound = StringUtils.isBlank(baseUrl) ? BASE_URL_PROPERTY_KEY : "";
+			if (StringUtils.isBlank(tokenUrl)) {
+				if (propertyNotFound != "") {
+					propertyNotFound = propertyNotFound + ", ";
+				}
+				propertyNotFound = propertyNotFound + TOKEN_URL_PROPERTY_KEY;
+			}
+			throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + propertyNotFound);
+		}
 	}
 
 	/**
