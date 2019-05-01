@@ -115,10 +115,8 @@ public class RESTConfigService {
 		String value = "";
 		if (isCheckSystemProp) {
 			value = System.getProperty(pName);
-			if (StringUtils.isBlank(value)) {
-				if (prop != null) {
-					value = prop.getProperty(pName);
-				}
+			if (StringUtils.isBlank(value) && (prop != null)) {
+				value = prop.getProperty(pName);
 			}
 		} else {
 			if (prop != null) {

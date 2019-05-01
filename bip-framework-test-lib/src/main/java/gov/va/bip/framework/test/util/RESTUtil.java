@@ -220,7 +220,6 @@ public class RESTUtil {
 	 */
 	private String executeAPI(final String serviceURL, final HttpEntity<?> request, final HttpMethod httpMethod) {
 		try {
-			// request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
 			return response.getBody();
@@ -385,7 +384,7 @@ public class RESTUtil {
 		
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
-			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+			public boolean retryRequest(final IOException exception, final int executionCount, final HttpContext context) {
 				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
 				if (exception instanceof org.apache.http.NoHttpResponseException) {
 					LOGGER.warn("No response from server on " + executionCount + " call");
