@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyStore;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -38,7 +36,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -175,13 +172,6 @@ public class RESTUtil {
 	public String postResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
 		HttpEntity<?> request = new HttpEntity<>(jsonText, headers);
-		
-		List<HttpMessageConverter<?>> converters = new ArrayList<>();
-		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
-		stringConverter.setWriteAcceptCharset(false);
-		converters.add(stringConverter);
-		restTemplate.setMessageConverters(converters);
-		
 		return executeAPI(serviceURL, request, HttpMethod.POST);
 	}
 
@@ -225,7 +215,6 @@ public class RESTUtil {
 	 */
 	private String executeAPI(final String serviceURL, HttpEntity<?> request, HttpMethod httpMethod) {
 		try {
-			// request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
 			return response.getBody();
@@ -330,6 +319,17 @@ public class RESTUtil {
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+
+		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+		stringConverter.setWriteAcceptCharset(false);
+		
+		for (int i = 0; i < apiTemplate.getMessageConverters().size(); i++) {
+		    if (apiTemplate.getMessageConverters().get(i) instanceof StringHttpMessageConverter) {
+		    		apiTemplate.getMessageConverters().remove(i);
+		    		apiTemplate.getMessageConverters().add(i, stringConverter);
+		        break;
+		    }
+		}
 		return apiTemplate;
 	}
 
