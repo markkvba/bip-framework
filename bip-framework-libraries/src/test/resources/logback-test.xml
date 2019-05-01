@@ -1,14 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <configuration scan="false" debug="false">
-
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	
 	<appender name="TestAppender" class="gov.va.bip.framework.TestAppender">
 	</appender>
-
+	
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n</pattern>
 		</encoder>
 	</appender>
+	
+	<appender name="JSON_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp>
+					<timeZone>UTC</timeZone>
+				</timestamp>
+				<context /> <!--Outputs entries from logback's context -->
+				<pattern>
+					<pattern>
+						{
+						"logType": "%mdc{logType:-applogs}",
+						"severity": "%level",
+						"class": "%logger{40}",
+						"pid": "${PID:-}"
+						}
+					</pattern>
+				</pattern>
+				<threadName />
+				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
+				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
+					<rules>
+			            <rule>
+			              <name>credit card</name>
+			              <pattern>\d{13,18}</pattern>
+			              <unmasked>4</unmasked>
+			            </rule>
+			             <rule>
+			              <name>SSN</name>
+			              <pattern>\d{3}-?\d{2}-?\d{4}</pattern>
+			             </rule>
+			          </rules>
+			    </provider>
+				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
+				<arguments /> <!--or through StructuredArguments -->
+				<stackTrace>
+					<!-- limit the size of stack traces, show root cause first -->
+					<throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+						<maxDepthPerThrowable>30</maxDepthPerThrowable>
+						<maxLength>2048</maxLength>
+						<shortenedClassNameLength>40</shortenedClassNameLength>
+						<rootCauseFirst>true</rootCauseFirst>
+					</throwableConverter>
+				</stackTrace>			
+			</providers>
+		</encoder>
+	</appender>
+	
+	<logger name="gov.va.bip.framework.log.logback" level="DEBUG" additivity="false">
+		<appender-ref ref="JSON_ENCODER" />
+	</logger>
 
 	<logger name="gov.va.bip.framework" level="DEBUG">
 		<appender-ref ref="TestAppender" />
