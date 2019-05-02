@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gov.va.bip.framework.test.util.PropertiesUtil;
 
@@ -39,6 +41,8 @@ import gov.va.bip.framework.test.util.PropertiesUtil;
  */
 public class RESTConfigService {
 
+	/** Logger for this class */
+	private static final Logger LOGGER = LoggerFactory.getLogger(RESTConfigService.class);
 
 	/** The singleton instance of this class */
 	private static RESTConfigService instance = null;
@@ -80,6 +84,8 @@ public class RESTConfigService {
 			final URL urlConfigFile = RESTConfigService.class.getClassLoader().getResource(url);
 			if (urlConfigFile != null) {
 				instance.prop = PropertiesUtil.readFile(urlConfigFile);
+			} else {
+				LOGGER.warn("No resource found with the URL : " + url + ". Hence no property files could be loaded.");
 			}
 		}
 
