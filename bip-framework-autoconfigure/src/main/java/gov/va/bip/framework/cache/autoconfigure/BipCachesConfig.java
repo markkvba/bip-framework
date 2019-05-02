@@ -87,6 +87,11 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	@Bean
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
 		LOGGER.debug("redisCacheConfigurations invoked here");
+		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = getRedisCacheConfigs();
+		return cacheConfigs;
+	}
+
+	private Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> getRedisCacheConfigs() {
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
 		if (!CollectionUtils.isEmpty(bipRedisCacheProperties.getExpires())) {
