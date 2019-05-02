@@ -2,6 +2,7 @@ package gov.va.bip.framework.audit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.slf4j.event.Level;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -19,6 +20,9 @@ public class AuditLogger {
 	/** Replacement for {@code null} parameters to the MDC entries that cannot be null */
 	private static final String EMPTY = "";
 
+	static {
+		LOGGER.setLevel(Level.DEBUG);
+	}
 	/*
 	 * private constructor
 	 */

@@ -39,6 +39,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -330,15 +331,10 @@ public class RESTUtil {
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
 
-		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
-		stringConverter.setWriteAcceptCharset(false);
-		
-		for (int i = 0; i < apiTemplate.getMessageConverters().size(); i++) {
-		    if (apiTemplate.getMessageConverters().get(i) instanceof StringHttpMessageConverter) {
-		    		apiTemplate.getMessageConverters().remove(i);
-		    		apiTemplate.getMessageConverters().add(i, stringConverter);
-		        break;
-		    }
+		for (HttpMessageConverter<?> converter : apiTemplate.getMessageConverters()) {
+		     if (converter instanceof StringHttpMessageConverter) {
+		         ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+		     }
 		}
 		return apiTemplate;
 	}
