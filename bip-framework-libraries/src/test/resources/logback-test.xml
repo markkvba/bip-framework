@@ -12,6 +12,14 @@
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n</pattern>
 		</encoder>
 	</appender>
+
+	<logger name="gov.va.bip.framework" level="DEBUG">
+		<appender-ref ref="TestAppender" />
+	</logger>
+
+	<root level="ERROR">
+		<appender-ref ref="STDOUT" />
+	</root>
 	
 	<appender name="JSON_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -63,13 +71,5 @@
 	<logger name="gov.va.bip.framework.log.logback" level="DEBUG" additivity="false">
 		<appender-ref ref="JSON_ENCODER" />
 	</logger>
-
-	<logger name="gov.va.bip.framework" level="DEBUG">
-		<appender-ref ref="TestAppender" />
-	</logger>
-
-	<root level="ERROR">
-		<appender-ref ref="STDOUT" />
-	</root>
 
 </configuration>
