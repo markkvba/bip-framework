@@ -39,6 +39,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -328,6 +330,12 @@ public class RESTUtil {
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
+
+		for (HttpMessageConverter<?> converter : apiTemplate.getMessageConverters()) {
+		     if (converter instanceof StringHttpMessageConverter) {
+		         ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+		     }
+		}
 		return apiTemplate;
 	}
 
