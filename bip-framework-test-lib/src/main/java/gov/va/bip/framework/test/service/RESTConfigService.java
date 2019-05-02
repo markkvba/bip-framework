@@ -85,7 +85,7 @@ public class RESTConfigService {
 			if (urlConfigFile != null) {
 				instance.prop = PropertiesUtil.readFile(urlConfigFile);
 			} else {
-				LOGGER.warn("No resource found with the URL : " + url + ". Hence no property files could be loaded.");
+				LOGGER.warn("No resource found with the URL: " + url + ". Property file could not be read.");
 			}
 		}
 
