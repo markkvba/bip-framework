@@ -63,7 +63,7 @@ public class PropertiesUtil {
 			properties.load(input);
 			substitutePlaceholders(properties);
 
-		} catch (IOException | URISyntaxException e) {
+		} catch (IllegalArgumentException | IOException | URISyntaxException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new BipTestLibRuntimeException("Could not load the properties file with URL : " + fileUrl, (Throwable) e);
 		}
