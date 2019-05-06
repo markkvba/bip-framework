@@ -126,6 +126,17 @@ public class BipRestAutoConfiguration {
 
 		clientBuilder.setConnectionManager(poolingConnectionManager);
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
+		setRetryHandlerToClientBuilder(clientBuilder);
+
+		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = 
+				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
+		clientHttpRequestFactory.setConnectTimeout(connTimeoutValue);
+		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
+		
+		return clientHttpRequestFactory;
+	}
+
+	private void setRetryHandlerToClientBuilder(HttpClientBuilder clientBuilder) {
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
 			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
@@ -138,13 +149,6 @@ public class BipRestAutoConfiguration {
 			}
 
 		});
-
-		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = 
-				new HttpComponentsClientHttpRequestFactory(clientBuilder.build());
-		clientHttpRequestFactory.setConnectTimeout(connTimeoutValue);
-		clientHttpRequestFactory.setReadTimeout(Integer.valueOf(readTimeout));
-		
-		return clientHttpRequestFactory;
 	}
 
 	/**
