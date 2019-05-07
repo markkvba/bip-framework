@@ -136,6 +136,11 @@ public class BipRestAutoConfiguration {
 		return clientHttpRequestFactory;
 	}
 
+	/**
+	 * Sets the retry handler to client builder.
+	 *
+	 * @param clientBuilder the new retry handler to client builder
+	 */
 	private void setRetryHandlerToClientBuilder(HttpClientBuilder clientBuilder) {
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
