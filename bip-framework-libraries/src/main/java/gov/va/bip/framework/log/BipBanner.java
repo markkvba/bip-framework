@@ -14,7 +14,7 @@ public class BipBanner {
 	/** WARNING - DO NOT USE BANNER LOGGING FROM WITHIN THIS CLASS */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipBanner.class);
 
-	private String banner;
+	private String BANNER;
 	private String bannerText;
 	private Level level;
 
@@ -32,7 +32,7 @@ public class BipBanner {
 		Level useLevel = getSafeLevel(level);
 		this.bannerText = bannerText;
 		this.level = useLevel;
-		this.banner = createBannerString(bannerText, useLevel);
+		this.BANNER = createBannerString(bannerText, useLevel);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class BipBanner {
 	 * @return String
 	 */
 	public String getBanner() {
-		return this.banner;
+		return this.BANNER;
 	}
 
 	/**
@@ -76,9 +76,9 @@ public class BipBanner {
 		Level useLevel = getSafeLevel(level);
 		if (!useLevel.equals(this.level)) {
 			this.level = useLevel;
-			this.banner = createBannerString(this.bannerText, useLevel);
+			this.BANNER = createBannerString(this.bannerText, useLevel);
 		}
-		return this.banner;
+		return this.BANNER;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class BipBanner {
 	 */
 	public void setLevel(Level level) {
 		this.level = getSafeLevel(level);
-		this.banner = createBannerString(this.bannerText, level);
+		this.BANNER = createBannerString(this.bannerText, level);
 	}
 
 	/**
