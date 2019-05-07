@@ -8,18 +8,17 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
+import org.springframework.stereotype.Component;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 import gov.va.bip.framework.log.BipLogger;
@@ -39,8 +38,7 @@ import redis.clients.jedis.Protocol;
  *
  * @author aburkholder
  */
-@Configuration
-@EnableConfigurationProperties({ RedisProperties.class })
+@Component
 public class BipJedisConnectionConfig {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipJedisConnectionConfig.class);
@@ -122,22 +120,22 @@ public class BipJedisConnectionConfig {
 				+ "]; JedisClientConfiguration["
 				+ "clientName=" + buildProperties.getName() + "_" + buildProperties.getVersion()
 				+ ";connectTimeout=" + (redisProperties.getTimeout() == null
-						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout())
 				+ ";readTimeout=" + (redisProperties.getTimeout() == null
-						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout())
 				+ ";poolConfig: [maxTotal=" + (redisProperties.getJedis().getPool().getMaxActive() <= 0
-						? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
+				? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
 						: redisProperties.getJedis().getPool().getMaxActive())
 				+ ";MaxIdle=" + (redisProperties.getJedis().getPool().getMaxIdle() <= 0
-						? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
+				? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
 						: redisProperties.getJedis().getPool().getMaxIdle())
 				+ ";MinIdle=" + (redisProperties.getJedis().getPool().getMinIdle() <= 0
-						? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
+				? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
 						: redisProperties.getJedis().getPool().getMinIdle())
 				+ ";MaxWaitMillis=" + (redisProperties.getJedis().getPool().getMaxWait() == null
-						? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
+				? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
 						: redisProperties.getJedis().getPool().getMaxWait().toMillis())
 				+ "]; SSL[" + redisProperties.isSsl()
 				+ (redisProperties.isSsl() ? ";hostnameVerifier=NoopHostnameVerifier" : "")
@@ -156,19 +154,19 @@ public class BipJedisConnectionConfig {
 				.builder()
 				.clientName(buildProperties.getName() + "_" + buildProperties.getVersion())
 				.connectTimeout((redisProperties.getTimeout() == null
-						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout()))
 				.readTimeout((redisProperties.getTimeout() == null
-						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout()));
 
 		if (redisProperties.getJedis() != null && redisProperties.getJedis().getPool() != null) {
 			builder.usePooling()
-					.poolConfig(jedisPoolConfig(redisProperties.getJedis().getPool()));
+			.poolConfig(jedisPoolConfig(redisProperties.getJedis().getPool()));
 		}
 		if (redisProperties.isSsl()) {
 			builder.useSsl()
-					.hostnameVerifier(NoopHostnameVerifier.INSTANCE);
+			.hostnameVerifier(NoopHostnameVerifier.INSTANCE);
 			/* also could set: .sslParameters(..) and sslSocketFactory(..) */
 		}
 		return builder.build();
@@ -188,16 +186,16 @@ public class BipJedisConnectionConfig {
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setMaxTotal((pool.getMaxActive() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
-				: pool.getMaxActive()));
+						: pool.getMaxActive()));
 		config.setMaxIdle((pool.getMaxIdle() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
-				: pool.getMaxIdle()));
+						: pool.getMaxIdle()));
 		config.setMinIdle((pool.getMinIdle() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
-				: pool.getMinIdle()));
+						: pool.getMinIdle()));
 		config.setMaxWaitMillis((pool.getMaxWait() == null
 				? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
-				: pool.getMaxWait().toMillis()));
+						: pool.getMaxWait().toMillis()));
 		return config;
 	}
 

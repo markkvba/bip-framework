@@ -2,12 +2,7 @@ package gov.va.bip.framework.cache.autoconfigure;
 
 import java.util.List;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -30,10 +25,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  * under {@code bip.framework:cache:expires}.
  *
  */
-@Configuration
-@RefreshScope
-@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-@ConfigurationProperties(prefix = "bip.framework.cache")
+@Component
 public class BipRedisCacheProperties {
 	/** Class logger */
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);
@@ -50,7 +42,6 @@ public class BipRedisCacheProperties {
 	 * @param expires
 	 */
 	public void setExpires(final List<RedisExpires> expires) {
-		LOGGER.debug("Setting expires to " + ReflectionToStringBuilder.toString(expires));
 		this.expires = expires;
 	}
 

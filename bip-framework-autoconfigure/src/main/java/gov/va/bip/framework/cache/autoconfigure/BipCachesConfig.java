@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.AnnotationCacheOperationSource;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -24,12 +23,11 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires;
@@ -47,18 +45,12 @@ import gov.va.bip.framework.validation.Defense;
  *
  * @author aburkholder
  */
-@Configuration
-@EnableConfigurationProperties({ BipRedisCacheProperties.class })
-//@AutoConfigureAfter(BipJedisConnectionConfig.class)
-//@AutoConfigureBefore(value = { CacheMetricsRegistrar.class })
+@Component
 public class BipCachesConfig extends CachingConfigurerSupport {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipCachesConfig.class);
 
 	private static final String CACHE_MANAGER_BEAN_NAME = "cacheManager";
-	private static final String CACHE_CONFIGURATION_NAME = "redisCacheConfiguration";
-	private static final String CACHE_CONFIGURATIONS_NAME = "redisCacheConfigurations";
-	private static final String CACHE_PROPERTIES_NAME = "bipRedisCacheProperties";
 
 	/** Reference to the Spring Context. Need this in order to get direct access bean refs. */
 	@Autowired
@@ -66,15 +58,14 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 
 	/** Cache properties derived from application YAML */
 	@Autowired
-	@Order(-9999)
-	private BipRedisCacheProperties theProperties;
+	private BipRedisCacheProperties bipRedisCacheProperties;
 
 	/**
 	 * Post construction validations.
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		Defense.notNull(theProperties, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(bipRedisCacheProperties, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
 	}
 
 	/**
@@ -107,9 +98,8 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 * @return RedisCacheConfiguration
 	 */
 	@Bean
-//	@DependsOn({ CACHE_PROPERTIES_NAME })
 	public RedisCacheConfiguration redisCacheConfiguration() {
-		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(theProperties.getDefaultExpires()));
+		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(bipRedisCacheProperties.getDefaultExpires()));
 	}
 
 	/**
@@ -121,19 +111,18 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 */
 	@Bean
 	@RefreshScope
-//	@DependsOn({ CACHE_PROPERTIES_NAME })
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
 		LOGGER.debug("redisCacheConfigurations invoked here");
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-		if (!CollectionUtils.isEmpty(theProperties.getExpires())) {
+		if (!CollectionUtils.isEmpty(bipRedisCacheProperties.getExpires())) {
 			// key = name, value - TTL
-			final Map<String, Long> resultExpires = theProperties.getExpires().stream().filter(o -> o.getName() != null)
+			final Map<String, Long> resultExpires = bipRedisCacheProperties.getExpires().stream().filter(o -> o.getName() != null)
 					.filter(o -> o.getTtl() != null).collect(Collectors.toMap(RedisExpires::getName, RedisExpires::getTtl));
 			for (Entry<String, Long> entry : resultExpires.entrySet()) {
 				org.springframework.data.redis.cache.RedisCacheConfiguration rcc =
 						org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig()
-								.entryTtl(Duration.ofSeconds(entry.getValue()));
+						.entryTtl(Duration.ofSeconds(entry.getValue()));
 				cacheConfigs.put(entry.getKey(), rcc);
 			}
 		}
@@ -148,19 +137,18 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 */
 	@Bean
 	@RefreshScope
-//	@DependsOn({ "redisConnectionFactory", CACHE_PROPERTIES_NAME, CACHE_CONFIGURATION_NAME, CACHE_CONFIGURATIONS_NAME })
 	public RedisCacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory) {
 		if (LOGGER.isDebugEnabled()) {
 			String initialCacheProperties = "null";
-			if (theProperties.getExpires() != null) {
+			if (bipRedisCacheProperties.getExpires() != null) {
 				initialCacheProperties = "";
-				for (BipRedisCacheProperties.RedisExpires expires : theProperties.getExpires()) {
+				for (BipRedisCacheProperties.RedisExpires expires : bipRedisCacheProperties.getExpires()) {
 					initialCacheProperties += "[name=" + expires.getName() + ";TTL=" + expires.getTtl() + "]";
 				}
 			}
 			LOGGER.debug(this.getClass() + ".cacheManager build with ["
 					+ "RedisCacheWriter=previously configured JedisConnectionFactory"
-					+ "; Default RedisCacheConfiguration[TTL=" + theProperties.getDefaultExpires()
+					+ "; Default RedisCacheConfiguration[TTL=" + bipRedisCacheProperties.getDefaultExpires()
 					+ ";all others as defined by RedisCacheConfiguration.defaultCacheConfig()]"
 					+ "; InitialCacheConfigurations[" + initialCacheProperties + "]");
 		}
@@ -223,6 +211,9 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 
 	/**
 	 * Logging for cache operation errors using the {@link CacheErrorHandler} strategy.
+	 *
+	 * <p>
+	 * {@inheritDoc}
 	 */
 	@Bean
 	@Override
@@ -235,23 +226,35 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 */
 	public static class RedisCacheErrorHandler implements CacheErrorHandler {
 
+		/* (non-Javadoc)
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheGetError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object)
+		 */
 		@Override
 		public void handleCacheGetError(final RuntimeException exception, final Cache cache, final Object key) {
 			LOGGER.error(BipBanner.newBanner("Unable to get from cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
+		/* (non-Javadoc)
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCachePutError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void handleCachePutError(final RuntimeException exception, final Cache cache, final Object key,
 				final Object value) {
 			LOGGER.error(BipBanner.newBanner("Unable to put into cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
+		/* (non-Javadoc)
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheEvictError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object)
+		 */
 		@Override
 		public void handleCacheEvictError(final RuntimeException exception, final Cache cache, final Object key) {
 			LOGGER.error(BipBanner.newBanner("Unable to evict from cache " + cache.getName(), Level.ERROR),
 					exception.getMessage());
 		}
 
+		/* (non-Javadoc)
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheClearError(java.lang.RuntimeException, org.springframework.cache.Cache)
+		 */
 		@Override
 		public void handleCacheClearError(final RuntimeException exception, final Cache cache) {
 			LOGGER.error(BipBanner.newBanner("Unable to clean cache " + cache.getName(), Level.ERROR), exception.getMessage());

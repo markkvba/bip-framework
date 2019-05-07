@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
@@ -38,9 +40,8 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  */
 @Configuration
 @AutoConfigureAfter(CacheAutoConfiguration.class)
-//@AutoConfigureBefore(value = { CacheMetricsRegistrar.class })
 @EnableCaching
-/* @Import to participate in the autoconfigure bootstrap process */
+/* @Import to participate in the auto configure bootstrap process */
 @Import({ BipCachesConfig.class, BipJedisConnectionConfig.class })
 @ConditionalOnProperty(name = BipCacheAutoConfiguration.CONDITIONAL_SPRING_REDIS,
 		havingValue = BipCacheAutoConfiguration.CACHE_SERVER_TYPE)
@@ -65,6 +66,19 @@ public class BipCacheAutoConfiguration {
 	@SuppressWarnings("unused")
 	@Autowired(required = false)
 	private BipEmbeddedRedisServer referenceServerRedisEmbedded;
+	
+	/**
+	 * BIP redis cache properties.
+	 *
+	 * @return the BIP redis cache properties
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	@RefreshScope
+	@ConfigurationProperties(prefix = "bip.framework.cache")
+	public BipRedisCacheProperties  bipRedisCacheProperties() {
+	    return new BipRedisCacheProperties();
+	}
 
 	/**
 	 * JMX MBean that exposes cache management operations.
