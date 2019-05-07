@@ -7,16 +7,16 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
@@ -40,11 +40,12 @@ import redis.clients.jedis.Protocol;
  * @author aburkholder
  */
 @Configuration
-@AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableConfigurationProperties({ RedisProperties.class })
 public class BipJedisConnectionConfig {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipJedisConnectionConfig.class);
+
+	private static final String REDIS_CONNECTION_FACTORY_BEAN_NAME = "redisConnectionFactory";
 
 	/** Build properties to provide a unique "clientName" for the JedisClientConfiguration */
 	@Autowired
@@ -54,33 +55,51 @@ public class BipJedisConnectionConfig {
 	@Autowired
 	private RedisProperties redisProperties;
 
-	/** ConnectionFactory from spring context, so it can be destroyed on refresh events */
+	/** Reference to the Spring Context. Need this in order to get direct access bean refs. */
 	@Autowired
-	private JedisConnectionFactory jedisConnectionFactory;
+	private ApplicationContext applicationContext;
 
 	/**
 	 * Ensure autowiring succeeded.
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		Defense.notNull(buildProperties);
-		Defense.notNull(redisProperties);
-		Defense.notNull(jedisConnectionFactory);
+		Defense.notNull(buildProperties, BuildProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(redisProperties, RedisProperties.class.getSimpleName() + " cannot be null.");
 	}
 
 	/**
 	 * On the RefreshScope refresh event, destroy the JedisConnectionFactory to force it
 	 * to rebuild from {@link #redisConnectionFactory()} with the current setting from the application YAML.
+	 * <p>
+	 * This event listener <b>must</b> run <b>before</b> any other cache related event listeners.
 	 *
 	 * @param event the refresh event
 	 */
 	@EventListener
+	@Order(BipCacheAutoConfiguration.REFRESH_ORDER_CONNECTION_FACTORY)
 	public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
-		LOGGER.debug("Reconfiguring caches after refresh event: event.getName() {}",
+		LOGGER.debug("Event activated to reconfigure " + REDIS_CONNECTION_FACTORY_BEAN_NAME + ": event.getName() {}",
 				event.getName() + "; event.getSource() {}",
 				event.getSource());
-		jedisConnectionFactory.destroy();
-		LOGGER.debug("redisConnectionFactory destroyed");
+
+		if (!applicationContext.containsBean(REDIS_CONNECTION_FACTORY_BEAN_NAME)) {
+			LOGGER.debug(REDIS_CONNECTION_FACTORY_BEAN_NAME + " does not yet exist.");
+		} else {
+			// connection factory is manipulate through the bean factory
+			// this is required to allow bean dependencies, autowiring, etc to be reinitialized
+			JedisConnectionFactory jedisConnectionFactory =
+					(JedisConnectionFactory) applicationContext.getBean(REDIS_CONNECTION_FACTORY_BEAN_NAME);
+
+			// block on the context, so that in-process executions are not interrupted
+			if (jedisConnectionFactory != null) {
+				synchronized (applicationContext) {
+					// automatically calls any destroy method on the bean
+					jedisConnectionFactory.destroy();
+				}
+			}
+			LOGGER.debug(REDIS_CONNECTION_FACTORY_BEAN_NAME + " destroyed.");
+		}
 	}
 
 	/**
@@ -91,9 +110,39 @@ public class BipJedisConnectionConfig {
 	 *
 	 * @return a connection factory with current property values
 	 */
-	@Bean
 	@RefreshScope
+	@Order(1)
+	@Bean
 	public JedisConnectionFactory redisConnectionFactory() {
+		LOGGER.debug(this.getClass() + ".redisConnectionFactory build with ["
+				+ "RedisStandaloneConfiguration[Database=" + redisProperties.getDatabase()
+				+ ";HostName=" + redisProperties.getHost()
+				+ ";Password=" + redisProperties.getPassword()
+				+ ";Port=" + redisProperties.getPort()
+				+ "]; JedisClientConfiguration["
+				+ "clientName=" + buildProperties.getName() + "_" + buildProperties.getVersion()
+				+ ";connectTimeout=" + (redisProperties.getTimeout() == null
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						: redisProperties.getTimeout())
+				+ ";readTimeout=" + (redisProperties.getTimeout() == null
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						: redisProperties.getTimeout())
+				+ ";poolConfig: [maxTotal=" + (redisProperties.getJedis().getPool().getMaxActive() <= 0
+						? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
+						: redisProperties.getJedis().getPool().getMaxActive())
+				+ ";MaxIdle=" + (redisProperties.getJedis().getPool().getMaxIdle() <= 0
+						? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
+						: redisProperties.getJedis().getPool().getMaxIdle())
+				+ ";MinIdle=" + (redisProperties.getJedis().getPool().getMinIdle() <= 0
+						? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
+						: redisProperties.getJedis().getPool().getMinIdle())
+				+ ";MaxWaitMillis=" + (redisProperties.getJedis().getPool().getMaxWait() == null
+						? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
+						: redisProperties.getJedis().getPool().getMaxWait().toMillis())
+				+ "]; SSL[" + redisProperties.isSsl()
+				+ (redisProperties.isSsl() ? ";hostnameVerifier=NoopHostnameVerifier" : "")
+				+ "]]");
+
 		return new JedisConnectionFactory(getRedisStandaloneConfiguration(), getJedisClientConfiguration());
 	}
 

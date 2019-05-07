@@ -12,11 +12,8 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.AnnotationCacheOperationSource;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.interceptor.CacheErrorHandler;
@@ -24,8 +21,12 @@ import org.springframework.cache.interceptor.CacheInterceptor;
 import org.springframework.cache.interceptor.CacheOperationSource;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -47,22 +48,56 @@ import gov.va.bip.framework.validation.Defense;
  * @author aburkholder
  */
 @Configuration
-@AutoConfigureAfter(CacheAutoConfiguration.class)
 @EnableConfigurationProperties({ BipRedisCacheProperties.class })
+//@AutoConfigureAfter(BipJedisConnectionConfig.class)
+//@AutoConfigureBefore(value = { CacheMetricsRegistrar.class })
 public class BipCachesConfig extends CachingConfigurerSupport {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipCachesConfig.class);
 
+	private static final String CACHE_MANAGER_BEAN_NAME = "cacheManager";
+	private static final String CACHE_CONFIGURATION_NAME = "redisCacheConfiguration";
+	private static final String CACHE_CONFIGURATIONS_NAME = "redisCacheConfigurations";
+	private static final String CACHE_PROPERTIES_NAME = "bipRedisCacheProperties";
+
+	/** Reference to the Spring Context. Need this in order to get direct access bean refs. */
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	/** Cache properties derived from application YAML */
-	@Autowired // TODO
-	private BipRedisCacheProperties bipRedisCacheProperties;
+	@Autowired
+	@Order(-9999)
+	private BipRedisCacheProperties theProperties;
 
 	/**
 	 * Post construction validations.
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		Defense.notNull(bipRedisCacheProperties, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
+		Defense.notNull(theProperties, BipRedisCacheProperties.class.getSimpleName() + " cannot be null.");
+	}
+
+	/**
+	 * On the RefreshScope refresh event, destroy the JedisConnectionFactory to force it
+	 * to rebuild from {@link #redisConnectionFactory()} with the current setting from the application YAML.
+	 * <p>
+	 * This event listener <b>must</b> run <b>after</b> any connection factory related event listeners.
+	 *
+	 * @param event the refresh event
+	 */
+	@EventListener
+	public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
+		LOGGER.debug("Event activated to reconfigure " + CACHE_MANAGER_BEAN_NAME + ": event.getName() {}",
+				event.getName() + "; event.getSource() {}",
+				event.getSource());
+
+		if (!applicationContext.containsBean(CACHE_MANAGER_BEAN_NAME)) {
+			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " does not yet exist.");
+		} else {
+			RedisCacheManager rcm = (RedisCacheManager) applicationContext.getBean(CACHE_MANAGER_BEAN_NAME);
+			rcm.initializeCaches();
+			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " re-initialized.");
+		}
 	}
 
 	/**
@@ -72,9 +107,9 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 * @return RedisCacheConfiguration
 	 */
 	@Bean
+//	@DependsOn({ CACHE_PROPERTIES_NAME })
 	public RedisCacheConfiguration redisCacheConfiguration() {
-		LOGGER.debug("redisCacheConfiguration invoked here");
-		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(bipRedisCacheProperties.getDefaultExpires()));
+		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(theProperties.getDefaultExpires()));
 	}
 
 	/**
@@ -85,13 +120,15 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 * @return Map&lt;String, org.springframework.data.redis.cache.RedisCacheConfiguration&gt;
 	 */
 	@Bean
+	@RefreshScope
+//	@DependsOn({ CACHE_PROPERTIES_NAME })
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
 		LOGGER.debug("redisCacheConfigurations invoked here");
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-		if (!CollectionUtils.isEmpty(bipRedisCacheProperties.getExpires())) {
+		if (!CollectionUtils.isEmpty(theProperties.getExpires())) {
 			// key = name, value - TTL
-			final Map<String, Long> resultExpires = bipRedisCacheProperties.getExpires().stream().filter(o -> o.getName() != null)
+			final Map<String, Long> resultExpires = theProperties.getExpires().stream().filter(o -> o.getName() != null)
 					.filter(o -> o.getTtl() != null).collect(Collectors.toMap(RedisExpires::getName, RedisExpires::getTtl));
 			for (Entry<String, Long> entry : resultExpires.entrySet()) {
 				org.springframework.data.redis.cache.RedisCacheConfiguration rcc =
@@ -111,8 +148,23 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 */
 	@Bean
 	@RefreshScope
-	public CacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory) {
-		LOGGER.debug("cacheManager invoked here");
+//	@DependsOn({ "redisConnectionFactory", CACHE_PROPERTIES_NAME, CACHE_CONFIGURATION_NAME, CACHE_CONFIGURATIONS_NAME })
+	public RedisCacheManager cacheManager(final RedisConnectionFactory redisConnectionFactory) {
+		if (LOGGER.isDebugEnabled()) {
+			String initialCacheProperties = "null";
+			if (theProperties.getExpires() != null) {
+				initialCacheProperties = "";
+				for (BipRedisCacheProperties.RedisExpires expires : theProperties.getExpires()) {
+					initialCacheProperties += "[name=" + expires.getName() + ";TTL=" + expires.getTtl() + "]";
+				}
+			}
+			LOGGER.debug(this.getClass() + ".cacheManager build with ["
+					+ "RedisCacheWriter=previously configured JedisConnectionFactory"
+					+ "; Default RedisCacheConfiguration[TTL=" + theProperties.getDefaultExpires()
+					+ ";all others as defined by RedisCacheConfiguration.defaultCacheConfig()]"
+					+ "; InitialCacheConfigurations[" + initialCacheProperties + "]");
+		}
+
 		return RedisCacheManager
 				.builder(redisConnectionFactory)
 				.cacheDefaults(this.redisCacheConfiguration())

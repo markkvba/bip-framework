@@ -38,6 +38,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  */
 @Configuration
 @AutoConfigureAfter(CacheAutoConfiguration.class)
+//@AutoConfigureBefore(value = { CacheMetricsRegistrar.class })
 @EnableCaching
 /* @Import to participate in the autoconfigure bootstrap process */
 @Import({ BipCachesConfig.class, BipJedisConnectionConfig.class })
@@ -54,6 +55,11 @@ public class BipCacheAutoConfiguration {
 	public static final String CONDITIONAL_SPRING_REDIS = "spring.cache.type";
 	/** The cache server type */
 	public static final String CACHE_SERVER_TYPE = "redis";
+
+	/** Refresh order for JedisConnectionFactory must be lower than for CacheManager */
+	static final int REFRESH_ORDER_CONNECTION_FACTORY = 1;
+	/** Refresh order for CacheManager must be higher than for JedisConnectionFactory */
+	static final int REFRESH_ORDER_CACHES = 10;
 
 	/** Embedded Redis bean to make sure embedded redis is started before redis cache is created. */
 	@SuppressWarnings("unused")
