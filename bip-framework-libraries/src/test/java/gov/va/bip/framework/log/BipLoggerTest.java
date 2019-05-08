@@ -116,7 +116,7 @@ public class BipLoggerTest extends AbstractBaseLogTester {
 				assertNotNull(loggingEvents.get(0));
 				assertTrue(
 						loggingEvents.stream().map(event -> event.toString()).collect(Collectors.joining(" "))
-								.contains(e.getClass().getName()));
+						.contains(e.getClass().getName()));
 			}
 		}
 	}
@@ -862,7 +862,7 @@ public class BipLoggerTest extends AbstractBaseLogTester {
 	@Test
 	public final void testNullMessage() throws IOException {
 		logger.log(Level.ERROR, null);
-		assertConsole(Level.ERROR, "null", null);
+		assertConsole(Level.ERROR, "", null);
 	}
 
 }
