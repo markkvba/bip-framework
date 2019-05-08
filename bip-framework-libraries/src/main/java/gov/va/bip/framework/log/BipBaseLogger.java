@@ -136,7 +136,7 @@ public class BipBaseLogger {
 	 * @param string the string to split
 	 * @return List of strings, each of which does not exceed maxLengthPerString
 	 */
-	private List<String> splitStringToLength(String string, int maxLengthPerString) {
+	private List<String> splitStringToLength(final String string, final int maxLengthPerString) {
 		if (maxLengthPerString < 1) {
 			throw new IllegalArgumentException(
 					"int argument 'maxLengthPerString' for splitStringToLength(..) must be greater than zero.");
@@ -144,15 +144,10 @@ public class BipBaseLogger {
 		if (string == null) {
 			return Arrays.asList(new String[] { "" });
 		}
-		// get a list of strings by splitting on platform-agnostic new line character(s)
-		// cannot use NEWLINE here, because we can't guarantee newline format of the string and stack trace
-		List<String> splitOnNewLines = Arrays.asList(string.split("\\r?\\n"));
 
 		// return an array of strings, each of which does not exceed max allowable docker length
 		ArrayList<String> returnList = new ArrayList<>();
-		for (String s : splitOnNewLines) {
-			makeToLength(s, returnList, maxLengthPerString);
-		}
+		makeToLength(string, returnList, maxLengthPerString);
 		return returnList;
 	}
 
@@ -165,7 +160,7 @@ public class BipBaseLogger {
 	 * @param addToThisList the list to add the split strings into, cannot be null
 	 * @param maxLength the max length allowed for each split string, must be greater than 0
 	 */
-	private void makeToLength(String string, List<String> addToThisList, int maxLength) {
+	private void makeToLength(final String string, final List<String> addToThisList, final int maxLength) {
 		if (addToThisList == null) {
 			throw new IllegalArgumentException("List argument 'addToThisList' for makeToLength(..) must not be null.");
 		}
@@ -177,17 +172,17 @@ public class BipBaseLogger {
 			return;
 		}
 
-		String[] words = string.split(" ");
+		String[] words = string.split(SPACE);
 		String toLength = "";
 		boolean alreadyAdded = false;
 		// accumulate words to the length specified for each addToThisList entry
 		for (String word : words) {
-			if (toLength.length() + word.length() + 1 > maxLength) {
+			if ((toLength.length() + word.length() + 1) > maxLength) {
 				addToThisList.add(toLength);
-				toLength = word; // start a new string
+				toLength = word + SPACE; // start a new string
 				alreadyAdded = true;
 			} else {
-				toLength += toLength + word + " ";
+				toLength = toLength + word + SPACE;
 				alreadyAdded = false;
 			}
 		}
@@ -206,8 +201,8 @@ public class BipBaseLogger {
 	 * @param marker any marker (or null)
 	 * @param level the log level, if null, the current logger's log level is used
 	 */
-	private void logStrings(List<String> strings, Marker marker, Level level) {
-		if (strings == null || strings.isEmpty()) {
+	private void logStrings(List<String> strings, final Marker marker, Level level) {
+		if ((strings == null) || strings.isEmpty()) {
 			strings = Arrays.asList(new String[] { "No log message provided. This log entry records the empty log event." });
 		}
 		if (level == null) {
