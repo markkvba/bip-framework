@@ -106,4 +106,80 @@ public class BearerTokenService {
 		return bearerToken;
 	}
 
+	/**
+	 * Makes API call to bearer token service and returns the token as string.
+	 * 
+	 * @param headerFile
+	 * @return
+	 */
+	public static String getTokenA(final String headerFile) {
+		final RESTConfigService restConfig = RESTConfigService.getInstance();
+		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
+		handleNullUrls(baseUrl, tokenUrl);
+		final Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
+		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
+		RESTUtil restUtility = new RESTUtil();
+		restUtility.setUpRequest(headerFile, headerMap);
+		return restUtility.postResponse(baseUrl + tokenUrl);
+	}
+
+	/**
+	 * Makes API call to bearer token service and returns the token as string.
+	 * 
+	 * @param headerFile
+	 * @return
+	 */
+	public static String getTokenB(final String headerFile) {
+		final RESTConfigService restConfig = RESTConfigService.getInstance();
+		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
+		handleNullUrls(baseUrl, tokenUrl);
+		final Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
+		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
+		RESTUtil restUtility = new RESTUtil();
+		restUtility.setUpRequest(headerFile, headerMap);
+		return restUtility.postResponse(baseUrl + tokenUrl);
+	}
+
+	/**
+	 * Makes API call to bearer token service and returns the token as string.
+	 * 
+	 * @param headerFile
+	 * @return
+	 */
+	public static String getTokenC(final String headerFile) {
+		final RESTConfigService restConfig = RESTConfigService.getInstance();
+		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
+		handleNullUrls(baseUrl, tokenUrl);
+		final Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
+		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
+		RESTUtil restUtility = new RESTUtil();
+		restUtility.setUpRequest(headerFile, headerMap);
+		return restUtility.postResponse(baseUrl + tokenUrl);
+	}
+
+	/**
+	 * Makes API call to bearer token service and returns the token as string.
+	 * 
+	 * @param headerFile
+	 * @return
+	 */
+	public static String getTokenD(final String headerFile) {
+		final RESTConfigService restConfig = RESTConfigService.getInstance();
+		final String baseUrl = restConfig.getProperty(BASE_URL_PROPERTY_KEY, true);
+		final String tokenUrl = restConfig.getProperty(TOKEN_URL_PROPERTY_KEY,true);
+		handleNullUrls(baseUrl, tokenUrl);
+		final Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Accept", ContentType.APPLICATION_JSON.getMimeType());
+		headerMap.put("Content-Type", ContentType.APPLICATION_JSON.getMimeType());
+		RESTUtil restUtility = new RESTUtil();
+		restUtility.setUpRequest(headerFile, headerMap);
+		return restUtility.postResponse(baseUrl + tokenUrl);
+	}
+
 }
