@@ -2,6 +2,7 @@ package gov.va.bip.framework.cache.autoconfigure;
 
 import java.util.List;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import gov.va.bip.framework.log.BipLogger;
@@ -26,6 +27,7 @@ import gov.va.bip.framework.log.BipLoggerFactory;
  *
  */
 @Component
+@RefreshScope
 public class BipRedisCacheProperties {
 	/** Class logger */
 	static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipRedisCacheProperties.class);

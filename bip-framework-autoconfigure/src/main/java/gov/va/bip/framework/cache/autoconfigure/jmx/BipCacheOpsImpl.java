@@ -2,9 +2,7 @@ package gov.va.bip.framework.cache.autoconfigure.jmx;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
@@ -225,10 +223,9 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 		}
 
 		try {
-			LOGGER.info(PREFIX + "(Default) RedisCacheConfiguration = " + redisCacheConfiguration);
+			LOGGER.info(PREFIX + "RedisCacheConfiguration (immutable) = " + redisCacheConfiguration);
 			if (redisCacheConfiguration != null) {
 				LOGGER.info(PREFIX + "    allowCacheNullValues = " + redisCacheConfiguration.getAllowCacheNullValues());
-				LOGGER.info(PREFIX + "    ttl = " + redisCacheConfiguration.getTtl().toMillis());
 				LOGGER.info(PREFIX + "    keySerializationPair = " + (redisCacheConfiguration.getKeySerializationPair() == null
 						? NULL
 						: redisCacheConfiguration.getKeySerializationPair().getClass()));
@@ -242,31 +239,8 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 				LOGGER.info(PREFIX + "    usePrefix = " + redisCacheConfiguration.usePrefix());
 			}
 
-			LOGGER.info(PREFIX + "(Configured) RedisCacheConfigurations = " + redisCacheConfigurations);
-			if (redisCacheConfigurations != null) {
-				for (Entry<String, RedisCacheConfiguration> entry : redisCacheConfigurations.entrySet()) {
-					if (entry != null && StringUtils.isNotBlank(entry.getKey()) && entry.getValue() != null) {
-						RedisCacheConfiguration value = entry.getValue();
-						LOGGER.info(PREFIX + "    Map key = " + entry.getKey() + "; value = " + value);
-						LOGGER.info(PREFIX + "        keyPrefix = " + value.getKeyPrefixFor(entry.getKey()));
-						LOGGER.info(PREFIX + "        allowCacheNullValues = " + value.getAllowCacheNullValues());
-						LOGGER.info(PREFIX + "        ttl = " + value.getTtl().toMillis());
-						LOGGER.info(PREFIX + "        usePrefix = " + value.usePrefix());
-						LOGGER.info(PREFIX + "        keySerializationPair = " + (value.getKeySerializationPair() == null
-								? NULL
-								: value.getKeySerializationPair().getClass()));
-						LOGGER.info(PREFIX + "        valueSerializationPair = " + (value.getValueSerializationPair() == null
-								? NULL
-								: value.getValueSerializationPair().getClass()));
-						LOGGER.info(PREFIX + "        conversionService = " + (value.getConversionService() == null
-								? NULL
-								: value.getConversionService().getClass()));
-					}
-				}
-			}
-
 			Collection<String> cacheNames = cacheManager.getCacheNames();
-			LOGGER.info(PREFIX + "(Caches) CacheNames = " + (cacheNames == null ? "null" : cacheNames.getClass()));
+			LOGGER.info(PREFIX + "Caches = " + (cacheNames == null ? "null" : cacheNames.getClass()));
 			if (cacheNames != null) {
 				for (String name : cacheNames) {
 					LOGGER.info(PREFIX + "    cacheName = " + name);

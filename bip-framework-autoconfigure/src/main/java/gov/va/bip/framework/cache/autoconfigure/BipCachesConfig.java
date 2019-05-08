@@ -86,6 +86,7 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " does not yet exist.");
 		} else {
 			RedisCacheManager rcm = (RedisCacheManager) applicationContext.getBean(CACHE_MANAGER_BEAN_NAME);
+//			rcm.builder().
 			rcm.initializeCaches();
 			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " re-initialized.");
 		}
@@ -122,7 +123,7 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 			for (Entry<String, Long> entry : resultExpires.entrySet()) {
 				org.springframework.data.redis.cache.RedisCacheConfiguration rcc =
 						org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig()
-						.entryTtl(Duration.ofSeconds(entry.getValue()));
+								.entryTtl(Duration.ofSeconds(entry.getValue()));
 				cacheConfigs.put(entry.getKey(), rcc);
 			}
 		}
@@ -226,16 +227,22 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 */
 	public static class RedisCacheErrorHandler implements CacheErrorHandler {
 
-		/* (non-Javadoc)
-		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheGetError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheGetError(java.lang.RuntimeException,
+		 * org.springframework.cache.Cache, java.lang.Object)
 		 */
 		@Override
 		public void handleCacheGetError(final RuntimeException exception, final Cache cache, final Object key) {
 			LOGGER.error(BipBanner.newBanner("Unable to get from cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCachePutError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object, java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCachePutError(java.lang.RuntimeException,
+		 * org.springframework.cache.Cache, java.lang.Object, java.lang.Object)
 		 */
 		@Override
 		public void handleCachePutError(final RuntimeException exception, final Cache cache, final Object key,
@@ -243,8 +250,11 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 			LOGGER.error(BipBanner.newBanner("Unable to put into cache " + cache.getName(), Level.ERROR), exception.getMessage());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheEvictError(java.lang.RuntimeException, org.springframework.cache.Cache, java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheEvictError(java.lang.RuntimeException,
+		 * org.springframework.cache.Cache, java.lang.Object)
 		 */
 		@Override
 		public void handleCacheEvictError(final RuntimeException exception, final Cache cache, final Object key) {
@@ -252,8 +262,11 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 					exception.getMessage());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheClearError(java.lang.RuntimeException, org.springframework.cache.Cache)
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.springframework.cache.interceptor.CacheErrorHandler#handleCacheClearError(java.lang.RuntimeException,
+		 * org.springframework.cache.Cache)
 		 */
 		@Override
 		public void handleCacheClearError(final RuntimeException exception, final Cache cache) {
