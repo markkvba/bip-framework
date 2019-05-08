@@ -86,7 +86,6 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " does not yet exist.");
 		} else {
 			RedisCacheManager rcm = (RedisCacheManager) applicationContext.getBean(CACHE_MANAGER_BEAN_NAME);
-//			rcm.builder().
 			rcm.initializeCaches();
 			LOGGER.debug(CACHE_MANAGER_BEAN_NAME + " re-initialized.");
 		}
