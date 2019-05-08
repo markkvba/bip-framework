@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -23,6 +21,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.cloud.context.scope.refresh.RefreshScope;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,7 +65,7 @@ public class BipCacheAutoConfigurationTest {
 		TestPropertyValues.of(BIP_REDIS_CLIENT_NAME).applyTo(context);
 
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, BuildProperties.class, TestConfigurationClassForBuildProperties.class);
 
 		context.refresh();
 		assertNotNull(context);
@@ -80,20 +79,22 @@ public class BipCacheAutoConfigurationTest {
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		TestPropertyValues.of(BIP_REDIS_CLIENT_NAME).applyTo(context);
 		TestPropertyValues.of("bip.framework.cache.defaultExpires=86401").applyTo(context);
+		TestPropertyValues.of("bip.framework.cache.expires[0].name=testName").applyTo(context);
+		TestPropertyValues.of("bip.framework.cache.expires[0].ttl=1500").applyTo(context);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class, RefreshScope.class,
+				BuildProperties.class);
 		context.refresh();
-		BipRedisCacheProperties bipRedisClientProperties = context.getBean(BipRedisCacheProperties.class);
-		BipRedisCacheProperties.RedisExpires redisExpires =
-				new gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires();
-		redisExpires.setName("testName");
-		redisExpires.setTtl(1500L);
-		List<BipRedisCacheProperties.RedisExpires> expiresList = new LinkedList<BipRedisCacheProperties.RedisExpires>();
-		expiresList.add(redisExpires);
-		bipRedisClientProperties.setExpires(expiresList);
-		context.register(BipCacheAutoConfiguration.class);
+		//		BipRedisCacheProperties bipRedisClientProperties = context.getBean(BipRedisCacheProperties.class);
+		//		BipRedisCacheProperties.RedisExpires redisExpires =
+		//				new gov.va.bip.framework.cache.autoconfigure.BipRedisCacheProperties.RedisExpires();
+		//		redisExpires.setName("testName");
+		//		redisExpires.setTtl(1500L);
+		//		List<BipRedisCacheProperties.RedisExpires> expiresList = new LinkedList<BipRedisCacheProperties.RedisExpires>();
+		//		expiresList.add(redisExpires);
+		//		bipRedisClientProperties.setExpires(expiresList);
+		//		context.register(BipCacheAutoConfiguration.class);
 		BipCachesConfig bipCacheAutoConfiguration = context.getBean(BipCachesConfig.class);
-
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs =
 				ReflectionTestUtils.invokeMethod(bipCacheAutoConfiguration, "getRedisCacheConfigs", null);
 
@@ -106,7 +107,7 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, BuildProperties.class, TestConfigurationClassForBuildProperties.class);
 		context.refresh();
 		assertNotNull(context);
 		KeyGenerator keyGenerator = context.getBean(KeyGenerator.class);
@@ -119,7 +120,7 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, BuildProperties.class, TestConfigurationClassForBuildProperties.class);
 		context.refresh();
 		assertNotNull(context);
 
@@ -132,7 +133,7 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, BuildProperties.class, TestConfigurationClassForBuildProperties.class);
 		context.refresh();
 		assertNotNull(context);
 
@@ -147,7 +148,7 @@ public class BipCacheAutoConfigurationTest {
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		context.registerBean(BaseAsyncAudit.class);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class, BipAuditAutoConfiguration.class,
-				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				TestConfigurationForAuditBeans.class, BuildProperties.class, TestConfigurationClassForBuildProperties.class);
 		context.refresh();
 		assertNotNull(context);
 
@@ -160,7 +161,8 @@ public class BipCacheAutoConfigurationTest {
 		context = new AnnotationConfigApplicationContext();
 		TestPropertyValues.of(SPRING_CACHE_TYPE_PROPERTY_AND_VALUE).applyTo(context);
 		context.register(BaseAsyncAudit.class, RedisAutoConfiguration.class, BipCacheAutoConfiguration.class,
-				BipAuditAutoConfiguration.class, TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class);
+				BipAuditAutoConfiguration.class, TestConfigurationForAuditBeans.class, BuildProperties.class,
+				TestConfigurationClassForBuildProperties.class);
 		context.refresh();
 		assertNotNull(context);
 
