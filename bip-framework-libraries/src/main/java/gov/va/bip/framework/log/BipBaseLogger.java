@@ -254,7 +254,7 @@ public class BipBaseLogger {
 	private String safeMessage(final String message) {
 		return message == null ? ""
 				: String.valueOf(BufferRecyclers.getJsonStringEncoder()
-						.quoteAsString(SanitizationUtil.stripXSS(message == null ? "" : message)));
+						.quoteAsString(SanitizationUtil.stripXSS(message)));
 	}
 
 	/**
