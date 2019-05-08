@@ -23,11 +23,13 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,27 +308,40 @@ public class RESTUtil {
 		RestTemplate apiTemplate = new RestTemplate();
 		
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		if (StringUtils.isNotBlank(pathToKeyStore)) {
-			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-			if (StringUtils.isBlank(password)) {
-				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
+		String pathToTrustStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true);
+		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+		try {
+			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
+				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+				sslContextBuilder =  sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
+			} else {						
+				if (StringUtils.isNotBlank(pathToKeyStore)) {
+					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
+					if (StringUtils.isBlank(password)) {
+						throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
+					}
+					sslContextBuilder = sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(), password.toCharArray());				
+				}
+				if (StringUtils.isNotBlank(pathToTrustStore)) {
+					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
+					if (StringUtils.isBlank(password)) {
+						throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
+					}
+					sslContextBuilder = sslContextBuilder.loadTrustMaterial(new File(pathToTrustStore), password.toCharArray());
+				} else {
+					sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+				}
 			}
-			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
-				KeyStore keyStore = KeyStore.getInstance("jks");
-				keyStore.load(instream, password.toCharArray());
-				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray())
-						.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-
-				SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
-						NoopHostnameVerifier.INSTANCE);
-				HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-				ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-				apiTemplate.setRequestFactory(requestFactory);
-			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e);
-				throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
-			}			
-		}
+			SSLContext sslContext = sslContextBuilder.build();
+			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
+					NoopHostnameVerifier.INSTANCE);
+			HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+			ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+			apiTemplate.setRequestFactory(requestFactory);
+		} catch (Exception e) {
+			LOGGER.error("Issue with the certificate or password", e);
+			throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
+		}					
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));

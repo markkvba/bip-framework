@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gov.va.bip.framework.test.util.PropertiesUtil;
+import gov.va.bip.framework.test.util.SanitizationUtil;
 
 /**
  * A singleton to hold an instance of this class AND - importantly - the test
@@ -74,7 +75,7 @@ public class RESTConfigService {
 	public static RESTConfigService getInstance() {
 		if (instance == null) {
 			instance = new RESTConfigService();
-			final String environment = System.getProperty(TEST_ENV);
+			final String environment = SanitizationUtil.stripXSS(System.getProperty(TEST_ENV));
 			String url = "";
 			if (StringUtils.isNotBlank(environment)) {
 				url = "config/vetservices-inttest-" + environment + ".properties";
