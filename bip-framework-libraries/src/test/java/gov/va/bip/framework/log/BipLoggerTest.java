@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -112,8 +113,10 @@ public class BipLoggerTest extends AbstractBaseLogTester {
 			final List<ch.qos.logback.classic.spi.LoggingEvent> loggingEvents = captorLoggingEvent.getAllValues();
 
 			if (captureCount == 1) {
-				assertNotNull(loggingEvents.get(0).getThrowableProxy());
-				assertTrue(e.getClass().getName().equals(loggingEvents.get(0).getThrowableProxy().getClassName()));
+				assertNotNull(loggingEvents.get(0));
+				assertTrue(
+						loggingEvents.stream().map(event -> event.toString()).collect(Collectors.joining(" "))
+								.contains(e.getClass().getName()));
 			}
 		}
 	}
