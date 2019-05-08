@@ -8,16 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import gov.va.bip.framework.cache.autoconfigure.jmx.BipCacheOpsImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BipCacheOpsImplTest {
 
 	@Mock
-	private CacheManager cacheManager;
+	private RedisCacheManager cacheManager;
 
 	BipCacheOpsImpl bipCacheOpsImpl;
 

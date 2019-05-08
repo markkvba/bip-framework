@@ -18,8 +18,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.stereotype.Component;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
@@ -112,7 +112,7 @@ public class BipJedisConnectionConfig {
 	@Order(1)
 	@Bean
 	public JedisConnectionFactory redisConnectionFactory() {
-		LOGGER.debug(this.getClass() + ".redisConnectionFactory build with ["
+		String msg = this.getClass() + ".redisConnectionFactory build with ["
 				+ "RedisStandaloneConfiguration[Database=" + redisProperties.getDatabase()
 				+ ";HostName=" + redisProperties.getHost()
 				+ ";Password=" + redisProperties.getPassword()
@@ -120,26 +120,29 @@ public class BipJedisConnectionConfig {
 				+ "]; JedisClientConfiguration["
 				+ "clientName=" + buildProperties.getName() + "_" + buildProperties.getVersion()
 				+ ";connectTimeout=" + (redisProperties.getTimeout() == null
-				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout())
 				+ ";readTimeout=" + (redisProperties.getTimeout() == null
-				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
-						: redisProperties.getTimeout())
-				+ ";poolConfig: [maxTotal=" + (redisProperties.getJedis().getPool().getMaxActive() <= 0
-				? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
-						: redisProperties.getJedis().getPool().getMaxActive())
-				+ ";MaxIdle=" + (redisProperties.getJedis().getPool().getMaxIdle() <= 0
-				? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
-						: redisProperties.getJedis().getPool().getMaxIdle())
-				+ ";MinIdle=" + (redisProperties.getJedis().getPool().getMinIdle() <= 0
-				? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
-						: redisProperties.getJedis().getPool().getMinIdle())
-				+ ";MaxWaitMillis=" + (redisProperties.getJedis().getPool().getMaxWait() == null
-				? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
-						: redisProperties.getJedis().getPool().getMaxWait().toMillis())
-				+ "]; SSL[" + redisProperties.isSsl()
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						: redisProperties.getTimeout());
+		if (redisProperties.getJedis() != null && redisProperties.getJedis().getPool() != null) {
+			msg += ";poolConfig: [maxTotal=" + (redisProperties.getJedis().getPool().getMaxActive() <= 0
+					? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
+					: redisProperties.getJedis().getPool().getMaxActive())
+					+ ";MaxIdle=" + (redisProperties.getJedis().getPool().getMaxIdle() <= 0
+							? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
+							: redisProperties.getJedis().getPool().getMaxIdle())
+					+ ";MinIdle=" + (redisProperties.getJedis().getPool().getMinIdle() <= 0
+							? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
+							: redisProperties.getJedis().getPool().getMinIdle())
+					+ ";MaxWaitMillis=" + (redisProperties.getJedis().getPool().getMaxWait() == null
+							? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
+							: redisProperties.getJedis().getPool().getMaxWait().toMillis());
+		}
+		msg += "]; SSL[" + redisProperties.isSsl()
 				+ (redisProperties.isSsl() ? ";hostnameVerifier=NoopHostnameVerifier" : "")
-				+ "]]");
+				+ "]]";
+		LOGGER.debug(msg);
 
 		return new JedisConnectionFactory(getRedisStandaloneConfiguration(), getJedisClientConfiguration());
 	}
@@ -154,19 +157,19 @@ public class BipJedisConnectionConfig {
 				.builder()
 				.clientName(buildProperties.getName() + "_" + buildProperties.getVersion())
 				.connectTimeout((redisProperties.getTimeout() == null
-				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout()))
 				.readTimeout((redisProperties.getTimeout() == null
-				? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
+						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout()));
 
 		if (redisProperties.getJedis() != null && redisProperties.getJedis().getPool() != null) {
 			builder.usePooling()
-			.poolConfig(jedisPoolConfig(redisProperties.getJedis().getPool()));
+					.poolConfig(jedisPoolConfig(redisProperties.getJedis().getPool()));
 		}
 		if (redisProperties.isSsl()) {
 			builder.useSsl()
-			.hostnameVerifier(NoopHostnameVerifier.INSTANCE);
+					.hostnameVerifier(NoopHostnameVerifier.INSTANCE);
 			/* also could set: .sslParameters(..) and sslSocketFactory(..) */
 		}
 		return builder.build();
@@ -186,16 +189,16 @@ public class BipJedisConnectionConfig {
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setMaxTotal((pool.getMaxActive() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
-						: pool.getMaxActive()));
+				: pool.getMaxActive()));
 		config.setMaxIdle((pool.getMaxIdle() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MAX_IDLE
-						: pool.getMaxIdle()));
+				: pool.getMaxIdle()));
 		config.setMinIdle((pool.getMinIdle() <= 0
 				? GenericObjectPoolConfig.DEFAULT_MIN_IDLE
-						: pool.getMinIdle()));
+				: pool.getMinIdle()));
 		config.setMaxWaitMillis((pool.getMaxWait() == null
 				? GenericObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS
-						: pool.getMaxWait().toMillis()));
+				: pool.getMaxWait().toMillis()));
 		return config;
 	}
 
