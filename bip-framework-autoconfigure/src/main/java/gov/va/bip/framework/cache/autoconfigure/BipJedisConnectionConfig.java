@@ -51,7 +51,7 @@ public class BipJedisConnectionConfig {
 
 	/** Properties from the application YAML */
 	@Autowired
-	private RedisProperties redisProperties;
+	RedisProperties redisProperties;
 
 	/** Reference to the Spring Context. Need this in order to get direct access bean refs. */
 	@Autowired
@@ -125,7 +125,7 @@ public class BipJedisConnectionConfig {
 				+ ";readTimeout=" + (redisProperties.getTimeout() == null
 						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout());
-		if (redisProperties.getJedis() != null && redisProperties.getJedis().getPool() != null) {
+		if (redisProperties.getJedis().getPool() != null) {
 			msg += ";poolConfig: [maxTotal=" + (redisProperties.getJedis().getPool().getMaxActive() <= 0
 					? GenericObjectPoolConfig.DEFAULT_MAX_TOTAL
 					: redisProperties.getJedis().getPool().getMaxActive())
@@ -163,7 +163,7 @@ public class BipJedisConnectionConfig {
 						? Duration.ofMillis(Protocol.DEFAULT_TIMEOUT)
 						: redisProperties.getTimeout()));
 
-		if (redisProperties.getJedis() != null && redisProperties.getJedis().getPool() != null) {
+		if (redisProperties.getJedis().getPool() != null) {
 			builder.usePooling()
 					.poolConfig(jedisPoolConfig(redisProperties.getJedis().getPool()));
 		}
