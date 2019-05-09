@@ -4,12 +4,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -216,7 +214,7 @@ public class RESTUtil {
 	 * Private method that is invoked by different http methods. It uses
 	 * RESTTemplate generic exchange method for various HTTP methods such as
 	 * GET,POST,PUT,DELETE
-	 * 
+	 *
 	 * @param serviceURL
 	 * @param request
 	 * @param httpMethod
@@ -260,9 +258,11 @@ public class RESTUtil {
 			return null;
 		}
 	}
+
 	/**
 	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
+	 * 
 	 * @param serviceURL
 	 * @param fileName
 	 * @param submitPayload
@@ -284,9 +284,11 @@ public class RESTUtil {
 		}
 
 	}
+
 	/**
 	 * Private method that is invoked by multipart methods. It uses
 	 * RESTTemplate generic exchange method for multipart HTTP methods.
+	 * 
 	 * @param serviceURL
 	 * @param body
 	 * @return
@@ -306,21 +308,22 @@ public class RESTUtil {
 	private RestTemplate getRestTemplate() {
 		// Create a new instance of the {@link RestTemplate} using default settings.
 		RestTemplate apiTemplate = new RestTemplate();
-		
+
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
 		String pathToTrustStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true);
 		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
 		try {
 			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
 				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-				sslContextBuilder =  sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
-			} else {						
+				sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
+			} else {
 				if (StringUtils.isNotBlank(pathToKeyStore)) {
 					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
 					if (StringUtils.isBlank(password)) {
 						throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
 					}
-					sslContextBuilder = sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(), password.toCharArray());				
+					sslContextBuilder = sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(),
+							password.toCharArray());
 				}
 				if (StringUtils.isNotBlank(pathToTrustStore)) {
 					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
@@ -341,15 +344,15 @@ public class RESTUtil {
 		} catch (Exception e) {
 			LOGGER.error("Issue with the certificate or password", e);
 			throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
-		}					
+		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
 
 		for (HttpMessageConverter<?> converter : apiTemplate.getMessageConverters()) {
-		     if (converter instanceof StringHttpMessageConverter) {
-		         ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
-		     }
+			if (converter instanceof StringHttpMessageConverter) {
+				((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+			}
 		}
 		return apiTemplate;
 	}
@@ -357,7 +360,7 @@ public class RESTUtil {
 	/**
 	 * Creates HttpComponentsClientHttpRequestFactory with different settings such
 	 * as connectionTimeout, readTimeout
-	 * 
+	 *
 	 * @return
 	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
@@ -372,7 +375,7 @@ public class RESTUtil {
 
 	/**
 	 * Creates PoolingHttpClientConnectionManager with various settings.
-	 * 
+	 *
 	 * @return
 	 */
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
@@ -393,7 +396,7 @@ public class RESTUtil {
 	/**
 	 * Creates HttpClientBuilder and sets PoolingHttpClientConnectionManager,
 	 * ConnectionConfig
-	 * 
+	 *
 	 * @return
 	 */
 	private HttpClientBuilder getHttpClientBuilder() {
@@ -404,7 +407,7 @@ public class RESTUtil {
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
-		
+
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
 			public boolean retryRequest(final IOException exception, final int executionCount, final HttpContext context) {
@@ -447,7 +450,7 @@ public class RESTUtil {
 
 	/**
 	 * Utility method to read file. The parameter holds absolute path.
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws IOException
