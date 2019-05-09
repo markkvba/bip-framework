@@ -92,7 +92,7 @@ public class BipCacheAutoConfigurationTest {
 		context.refresh();
 		BipCachesConfig bipCachesConfig = context.getBean(BipCachesConfig.class);
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs =
-				ReflectionTestUtils.invokeMethod(bipCachesConfig, "getRedisCacheConfigs", (Object) null);
+				ReflectionTestUtils.invokeMethod(bipCachesConfig, "getRedisCacheConfigs");
 
 		assertNotNull(cacheConfigs);
 		assertEquals(cacheConfigs.get("testName").getTtl().getSeconds(), 1500L);
