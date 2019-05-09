@@ -77,7 +77,7 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	 * @param event the refresh event
 	 */
 	@EventListener
-	public void onApplicationEvent(RefreshScopeRefreshedEvent event) {
+	public void onApplicationEvent(final RefreshScopeRefreshedEvent event) {
 		LOGGER.debug("Event activated to reconfigure " + CACHE_MANAGER_BEAN_NAME + ": event.getName() {}",
 				event.getName() + "; event.getSource() {}",
 				event.getSource());
@@ -113,8 +113,7 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 	@RefreshScope
 	public Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfigurations() {
 		LOGGER.debug("redisCacheConfigurations invoked here");
-		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs = getRedisCacheConfigs();
-		return cacheConfigs;
+		return getRedisCacheConfigs();
 	}
 
 	private Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> getRedisCacheConfigs() {
@@ -127,7 +126,7 @@ public class BipCachesConfig extends CachingConfigurerSupport {
 			for (Entry<String, Long> entry : resultExpires.entrySet()) {
 				org.springframework.data.redis.cache.RedisCacheConfiguration rcc =
 						org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig()
-								.entryTtl(Duration.ofSeconds(entry.getValue()));
+						.entryTtl(Duration.ofSeconds(entry.getValue()));
 				cacheConfigs.put(entry.getKey(), rcc);
 			}
 		}

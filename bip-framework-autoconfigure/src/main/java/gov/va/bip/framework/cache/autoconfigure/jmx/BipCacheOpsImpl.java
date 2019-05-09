@@ -28,7 +28,7 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 @Component
 @ManagedResource(objectName = BipCacheOpsImpl.OBJECT_NAME,
-		description = "A JMX MBean implementation for operations on the current spring cache context.")
+description = "A JMX MBean implementation for operations on the current spring cache context.")
 public class BipCacheOpsImpl implements BipCacheOpsMBean {
 	/** Class logger */
 	private static final BipLogger LOGGER = BipLoggerFactory.getLogger(BipCacheOpsImpl.class);
@@ -44,9 +44,6 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 	private static final String OBJECT_NAME_PROPERTIES = "type=Support,name=cacheOps";
 	/** The object name for JMX bean */
 	static final String OBJECT_NAME = OBJECT_NAME_DOMAIN + ":" + OBJECT_NAME_PROPERTIES;
-
-	private static final String[] JAVA =
-			new String[] { "com.sun.", "java.", "javax.", "jdk.", "netscape.", "org.ietf.", "org.w3c.", "org.xml." };
 
 	/** The configured spring cache manager */
 	@Autowired
@@ -85,7 +82,7 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 	public void clearAllCaches() {
 		if (cacheManager != null) {
 			cacheManager.getCacheNames().parallelStream()
-					.forEach(name -> cacheManager.getCache(name).clear());
+			.forEach(name -> cacheManager.getCache(name).clear());
 		}
 	}
 
@@ -101,38 +98,41 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 		LOGGER.info(PREFIX + "Cache Configs in '" + (buildProperties == null ? NULL : buildProperties.getName()) + "'");
 		LOGGER.info(PREFIX + "Config for Default: [TTL=" + (redisCacheConfiguration.getTtl() == null
 				? NULL
-				: redisCacheConfiguration.getTtl().toMillis())
+						: redisCacheConfiguration.getTtl().toMillis())
 				+ ";UsePrefix=" + redisCacheConfiguration.usePrefix()
 				+ ";AllowCacheNullValues=" + redisCacheConfiguration.getAllowCacheNullValues()
 				+ ";ConversionService=" + (redisCacheConfiguration.getConversionService() == null
-						? NULL
+				? NULL
 						: redisCacheConfiguration.getConversionService().getClass().getName()));
-		if (redisCacheConfigurations == null) {
-			LOGGER.info(PREFIX + "Config for !null cunfigurations list!");
-		} else if (redisCacheConfigurations.isEmpty()) {
-			LOGGER.info(PREFIX + "Config for !empty configurations list!");
-		} else {
-			for (String key : redisCacheConfigurations.keySet()) {
-				RedisCacheConfiguration config = redisCacheConfigurations.get(key);
-				String msg = PREFIX + "Config for [key=" + key
-						+ "[KeyPrefix=" + config.getKeyPrefixFor(key)
-						+ ";TTL=" + (config.getTtl() == null ? NULL : config.getTtl().toMillis())
-						+ ";UsePrefix=" + config.usePrefix()
-						+ ";AllowCacheNullValues=" + config.getAllowCacheNullValues()
-						+ ";ConversionService=" + (config.getConversionService() == null
-								? NULL
-								: config.getConversionService().getClass().getName())
-						+ "]]; ";
-				LOGGER.info(msg);
-			}
-		}
-		if (cacheManager == null || cacheManager.getCacheNames() == null) {
+		logRedisCacheConfig();
+		if ((cacheManager == null) || (cacheManager.getCacheNames() == null)) {
 			LOGGER.info(PREFIX + "Cache names in CacheManager: null");
 		} else if (cacheManager.getCacheNames().isEmpty()) {
 			LOGGER.info(PREFIX + "Cache names in CacheManager: empty");
 		} else {
 			LOGGER.info(PREFIX + "Cache names in CacheManager: ["
 					+ String.join(", ", cacheManager.getCacheNames()) + "]");
+		}
+	}
+
+	private void logRedisCacheConfig() {
+		if (redisCacheConfigurations == null) {
+			LOGGER.info(PREFIX + "Config for !null cunfigurations list!");
+		} else if (redisCacheConfigurations.isEmpty()) {
+			LOGGER.info(PREFIX + "Config for !empty configurations list!");
+		} else {
+			for (Map.Entry<String, RedisCacheConfiguration> entry : redisCacheConfigurations.entrySet()) {
+				RedisCacheConfiguration config = entry.getValue();
+				String msg = PREFIX + "Config for [key=" + entry.getKey() + "[KeyPrefix=" + config.getKeyPrefixFor(entry.getKey())
+				+ ";TTL=" + (config.getTtl() == null ? NULL : config.getTtl().toMillis())
+				+ ";UsePrefix=" + config.usePrefix()
+				+ ";AllowCacheNullValues=" + config.getAllowCacheNullValues()
+				+ ";ConversionService=" + (config.getConversionService() == null
+				? NULL
+						: config.getConversionService().getClass().getName())
+				+ "]]; ";
+				LOGGER.info(msg);
+			}
 		}
 	}
 
@@ -228,42 +228,46 @@ public class BipCacheOpsImpl implements BipCacheOpsMBean {
 				LOGGER.info(PREFIX + "    allowCacheNullValues = " + redisCacheConfiguration.getAllowCacheNullValues());
 				LOGGER.info(PREFIX + "    keySerializationPair = " + (redisCacheConfiguration.getKeySerializationPair() == null
 						? NULL
-						: redisCacheConfiguration.getKeySerializationPair().getClass()));
+								: redisCacheConfiguration.getKeySerializationPair().getClass()));
 				LOGGER.info(PREFIX + "    valueSerializationPair = "
 						+ (redisCacheConfiguration.getValueSerializationPair() == null
-								? NULL
+						? NULL
 								: redisCacheConfiguration.getValueSerializationPair().getClass()));
 				LOGGER.info(PREFIX + "    conversionService = " + (redisCacheConfiguration.getConversionService() == null
 						? NULL
-						: redisCacheConfiguration.getConversionService().getClass()));
+								: redisCacheConfiguration.getConversionService().getClass()));
 				LOGGER.info(PREFIX + "    usePrefix = " + redisCacheConfiguration.usePrefix());
 			}
 
 			Collection<String> cacheNames = cacheManager.getCacheNames();
 			LOGGER.info(PREFIX + "Caches = " + (cacheNames == null ? "null" : cacheNames.getClass()));
-			if (cacheNames != null) {
-				for (String name : cacheNames) {
-					LOGGER.info(PREFIX + "    cacheName = " + name);
-					RedisCache cache = (cacheManager.isTransactionAware()
-							? (RedisCache) ((TransactionAwareCacheDecorator) cacheManager.getCache(name)).getTargetCache()
-							: (RedisCache) cacheManager.getCache(name));
-					RedisCacheConfiguration config = cache.getCacheConfiguration();
-					LOGGER.info(PREFIX + "        allowCacheNullValues = " + config.getAllowCacheNullValues());
-					LOGGER.info(PREFIX + "        ttl = " + config.getTtl().toMillis());
-					LOGGER.info(PREFIX + "        keySerializationPair = " + (config.getKeySerializationPair() == null
-							? NULL
-							: config.getKeySerializationPair().getClass()));
-					LOGGER.info(PREFIX + "        valueSerializationPair = " + (config.getValueSerializationPair() == null
-							? NULL
-							: config.getValueSerializationPair().getClass()));
-					LOGGER.info(PREFIX + "        conversionService = " + (config.getConversionService() == null
-							? NULL
-							: config.getConversionService().getClass()));
-					LOGGER.info(PREFIX + "        usePrefix = " + config.usePrefix());
-				}
-			}
+			logInfoForAllCacheNames(cacheNames);
 		} catch (Exception e) {
 			LOGGER.error("While logging CacheManager field values", e);
+		}
+	}
+
+	private void logInfoForAllCacheNames(final Collection<String> cacheNames) {
+		if (cacheNames != null) {
+			for (String name : cacheNames) {
+				LOGGER.info(PREFIX + "    cacheName = " + name);
+				RedisCache cache = (cacheManager.isTransactionAware()
+						? (RedisCache) ((TransactionAwareCacheDecorator) cacheManager.getCache(name)).getTargetCache()
+								: (RedisCache) cacheManager.getCache(name));
+				RedisCacheConfiguration config = cache.getCacheConfiguration();
+				LOGGER.info(PREFIX + "        allowCacheNullValues = " + config.getAllowCacheNullValues());
+				LOGGER.info(PREFIX + "        ttl = " + config.getTtl().toMillis());
+				LOGGER.info(PREFIX + "        keySerializationPair = " + (config.getKeySerializationPair() == null
+						? NULL
+								: config.getKeySerializationPair().getClass()));
+				LOGGER.info(PREFIX + "        valueSerializationPair = " + (config.getValueSerializationPair() == null
+						? NULL
+								: config.getValueSerializationPair().getClass()));
+				LOGGER.info(PREFIX + "        conversionService = " + (config.getConversionService() == null
+						? NULL
+								: config.getConversionService().getClass()));
+				LOGGER.info(PREFIX + "        usePrefix = " + config.usePrefix());
+			}
 		}
 	}
 }

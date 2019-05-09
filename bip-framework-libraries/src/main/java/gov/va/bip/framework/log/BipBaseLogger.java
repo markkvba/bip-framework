@@ -201,24 +201,22 @@ public class BipBaseLogger {
 	 * @param marker any marker (or null)
 	 * @param level the log level, if null, the current logger's log level is used
 	 */
-	private void logStrings(List<String> strings, final Marker marker, Level level) {
-		if ((strings == null) || strings.isEmpty()) {
-			strings = Arrays.asList(new String[] { "No log message provided. This log entry records the empty log event." });
-		}
-		if (level == null) {
-			level = this.getLevel();
-		}
+	private void logStrings(final List<String> strings, final Marker marker, final Level level) {
+		List<String> stringsToLog = ((strings == null) || strings.isEmpty())
+				? Arrays.asList(new String[] { "No log message provided. This log entry records the empty log event." })
+						: strings;
+		Level levelToLogAt = (level == null) ? this.getLevel() : level;
 
-		if (strings.size() < 2) {
-			this.sendLogAtLevel(level, marker, strings.get(0), null);
+		if (stringsToLog.size() < 2) {
+			this.sendLogAtLevel(levelToLogAt, marker, stringsToLog.get(0), null);
 			return; // all done here
 		}
 
-		String maxSequence = Integer.toString(strings.size());
+		String maxSequence = Integer.toString(stringsToLog.size());
 		int sequence = 1;
-		for (String toLog : strings) {
+		for (String toLog : stringsToLog) {
 			MDC.put(SPLIT_MDC_NAME, Integer.toString(sequence) + " of " + maxSequence);
-			this.sendLogAtLevel(level, marker, toLog, null);
+			this.sendLogAtLevel(levelToLogAt, marker, toLog, null);
 		}
 	}
 
