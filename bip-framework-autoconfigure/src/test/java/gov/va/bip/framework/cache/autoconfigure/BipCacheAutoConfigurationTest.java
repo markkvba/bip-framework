@@ -25,6 +25,7 @@ import org.springframework.cloud.context.scope.refresh.RefreshScope;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -82,7 +83,8 @@ public class BipCacheAutoConfigurationTest {
 		TestPropertyValues.of("bip.framework.cache.defaultExpires=86401").applyTo(context);
 		TestPropertyValues.of("bip.framework.cache.expires[0].name=testName").applyTo(context);
 		TestPropertyValues.of("bip.framework.cache.expires[0].ttl=1500").applyTo(context);
-		context.registerBean(BipCacheAutoConfiguration.class, BipRedisCacheProperties.class);
+		context.registerBean(RedisAutoConfiguration.class, JedisConnectionFactory.class, BipCacheAutoConfiguration.class,
+				BipRedisCacheProperties.class);
 		context.register(RedisAutoConfiguration.class, BipCacheAutoConfiguration.class,
 				BipAuditAutoConfiguration.class,
 				TestConfigurationForAuditBeans.class, TestConfigurationClassForBuildProperties.class, RefreshScope.class,
@@ -90,7 +92,7 @@ public class BipCacheAutoConfigurationTest {
 		context.refresh();
 		BipCachesConfig bipCachesConfig = context.getBean(BipCachesConfig.class);
 		Map<String, org.springframework.data.redis.cache.RedisCacheConfiguration> cacheConfigs =
-				ReflectionTestUtils.invokeMethod(bipCachesConfig, "getRedisCacheConfigs", null);
+				ReflectionTestUtils.invokeMethod(bipCachesConfig, "getRedisCacheConfigs");
 
 		assertNotNull(cacheConfigs);
 		assertEquals(cacheConfigs.get("testName").getTtl().getSeconds(), 1500L);
