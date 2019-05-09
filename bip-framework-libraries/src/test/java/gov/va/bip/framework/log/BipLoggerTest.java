@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,8 @@ import org.slf4j.event.Level;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.github.lalyos.jfiglet.FigletFont;
 
@@ -865,4 +868,34 @@ public class BipLoggerTest extends AbstractBaseLogTester {
 		assertConsole(Level.ERROR, "", null);
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public final void testMakeToLengthExceptionForNullList() {
+		ReflectionTestUtils.invokeMethod(logger, "makeToLength", "string", null, 1000);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testMakeToLengthExceptionInvalidMaxLength() {
+		ReflectionTestUtils.invokeMethod(logger, "makeToLength", "string", new LinkedList<String>(), -1000);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testSplitStringToLengthException() {
+		ReflectionTestUtils.invokeMethod(logger, "splitStringToLength", "string", -1000);
+	}
+
+	@Test
+	public final void testSplitStringToLengthForNullString() {
+		List<String> list = ReflectionTestUtils.invokeMethod(logger, "splitStringToLength", null, 1000);
+		assertTrue(list.size() == 1);
+		assertTrue(list.get(0).equals(""));
+	}
+
+	@Test
+	public final void testLogStrings() throws IOException {
+		List<String> list = null;
+		Level level = null;
+		ReflectionTestUtils.invokeMethod(logger, "logStrings", list, null, level);
+		List<String> strings = Arrays.asList(new String[] { "No log message provided. This log entry records the empty log event." });
+		assertConsole(logger.getLevel(), strings.get(0), null);
+	}
 }
