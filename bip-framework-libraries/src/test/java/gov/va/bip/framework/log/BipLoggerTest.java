@@ -213,44 +213,6 @@ public class BipLoggerTest extends AbstractBaseLogTester {
 		logger.error(StringUtils.repeat("test ", 1600), e);
 
 		StringUtils.repeat("test ", 1600);
-
-		//		String stackTrace = null;
-		//		stackTrace = ReflectionTestUtils.invokeMethod(logger, "getStackTraceAsString", e);
-		//		int messageLength = message == null ? 0 : message.length();
-		//		int stackTraceLength = stackTrace == null ? 0 : stackTrace.length();
-		//		int mdcReserveLength = gov.va.bip.framework.log.BipBaseLogger.MDC_RESERVE_LENGTH;
-		//
-		//		int captureCount = 0;
-		//
-		//		if ((mdcReserveLength + messageLength + stackTraceLength) > MAX_TOTAL_LOG_LEN) {
-		//			if (messageLength >= gov.va.bip.framework.log.BipBaseLogger.MAX_MSG_LENGTH) {
-		//				String[] splitMessages = ReflectionTestUtils.invokeMethod(logger, "splitMessages", message);
-		//				captureCount = splitMessages.length;
-		//			} else {
-		//				captureCount = 1;
-		//			}
-		//
-		//			if (stackTraceLength >= gov.va.bip.framework.log.BipBaseLogger.MAX_STACK_TRACE_TEXT_LENGTH) {
-		//				String[] splitstackTrace = ReflectionTestUtils.invokeMethod(logger, "splitStackTraceText", stackTrace);
-		//				captureCount = captureCount + splitstackTrace.length;
-		//			} else if (stackTraceLength != 0) {
-		//				captureCount = captureCount + 1;
-		//			}
-		//
-		//		} else
-		//
-		//		{
-		//			captureCount = 1;
-		//		}
-		//
-		//		try {
-		//			assertConsoleBanner(Level.DEBUG, null, "test ", null, captureCount);
-		//		} catch (IOException ioe) {
-		//			System.out.println(e.getMessage());
-		//			e.printStackTrace();
-		//			fail("Should not have thrown exception");
-		//		}
-		//		logger.setLevel(Level.DEBUG);
 	}
 
 	@Test
