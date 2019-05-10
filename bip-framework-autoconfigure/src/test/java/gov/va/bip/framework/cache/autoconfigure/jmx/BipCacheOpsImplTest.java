@@ -2,6 +2,7 @@ package gov.va.bip.framework.cache.autoconfigure.jmx;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -104,6 +105,27 @@ public class BipCacheOpsImplTest {
 	}
 
 	@Test
+	public void testlogCacheConfigPropertiesWithNullValues() {
+		try {
+			BipCacheOpsImpl bipCacheOpsImpl = new BipCacheOpsImpl();
+			RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+			ReflectionTestUtils.setField(redisCacheConfiguration, "ttl", null);
+			ReflectionTestUtils.setField(bipCacheOpsImpl, "redisCacheConfiguration", redisCacheConfiguration);
+			ReflectionTestUtils.setField(bipCacheOpsImpl, "redisCacheConfigurations", null);
+			RedisCacheManager mockCacheManager = mock(RedisCacheManager.class);
+			when(mockCacheManager.getCacheNames()).thenReturn(Arrays.asList(new String[] {}));
+			ReflectionTestUtils.setField(bipCacheOpsImpl, "cacheManager", mockCacheManager);
+			bipCacheOpsImpl.logCacheConfigProperties();
+
+			Map<String, RedisCacheConfiguration> redisCacheConfigurations = new HashMap<String, RedisCacheConfiguration>();
+			ReflectionTestUtils.setField(bipCacheOpsImpl, "redisCacheConfigurations", redisCacheConfigurations);
+			bipCacheOpsImpl.logCacheConfigProperties();
+		} catch (Exception e) {
+			fail("Exception should not be thrown");
+		}
+	}
+
+	@Test
 	public void testlogCurrentJedisConnectionFactoryFields() {
 		JedisConnectionFactory mockRedisConnectionFactory = mock(JedisConnectionFactory.class);
 
@@ -151,6 +173,16 @@ public class BipCacheOpsImplTest {
 		verify(mockGopc, times(1)).getTestOnCreate();
 		verify(mockGopc, times(1)).getTestOnReturn();
 		verify(mockGopc, times(1)).getTestWhileIdle();
+	}
+
+	@Test
+	public void testlogCurrentJedisConnectionFactoryFieldsWithNullValues() {
+		try {
+			ReflectionTestUtils.setField(bipCacheOpsImpl, "redisConnectionFactory", null);
+			bipCacheOpsImpl.logCurrentJedisConnectionFactoryFields();
+		} catch (Exception e) {
+			fail("Exception should not be thrown");
+		}
 	}
 
 	@Test
