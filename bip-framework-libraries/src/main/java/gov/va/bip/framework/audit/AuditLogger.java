@@ -1,12 +1,12 @@
 package gov.va.bip.framework.audit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.MDC;
 import org.slf4j.event.Level;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
-import gov.va.bip.framework.util.SanitizationUtil;
 
 /**
  * The Class AuditLogger.
@@ -28,8 +28,8 @@ public class AuditLogger {
 
 	static {
 		LOGGER.setLevel(Level.DEBUG); // TO ENSURE THAT THE CLASS HAS DEBUG
-										// ENABLED TO WRITE ALL SEVERITY AUDIT
-										// LOGS
+										 // ENABLED TO WRITE ALL SEVERITY AUDIT
+										 // LOGS
 	}
 
 	/*
@@ -49,7 +49,7 @@ public class AuditLogger {
 	 */
 	public static void debug(AuditEventData auditable, String activityDetail) {
 		addMdcSecurityEntries(auditable);
-		LOGGER.debug(SanitizationUtil.stripXSS(activityDetail));
+		LOGGER.debug(Sanitizer.stripXss(activityDetail));
 		MDC.clear();
 	}
 
@@ -63,7 +63,7 @@ public class AuditLogger {
 	 */
 	public static void info(AuditEventData auditable, String activityDetail) {
 		addMdcSecurityEntries(auditable);
-		LOGGER.info(SanitizationUtil.stripXSS(activityDetail));
+		LOGGER.info(Sanitizer.stripXss(activityDetail));
 		MDC.clear();
 
 	}
@@ -78,7 +78,7 @@ public class AuditLogger {
 	 */
 	public static void warn(AuditEventData auditable, String activityDetail) {
 		addMdcSecurityEntries(auditable);
-		LOGGER.warn(SanitizationUtil.stripXSS(activityDetail));
+		LOGGER.warn(Sanitizer.stripXss(activityDetail));
 		MDC.clear();
 
 	}
@@ -93,7 +93,7 @@ public class AuditLogger {
 	 */
 	public static void error(final AuditEventData auditable, final String activityDetail, final Throwable t) {
 		addMdcSecurityEntries(auditable);
-		LOGGER.error(SanitizationUtil.stripXSS(activityDetail), t);
+		LOGGER.error(Sanitizer.stripXss(activityDetail), t);
 		MDC.clear();
 
 	}

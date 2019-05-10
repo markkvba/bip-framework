@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class RESTConfigService {
 	public static RESTConfigService getInstance() {
 		if (instance == null) {
 			instance = new RESTConfigService();
-			final String environment = System.getProperty(TEST_ENV);
+			final String environment = Sanitizer.stripXss(System.getProperty(TEST_ENV));
 			String url = "";
 			if (StringUtils.isNotBlank(environment)) {
 				url = "config/vetservices-inttest-" + environment + ".properties";
