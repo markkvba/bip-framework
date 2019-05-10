@@ -9,11 +9,11 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bip.framework.shared.sanitize.Sanitizer;
 import org.springframework.util.Assert;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
+import gov.va.bip.framework.shared.sanitize.Sanitizer;
 import gov.va.bip.framework.util.HashGenerator;
 import gov.va.bip.framework.validation.Defense;
 
