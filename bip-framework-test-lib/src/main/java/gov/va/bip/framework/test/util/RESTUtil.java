@@ -8,6 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -29,6 +33,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
+import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -309,31 +314,16 @@ public class RESTUtil {
 		// Create a new instance of the {@link RestTemplate} using default settings.
 		RestTemplate apiTemplate = new RestTemplate();
 
-		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		String pathToTrustStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true);
+		String pathToKeyStore = Sanitizer.safePath(RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true));
+		String pathToTrustStore = Sanitizer.safePath(RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true));
 		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
 		try {
 			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
 				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
 				sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
 			} else {
-				if (StringUtils.isNotBlank(pathToKeyStore)) {
-					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-					if (StringUtils.isBlank(password)) {
-						throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
-					}
-					sslContextBuilder = sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(),
-							password.toCharArray());
-				}
-				if (StringUtils.isNotBlank(pathToTrustStore)) {
-					String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
-					if (StringUtils.isBlank(password)) {
-						throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
-					}
-					sslContextBuilder = sslContextBuilder.loadTrustMaterial(new File(pathToTrustStore), password.toCharArray());
-				} else {
-					sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-				}
+				sslContextBuilder = loadKeyMaterial(pathToKeyStore, sslContextBuilder);
+				sslContextBuilder = loadTrustMaterial(pathToTrustStore, sslContextBuilder);
 			}
 			SSLContext sslContext = sslContextBuilder.build();
 			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
@@ -356,7 +346,31 @@ public class RESTUtil {
 		}
 		return apiTemplate;
 	}
+	
+	private SSLContextBuilder loadKeyMaterial(String pathToKeyStore, SSLContextBuilder sslContextBuilder) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+		if (StringUtils.isNotBlank(pathToKeyStore)) {
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
+			if (StringUtils.isBlank(password)) {
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
+			}
+			return sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(),
+					password.toCharArray());
+		}		
+		return sslContextBuilder;
+	}
 
+	private SSLContextBuilder loadTrustMaterial(String pathToTrustStore, SSLContextBuilder sslContextBuilder) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+		if (StringUtils.isNotBlank(pathToTrustStore)) {
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
+			if (StringUtils.isBlank(password)) {
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
+			}
+			return sslContextBuilder.loadTrustMaterial(new File(pathToTrustStore), password.toCharArray());
+		} else {
+			return sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+		}				
+	}
+	
 	/**
 	 * Creates HttpComponentsClientHttpRequestFactory with different settings such
 	 * as connectionTimeout, readTimeout
