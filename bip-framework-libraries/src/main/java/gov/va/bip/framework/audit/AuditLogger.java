@@ -1,12 +1,12 @@
 package gov.va.bip.framework.audit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.MDC;
 import org.slf4j.event.Level;
 
 import gov.va.bip.framework.log.BipLogger;
 import gov.va.bip.framework.log.BipLoggerFactory;
+import gov.va.bip.framework.shared.sanitize.Sanitizer;
 
 /**
  * The Class AuditLogger.

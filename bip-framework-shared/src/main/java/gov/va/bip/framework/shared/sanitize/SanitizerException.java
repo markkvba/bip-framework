@@ -1,4 +1,4 @@
-package org.bip.framework.shared.sanitize;
+package gov.va.bip.framework.shared.sanitize;
 
 /**
  * Thrown to indicate that an unrecoverable problem was encountered in a {@link Sanitizer} method.
