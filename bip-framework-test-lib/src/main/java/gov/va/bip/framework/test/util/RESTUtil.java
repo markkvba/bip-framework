@@ -314,8 +314,8 @@ public class RESTUtil {
 		// Create a new instance of the {@link RestTemplate} using default settings.
 		RestTemplate apiTemplate = new RestTemplate();
 
-		String pathToKeyStore = Sanitizer.safePath(RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true));
-		String pathToTrustStore = Sanitizer.safePath(RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true));
+		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		String pathToTrustStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true);
 		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
 		try {
 			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
@@ -353,7 +353,7 @@ public class RESTUtil {
 			if (StringUtils.isBlank(password)) {
 				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
 			}
-			return sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore), password.toCharArray(),
+			return sslContextBuilder.loadKeyMaterial(new File(Sanitizer.safePath(pathToKeyStore)), password.toCharArray(),
 					password.toCharArray());
 		}		
 		return sslContextBuilder;
@@ -365,7 +365,7 @@ public class RESTUtil {
 			if (StringUtils.isBlank(password)) {
 				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
 			}
-			return sslContextBuilder.loadTrustMaterial(new File(pathToTrustStore), password.toCharArray());
+			return sslContextBuilder.loadTrustMaterial(new File(Sanitizer.safePath(pathToTrustStore)), password.toCharArray());
 		} else {
 			return sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
 		}				
