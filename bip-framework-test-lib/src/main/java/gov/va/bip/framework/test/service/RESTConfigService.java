@@ -6,10 +6,10 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gov.va.bip.framework.shared.sanitize.Sanitizer;
 import gov.va.bip.framework.test.util.PropertiesUtil;
 
 /**
@@ -82,9 +82,14 @@ public class RESTConfigService {
 			} else {
 				url = "config/vetservices-inttest.properties";
 			}
+			LOGGER.debug("Properties File URL: {}", url);
+			LOGGER.debug("Environment: {}", environment);
 			final URL urlConfigFile = RESTConfigService.class.getClassLoader().getResource(url);
+			LOGGER.info("Properties File ClassLoader URL: {}", urlConfigFile);
 			if (urlConfigFile != null) {
 				instance.prop = PropertiesUtil.readFile(urlConfigFile);
+				LOGGER.debug("Properties File Loaded");
+				LOGGER.debug("Properties {}", instance.prop);
 			} else {
 				LOGGER.warn("No resource found with the URL: " + url + ". Property file could not be read.");
 			}
@@ -119,17 +124,21 @@ public class RESTConfigService {
 	 * @return String the value associated with pName
 	 */
 	public String getProperty(final String pName, final boolean isCheckSystemProp) {
+		LOGGER.debug("RESTConfigService instance {}", instance);
+		if (instance == null) {
+			getInstance();
+		}
+		LOGGER.debug("RESTConfigService instance.prop {}", instance.prop);
 		String value = "";
 		if (isCheckSystemProp) {
 			value = System.getProperty(pName);
-			if (StringUtils.isBlank(value) && (prop != null)) {
-				value = prop.getProperty(pName);
-			}
-		} else {
-			if (prop != null) {
-				value = prop.getProperty(pName);
-			}
 		}
+		if (StringUtils.isBlank(value) && (instance.prop != null)) {
+			LOGGER.debug("Retrieving from Properties File");
+			value = instance.prop.getProperty(pName);
+		}
+		LOGGER.debug("Property Name: {}", pName);
+		LOGGER.debug("Property Value: {}", value);
 		return value;
 	}
 

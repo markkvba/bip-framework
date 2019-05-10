@@ -1,4 +1,4 @@
-package org.bip.framework.shared.sanitize;
+package gov.va.bip.framework.shared.sanitize;
 
 import java.text.Normalizer;
 import java.util.Arrays;

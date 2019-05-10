@@ -33,7 +33,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
-import org.bip.framework.shared.sanitize.Sanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -51,8 +50,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import gov.va.bip.framework.shared.sanitize.Sanitizer;
 import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.RESTConfigService;
+
 
 /**
  * It is a wrapper for rest Template API for making HTTP calls, parse JSON and
@@ -161,8 +162,8 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a GET method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a GET method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
@@ -174,8 +175,8 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a POST method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a POST method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
@@ -188,8 +189,8 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a PUT method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a PUT method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
@@ -202,8 +203,8 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a DELETE method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a DELETE method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
 	 * @return
@@ -291,12 +292,13 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Private method that is invoked by multipart methods. It uses
-	 * RESTTemplate generic exchange method for multipart HTTP methods.
-	 * 
+	 * Execute multipart API.
+	 *
 	 * @param serviceURL
+	 *            the service URL
 	 * @param body
-	 * @return
+	 *            the body
+	 * @return the string
 	 */
 	private String executeMultipartAPI(final String serviceURL, final MultiValueMap<String, Object> body) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
@@ -306,12 +308,15 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Loads the KeyStore and password in to rest Template API so all the API's are
-	 * SSL enabled.
+	 * Loads the KeyStore and password in to rest Template API so all the API's
+	 * are SSL enabled.
+	 *
+	 * @return the rest template
 	 */
 
 	private RestTemplate getRestTemplate() {
-		// Create a new instance of the {@link RestTemplate} using default settings.
+		// Create a new instance of the {@link RestTemplate} using default
+		// settings.
 		RestTemplate apiTemplate = new RestTemplate();
 
 		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
@@ -346,36 +351,76 @@ public class RESTUtil {
 		}
 		return apiTemplate;
 	}
-	
-	private SSLContextBuilder loadKeyMaterial(String pathToKeyStore, SSLContextBuilder sslContextBuilder) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+
+	/**
+	 * Load key material.
+	 *
+	 * @param pathToKeyStore
+	 *            the path to key store
+	 * @param sslContextBuilder
+	 *            the ssl context builder
+	 * @return the SSL context builder
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws KeyStoreException
+	 *             the key store exception
+	 * @throws UnrecoverableKeyException
+	 *             the unrecoverable key exception
+	 * @throws CertificateException
+	 *             the certificate exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private SSLContextBuilder loadKeyMaterial(String pathToKeyStore, SSLContextBuilder sslContextBuilder)
+			throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException,
+			IOException {
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
 			if (StringUtils.isBlank(password)) {
 				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
 			}
-			return sslContextBuilder.loadKeyMaterial(new File(Sanitizer.safePath(pathToKeyStore)), password.toCharArray(),
-					password.toCharArray());
-		}		
+			return sslContextBuilder.loadKeyMaterial(new File(Sanitizer.safePath(pathToKeyStore)),
+					password.toCharArray(), password.toCharArray());
+		}
 		return sslContextBuilder;
 	}
 
-	private SSLContextBuilder loadTrustMaterial(String pathToTrustStore, SSLContextBuilder sslContextBuilder) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+	/**
+	 * Load trust material.
+	 *
+	 * @param pathToTrustStore
+	 *            the path to trust store
+	 * @param sslContextBuilder
+	 *            the ssl context builder
+	 * @return the SSL context builder
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws KeyStoreException
+	 *             the key store exception
+	 * @throws CertificateException
+	 *             the certificate exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private SSLContextBuilder loadTrustMaterial(String pathToTrustStore, SSLContextBuilder sslContextBuilder)
+			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		if (StringUtils.isNotBlank(pathToTrustStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
 			if (StringUtils.isBlank(password)) {
-				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
+				throw new BipTestLibRuntimeException(
+						COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
 			}
-			return sslContextBuilder.loadTrustMaterial(new File(Sanitizer.safePath(pathToTrustStore)), password.toCharArray());
+			return sslContextBuilder.loadTrustMaterial(new File(Sanitizer.safePath(pathToTrustStore)),
+					password.toCharArray());
 		} else {
 			return sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-		}				
+		}
 	}
-	
+
 	/**
-	 * Creates HttpComponentsClientHttpRequestFactory with different settings such
-	 * as connectionTimeout, readTimeout
+	 * Http components client http request factory.
 	 *
-	 * @return
+	 * @return the http components client http request factory
 	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
@@ -415,8 +460,7 @@ public class RESTUtil {
 	 */
 	private HttpClientBuilder getHttpClientBuilder() {
 		int connectionBufferSize = 4128;
-		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-				.setBufferSize(connectionBufferSize).build();
+		ConnectionConfig connectionConfig = ConnectionConfig.custom().setBufferSize(connectionBufferSize).build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
@@ -424,7 +468,8 @@ public class RESTUtil {
 
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
-			public boolean retryRequest(final IOException exception, final int executionCount, final HttpContext context) {
+			public boolean retryRequest(final IOException exception, final int executionCount,
+					final HttpContext context) {
 				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
 				if (exception instanceof org.apache.http.NoHttpResponseException) {
 					LOGGER.warn("No response from server on " + executionCount + " call");
