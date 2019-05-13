@@ -26,4 +26,4 @@ Add the dependency in the application project's POM file.
 
 ## Class Diagrams
 ##### Sanitizer
-<img src="/images/bip.framework.shared.sanitize.png">
+<img src="/images/cd-bip.framework.shared.sanitize.png">
