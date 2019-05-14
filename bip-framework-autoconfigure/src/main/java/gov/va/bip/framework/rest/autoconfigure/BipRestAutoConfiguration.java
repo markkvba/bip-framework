@@ -185,9 +185,13 @@ public class BipRestAutoConfiguration {
 		restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
 
 		for (HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
-			((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
-			((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+			if (StringHttpMessageConverter.class.isAssignableFrom(converter.getClass())) {
+				LOGGER.debug("Casting converter to StringHttpMessageConverter");
+				((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+				((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+			}
 		}
+
 		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 		interceptors.add(tokenClientHttpRequestInterceptor());
 		restTemplate.setInterceptors(interceptors);
