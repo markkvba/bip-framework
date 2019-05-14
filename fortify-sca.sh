@@ -19,30 +19,28 @@ echo "====================================================="
 #read -n 1 -t 5 -p "Press a key to begin ..."
 
 ### Build the code ###
-#read -n 1 -p "▶︎ ${MAVEN_BIN} clean compile package -Dmaven.test.skip"
+echo ">>> ${MAVEN_BIN} clean compile package -Dmaven.test.skip"
 ${MAVEN_BIN} clean install -Dmaven.test.skip
 
 ### Resolve the dependencies because fortify needs to have it for the scan ###
-#read -n 1 -p "▶︎ ${MAVEN_BIN} dependency:resolve"
+echo ">>> ${MAVEN_BIN} dependency:resolve"
 ${MAVEN_BIN} dependency:resolve
 
 ### Only need to worry about this jar for the scan warnings, tomcat or weblogic can take care of this dependency ###
 #page_context_path="/home/jenkins/.m2/repository/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar"
 
 ### Clean the SCA workspace
-#read -n 1 -p "▶︎ sourceanalyzer -b ${artifact} -clean"
+echo ">>> sourceanalyzer -b ${artifact} -clean"
 sourceanalyzer -b ${artifact} -clean
 
 ### Build into the SCA workspace
-#read -n 1 -p "▶︎ sourceanalyzer -b ${artifact} touchless ${MAVEN_BIN} com.fortify.sca.plugins.maven:sca-maven-plugin:18.20:translate -Dfortify.sca.buildId=${artifact}"
-sourceanalyzer -b ${artifact} touchless ${MAVEN_BIN} com.fortify.sca.plugins.maven:sca-maven-plugin:translate\
-	#	-Dfortify.sca.cp=${page_context_path}\
-	-Dfortify.sca.buildId=${artifact}
+echo ">>> sourceanalyzer -b ${artifact} touchless ${MAVEN_BIN} com.fortify.sca.plugins.maven:sca-maven-plugin:18.20:translate -Dfortify.sca.buildId=${artifact}"
+sourceanalyzer -b ${artifact} touchless ${MAVEN_BIN} com.fortify.sca.plugins.maven:sca-maven-plugin:translate -Dfortify.sca.buildId=${artifact}
+#	-Dfortify.sca.cp=${page_context_path}\
 
-# read -n 1 -p "▶︎ ${MAVEN_BIN} initialize com.fortify.sca.plugins.maven:sca-maven-plugin:18.20:scan -Dcom.fortify.sca.fileextensions.class=BYTECODE -Dcom.fortify.sca.fileextensions.jar=ARCHIVE -Dfortify.sca.buildId=${artifact} -DscaFailOnError=true -Dverbose=true"
+	echo ">>> ${MAVEN_BIN} initialize com.fortify.sca.plugins.maven:sca-maven-plugin:18.20:scan -Dfortify.sca.buildId=${artifact}"
 ${MAVEN_BIN} initialize com.fortify.sca.plugins.maven:sca-maven-plugin:scan -Dfortify.sca.buildId=${artifact}
-# \
-	# -Dcom.fortify.sca.fileextensions.class=BYTECODE \
+# -Dcom.fortify.sca.fileextensions.class=BYTECODE \
 	# -Dcom.fortify.sca.fileextensions.jar=ARCHIVE \
 	# -DscaFailOnError=true \
 	# -Dverbose=true
