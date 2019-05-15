@@ -12,6 +12,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -324,15 +325,23 @@ public class RESTUtil {
 		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
 		try {
 			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
-				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+				System.out.println("****************************");
+				//TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+				System.out.println("****************************");
+				//TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+				TrustStrategy acceptingTrustStrategy =new TrustStrategy() {
+		            public boolean isTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+		                return true;
+		            }
+		        };
 				sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
 			} else {
 				sslContextBuilder = loadKeyMaterial(pathToKeyStore, sslContextBuilder);
 				sslContextBuilder = loadTrustMaterial(pathToTrustStore, sslContextBuilder);
 			}
 			SSLContext sslContext = sslContextBuilder.build();
-			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
-					NoopHostnameVerifier.INSTANCE);
+			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+					//NoopHostnameVerifier.INSTANCE);
 			HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
 			ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 			apiTemplate.setRequestFactory(requestFactory);

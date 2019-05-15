@@ -25,14 +25,17 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.net.HttpHeaders;
 
 import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
@@ -46,6 +49,27 @@ public class RESTUtilTest {
 	private static final String LOCALHOST_URL_PERSON = "http://localhost:9999/person";
 	private static final String LOCALHOST_MULTIPART_URL_PERSON = "http://localhost:9999/multipart/person";
 	private static final String SUBMIT_PAYLOAD_TXT = "submitpayload.txt";
+	private static final String LOCALHOST_HTTPS_URL_PERSON = "https://localhost:8443/person";
+	
+	protected static final int HTTP_ENDPOINT_PORT = 8123;
+    protected static final int HTTPS_ENDPOINT_PORT = 8443;
+    protected static final String BASE_PATH = "/person";
+    protected static final String BASE_HTTP_URL =
+        "http://localhost:" + HTTP_ENDPOINT_PORT + BASE_PATH;
+    protected static final String BASE_HTTPS_URL =
+        "https://localhost:" + HTTPS_ENDPOINT_PORT + BASE_PATH;
+    protected static final int DEFAULT_TIMEOUT = 5000;
+    /* Client keystore and truststore. Self-signed. */
+    protected static final String CLIENT_KEYSTORE_PATH = "client/client_keystore.jks";
+    protected static final String CLIENT_KEYSTORE_PASSWORD = "secret";
+    protected static final String CLIENT_TRUSTSTORE_PATH = "client/client_cacerts.jks";
+    protected static final String CLIENT_TRUSTSTORE_PASSWORD = "secret";
+    /* Server keystore and truststore. Self-signed. */
+    protected static final String SERVER_KEYSTORE_PATH = "client/server/server_keystore.jks";
+    protected static final String SERVER_KEYSTORE_PASSWORD = "secret";
+    protected static final String SERVER_TRUSTSTORE_PATH = "client/server/server_cacerts.jks";
+    protected static final String SERVER_TRUSTSTORE_PASSWORD = "secret";
+
 
 	@BeforeClass
 	public static void setup() {
@@ -53,13 +77,36 @@ public class RESTUtilTest {
 		wireMockServer.start();
 		setupStub();
 	}
-
+	@Rule
+	public WireMockRule wireMockRule = new WireMockRule(wireMockConfig());
 	@AfterClass
 	public static void teardown() {
 		wireMockServer.stop();
 	}
 
+	
+
+	private WireMockConfiguration wireMockConfig() {
+		try {
+			return WireMockConfiguration.options().httpsPort(HTTPS_ENDPOINT_PORT)
+	        //.keystorePath(SERVER_KEYSTORE_PATH)
+	        //.keystorePassword(SERVER_KEYSTORE_PASSWORD);
+					.keystorePath(new ClassPathResource("client/server/server_keystore.jks").getFile().getCanonicalPath())
+					.keystorePassword(SERVER_KEYSTORE_PASSWORD).keystoreType("JKS")
+					.trustStorePath(new ClassPathResource("clienttrust.jks").getFile().getCanonicalPath())
+					.trustStorePassword("changeit").trustStoreType("JKS");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+
+
+
 	public static void setupStub() {
+		addHttpsGetPersonStub();
 		addGetPersonStub();
 		addPostPersonStub();
 		addDeletePersonStub();
@@ -69,27 +116,32 @@ public class RESTUtilTest {
 
 	private static void addGetPersonStub() {
 		wireMockServer.stubFor(get(urlEqualTo(URL_PERSON))
-				.willReturn(aResponse().withStatus(HttpStatus.OK_200).withBodyFile("json/get-person-response.json")));
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/get-person-response.json")));
+	}
+
+	private static void addHttpsGetPersonStub() {
+		wireMockServer.stubFor(get(urlEqualTo(BASE_HTTP_URL))
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/get-person-response.json")));
 	}
 
 	private static void addPostPersonStub() {
 		wireMockServer.stubFor(post(urlEqualTo(URL_PERSON))
-				.willReturn(aResponse().withStatus(HttpStatus.OK_200).withBodyFile("json/post-person-response.json")));
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/post-person-response.json")));
 	}
 
 	private static void addPutPersonStub() {
 		wireMockServer.stubFor(put(urlEqualTo(URL_PERSON))
-				.willReturn(aResponse().withStatus(HttpStatus.OK_200).withBodyFile("json/put-person-response.json")));
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/put-person-response.json")));
 	}
 
 	private static void addDeletePersonStub() {
 		wireMockServer.stubFor(delete(urlEqualTo(URL_PERSON))
-				.willReturn(aResponse().withStatus(HttpStatus.OK_200).withBodyFile("json/delete-person-response.json")));
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/delete-person-response.json")));
 	}
 
 	private static void addPostMultiPart() {
 		wireMockServer.stubFor(post(urlEqualTo("/multipart/person"))
-				.willReturn(aResponse().withStatus(HttpStatus.OK_200).withBodyFile("json/post-multipart-person-response.json")));
+				.willReturn(aResponse().withStatus(200).withBodyFile("json/post-multipart-person-response.json")));
 	}
 
 	@Test
@@ -135,6 +187,14 @@ public class RESTUtilTest {
 		assertThat(true, equalTo(!response.isEmpty()));
 	}
 
+	@Test
+	public void test_https_getResponse_validKeyStore() {
+		String response = restUtil.getResponse(BASE_HTTPS_URL);
+		assertThat(true, equalTo(!response.isEmpty()));
+		
+	}
+
+	
 	@Test
 	public void testGetRestTemplate() {
 		Constructor<RESTConfigService> constructor;
