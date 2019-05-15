@@ -88,13 +88,14 @@ public class RESTUtilTest {
 
 	private WireMockConfiguration wireMockConfig() {
 		try {
+			System.out.println(new ClassPathResource("client/server/server_keystore.jks").getFile().getCanonicalPath());
 			return WireMockConfiguration.options().httpsPort(HTTPS_ENDPOINT_PORT)
 	        //.keystorePath(SERVER_KEYSTORE_PATH)
 	        //.keystorePassword(SERVER_KEYSTORE_PASSWORD);
 					.keystorePath(new ClassPathResource("client/server/server_keystore.jks").getFile().getCanonicalPath())
 					.keystorePassword(SERVER_KEYSTORE_PASSWORD).keystoreType("JKS")
-					.trustStorePath(new ClassPathResource("clienttrust.jks").getFile().getCanonicalPath())
-					.trustStorePassword("changeit").trustStoreType("JKS");
+					.trustStorePath(new ClassPathResource("client/server/server_cacerts.jks").getFile().getCanonicalPath())
+					.trustStorePassword("secret").trustStoreType("JKS").needClientAuth(true);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -120,7 +121,7 @@ public class RESTUtilTest {
 	}
 
 	private static void addHttpsGetPersonStub() {
-		wireMockServer.stubFor(get(urlEqualTo(BASE_HTTP_URL))
+		wireMockServer.stubFor(get(urlEqualTo(BASE_PATH))
 				.willReturn(aResponse().withStatus(200).withBodyFile("json/get-person-response.json")));
 	}
 
