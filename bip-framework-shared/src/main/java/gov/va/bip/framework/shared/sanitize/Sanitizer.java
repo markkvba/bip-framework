@@ -53,7 +53,7 @@ public class Sanitizer {
 				cleanPath.append(safeFilename(part.toString()));
 			}
 		} catch (Exception e) {
-			throw new SanitizerException("safePath(..) ", e);
+			throw new SanitizerException("path information", e);
 		}
 
 		return cleanPath.toString();
@@ -100,7 +100,7 @@ public class Sanitizer {
 				}
 			}
 		} catch (Exception e) {
-			throw new SanitizerException("safeFileName(..) ", e);
+			throw new SanitizerException("filename", e);
 		}
 
 		return cleanFilename.toString();
@@ -173,7 +173,7 @@ public class Sanitizer {
 			scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 			cleanValue = scriptPattern.matcher(cleanValue).replaceAll("");
 		} catch (Exception e) {
-			throw new SanitizerException("stripXSS(..) ", e);
+			throw new SanitizerException("input characters", e);
 		}
 
 		return cleanValue;
