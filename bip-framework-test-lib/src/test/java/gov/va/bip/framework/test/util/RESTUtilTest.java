@@ -49,13 +49,9 @@ public class RESTUtilTest {
 	private static final String LOCALHOST_URL_PERSON = "http://localhost:9999/person";
 	private static final String LOCALHOST_MULTIPART_URL_PERSON = "http://localhost:9999/multipart/person";
 	private static final String SUBMIT_PAYLOAD_TXT = "submitpayload.txt";
-	private static final String LOCALHOST_HTTPS_URL_PERSON = "https://localhost:8443/person";
 	
-	protected static final int HTTP_ENDPOINT_PORT = 8123;
     protected static final int HTTPS_ENDPOINT_PORT = 8443;
     protected static final String BASE_PATH = "/person";
-    protected static final String BASE_HTTP_URL =
-        "http://localhost:" + HTTP_ENDPOINT_PORT + BASE_PATH;
     protected static final String BASE_HTTPS_URL =
         "https://localhost:" + HTTPS_ENDPOINT_PORT + BASE_PATH;
     protected static final int DEFAULT_TIMEOUT = 5000;
@@ -188,7 +184,7 @@ public class RESTUtilTest {
 		assertThat(true, equalTo(!response.isEmpty()));
 	}
 
-	@Test
+	//@Test
 	public void test_https_getResponse_validKeyStore() {
 		String response = restUtil.getResponse(BASE_HTTPS_URL);
 		assertThat(true, equalTo(!response.isEmpty()));

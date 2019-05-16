@@ -325,9 +325,9 @@ public class RESTUtil {
 		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
 		try {
 			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
-				System.out.println("****************************");
+				//System.out.println("****************************");
 				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-				System.out.println("****************************");
+				//System.out.println("****************************");
 				//TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 				/*TrustStrategy acceptingTrustStrategy =new TrustStrategy() {
 		            public boolean isTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
@@ -385,12 +385,10 @@ public class RESTUtil {
 			IOException {
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-			System.out.println("Keystore password ======"+password);
 			if (StringUtils.isBlank(password)) {
 				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
 			}
-			System.out.println("Keystore path ======"+Sanitizer.safePath(pathToKeyStore));
-			return sslContextBuilder.loadKeyMaterial(new File(pathToKeyStore),
+			return sslContextBuilder.loadKeyMaterial(new File(Sanitizer.safePath(pathToKeyStore)),
 					password.toCharArray(), password.toCharArray());
 		}
 		return sslContextBuilder;
@@ -417,13 +415,11 @@ public class RESTUtil {
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		if (StringUtils.isNotBlank(pathToTrustStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
-			System.out.println("Truststore password ======"+password);
 			if (StringUtils.isBlank(password)) {
 				throw new BipTestLibRuntimeException(
 						COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
 			}
-			System.out.println("Keystore path ======"+Sanitizer.safePath(pathToTrustStore));
-			return sslContextBuilder.loadTrustMaterial(new File(pathToTrustStore),
+			return sslContextBuilder.loadTrustMaterial(new File(Sanitizer.safePath(pathToTrustStore)),
 					password.toCharArray());
 		} else {
 			return sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
