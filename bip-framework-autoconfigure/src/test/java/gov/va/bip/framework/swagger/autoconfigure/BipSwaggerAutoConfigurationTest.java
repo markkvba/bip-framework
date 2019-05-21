@@ -11,8 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.classmate.TypeResolver;
 
-import gov.va.bip.framework.swagger.autoconfigure.BipSwaggerAutoConfiguration;
-import gov.va.bip.framework.swagger.autoconfigure.SwaggerProperties;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
@@ -21,6 +19,9 @@ public class BipSwaggerAutoConfigurationTest {
 
 	@Mock
 	private SwaggerProperties swaggerProperties = new SwaggerProperties();
+	
+	@Mock
+	private ApiInfoProperties apiInfoProperties = new ApiInfoProperties();
 
 	@Mock
 	private TypeResolver typeResolver;

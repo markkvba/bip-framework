@@ -39,7 +39,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 
 @Configuration
-@EnableConfigurationProperties(SwaggerProperties.class)
+@EnableConfigurationProperties({ SwaggerProperties.class, ApiInfoProperties.class })
 @EnableSwagger2
 @ConditionalOnProperty(prefix = "bip.framework.swagger", name = "enabled", matchIfMissing = true)
 @Import({ BeanValidatorPluginsConfiguration.class })
@@ -56,36 +56,32 @@ public class BipSwaggerAutoConfiguration {
 	private SwaggerProperties swaggerProperties;
 
 	@Autowired
+	private ApiInfoProperties apiInfoProperties;
+
+	@Autowired
 	private TypeResolver typeResolver;
 
 	@Bean
 	public Docket categoryApi() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName(swaggerProperties.getGroupName())
-				.apiInfo(apiInfo())
-				.select()
-				.apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
-				.build()
-				.ignoredParameterTypes(ApiIgnore.class)
-				.additionalModels(typeResolver.resolve(ProviderResponse.class))
+		return new Docket(DocumentationType.SWAGGER_2).groupName(swaggerProperties.getGroupName()).apiInfo(apiInfo())
+				.select().apis(RequestHandlerSelectors.withClassAnnotation(RestController.class)).build()
+				.ignoredParameterTypes(ApiIgnore.class).additionalModels(typeResolver.resolve(ProviderResponse.class))
 				.globalResponseMessage(RequestMethod.GET, globalResponseMessages())
 				.globalResponseMessage(RequestMethod.POST, globalResponseMessages())
-				.globalResponseMessage(RequestMethod.DELETE, globalResponseMessages())
-				.enableUrlTemplating(false)
-				.securityContexts(Arrays.asList(securityContext()))
-				.securitySchemes(Arrays.asList(apiKey()));
+				.globalResponseMessage(RequestMethod.DELETE, globalResponseMessages()).enableUrlTemplating(false)
+				.securityContexts(Arrays.asList(securityContext())).securitySchemes(Arrays.asList(apiKey()));
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder()
-				.title(swaggerProperties.getTitle())
-				.description(swaggerProperties.getDescription())
-				.version(swaggerProperties.getVersion())
-				.contact(new Contact(swaggerProperties.getContactName(),swaggerProperties.getContactUrl(), swaggerProperties.getContactEmail()))
-				.license(swaggerProperties.getLicense())
-				.licenseUrl(swaggerProperties.getLicenseUrl())
-				.termsOfServiceUrl(swaggerProperties.getTermsOfServiceUrl())
-				.build();
+		return new ApiInfoBuilder().title(apiInfoProperties.getTitle()).description(apiInfoProperties.getDescription())
+				.version(apiInfoProperties.getVersion())
+				.contact(new Contact(
+						apiInfoProperties.getContact() == null ? "" : apiInfoProperties.getContact().getName(),
+						apiInfoProperties.getContact() == null ? "" : apiInfoProperties.getContact().getUrl(),
+						apiInfoProperties.getContact() == null ? "" : apiInfoProperties.getContact().getEmail()))
+				.license(apiInfoProperties.getLicense() == null ? "" : apiInfoProperties.getLicense().getName())
+				.licenseUrl(apiInfoProperties.getLicense() == null ? "" : apiInfoProperties.getLicense().getUrl())
+				.termsOfServiceUrl(apiInfoProperties.getTermsOfService()).build();
 	}
 
 	private ApiKey apiKey() {
@@ -93,10 +89,8 @@ public class BipSwaggerAutoConfiguration {
 	}
 
 	private SecurityContext securityContext() {
-		return SecurityContext.builder()
-				.securityReferences(defaultAuth())
-				.forPaths(PathSelectors.regex(swaggerProperties.getSecurePaths()))
-				.build();
+		return SecurityContext.builder().securityReferences(defaultAuth())
+				.forPaths(PathSelectors.regex(swaggerProperties.getSecurePaths())).build();
 	}
 
 	private List<SecurityReference> defaultAuth() {
@@ -111,14 +105,14 @@ public class BipSwaggerAutoConfiguration {
 
 	private List<ResponseMessage> globalResponseMessages() {
 		List<ResponseMessage> responseMessages = new ArrayList<>();
-		responseMessages.add(new ResponseMessageBuilder().code(200).message(MESSAGE_200).
-				responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
-		responseMessages.add(new ResponseMessageBuilder().code(400).message(MESSAGE_400).
-				responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
-		responseMessages.add(new ResponseMessageBuilder().code(500).message(MESSAGE_500).
-				responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
-		responseMessages.add(new ResponseMessageBuilder().code(403).message(MESSAGE_403).
-				responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
+		responseMessages.add(new ResponseMessageBuilder().code(200).message(MESSAGE_200)
+				.responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
+		responseMessages.add(new ResponseMessageBuilder().code(400).message(MESSAGE_400)
+				.responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
+		responseMessages.add(new ResponseMessageBuilder().code(500).message(MESSAGE_500)
+				.responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
+		responseMessages.add(new ResponseMessageBuilder().code(403).message(MESSAGE_403)
+				.responseModel(new ModelRef(PROVIDER_RESPONSE)).build());
 		return responseMessages;
 	}
 }
