@@ -113,7 +113,7 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 	 *
 	 * @param ex - the exception
 	 * @param key - the key to use for reporting to support/maintenance
-	 * @param severity - the MessageSeverityttp to report for the exception
+	 * @param severity - the MessageSeverity to report for the exception
 	 * @param status - the status to report for the exception
 	 * @param params - arguments to fill in any params in the MessageKey message (e.g. value for {0})
 	 */
