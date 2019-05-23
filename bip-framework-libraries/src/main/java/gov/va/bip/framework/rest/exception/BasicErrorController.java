@@ -22,7 +22,21 @@ import gov.va.bip.framework.util.HttpHeadersUtil;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * The Class BasicErrorController.
+ * Spring Boot automatically registers a BasicErrorController bean if you don’t
+ * specify any custom implementation in the configuration. However, this default
+ * controller needs to be configured for BIP platform. By default Spring Boot
+ * maps /error to BasicErrorController which populates model with error
+ * attributes and then returns 'error' as the view name to map application
+ * defined error pages. To replace BasicErrorController with our own custom
+ * controller which can map to '/error', we need to implement ErrorController
+ * interface. Also @ApiIgnore added to ignored controller method parameter types
+ * so that the framework does not generate swagger model or parameter
+ * information for these specific types
+ *
+ * @author akulkarni
+ * 
+ * @see org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController
+ * @see org.springframework.boot.autoconfigure.web.ErrorProperties
  */
 @RestController
 @ApiIgnore
@@ -67,7 +81,7 @@ public class BasicErrorController implements ErrorController {
 
 		ProviderResponse providerResponse = new ProviderResponse();
 		providerResponse.addMessage(MessageSeverity.ERROR, httpStatus.name(), message, httpStatus);
-		
+
 		return new ResponseEntity<>(providerResponse, HttpHeadersUtil.buildHttpHeadersForError(), httpStatus);
 	}
 
