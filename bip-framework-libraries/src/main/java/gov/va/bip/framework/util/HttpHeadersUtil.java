@@ -14,10 +14,10 @@ public final class HttpHeadersUtil {
 	private HttpHeadersUtil() {
 		throw new IllegalAccessError("HttpHeadersUtil is a static class. Do not instantiate it.");
 	}
-	
-	
+
 	/**
-	 * Builds the error http headers.
+	 * Builds an http header specifically for returning errors,
+	 * by setting the content-type to application/problem+json.
 	 *
 	 * @return the http headers
 	 */
