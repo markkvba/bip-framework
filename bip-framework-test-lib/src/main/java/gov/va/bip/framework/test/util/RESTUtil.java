@@ -109,7 +109,12 @@ public class RESTUtil {
 	 * Spring REST template object to invoke all API calls.
 	 */
 	private RestTemplate restTemplate;
-
+	
+	/**
+	 * Spring rest template response http header
+	 */
+	private HttpHeaders responseHttpHeaders;
+	
 	/**
 	 * Constructor to initialize objects.
 	 */
@@ -228,10 +233,12 @@ public class RESTUtil {
 		try {
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
+			responseHttpHeaders = response.getHeaders();
 			return response.getBody();
 		} catch (HttpClientErrorException clientError) {
 			LOGGER.error("Http client exception is thrown", clientError);
 			httpResponseCode = clientError.getRawStatusCode();
+			responseHttpHeaders = clientError.getResponseHeaders();
 			return clientError.getResponseBodyAsString();
 		}
 	}
@@ -538,5 +545,14 @@ public class RESTUtil {
 		assertThat(httpResponseCode, equalTo(intStatusCode));
 
 	}
+
+	/**
+	 * Returns response HTTP headers
+	 * @return
+	 */
+	public HttpHeaders getResponseHttpHeaders() {
+		return responseHttpHeaders;
+	}
+
 
 }
