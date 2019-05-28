@@ -5,7 +5,7 @@ import java.io.Serializable;
 import gov.va.bip.framework.transfer.ProviderTransferObjectMarker;
 
 /**
- * A base Response object capable of representing the payload of a provider response.
+ * A base Request object capable of representing the payload of a provider request.
  *
  * @see ProviderTransferObjectMarker
  *
@@ -16,7 +16,7 @@ public class ProviderRequest implements ProviderTransferObjectMarker, Serializab
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Instantiates a new rest provider response.
+	 * Instantiates a new rest provider request.
 	 */
 	public ProviderRequest() {
 		super();
