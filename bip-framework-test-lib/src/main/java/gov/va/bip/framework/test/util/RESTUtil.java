@@ -54,7 +54,6 @@ import gov.va.bip.framework.shared.sanitize.Sanitizer;
 import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.RESTConfigService;
 
-
 /**
  * It is a wrapper for rest Template API for making HTTP calls, parse JSON and
  * xml responses and status code check.
@@ -78,6 +77,8 @@ public class RESTUtil {
 	 * Constant for submit folder name
 	 */
 	private static final String SUBMIT_PAYLOAD = "submitPayload";
+
+	/** The Constant COULD_NOT_FIND_PROPERTY_STRING. */
 	private static final String COULD_NOT_FIND_PROPERTY_STRING = "Could not find property : ";
 
 	/**
@@ -109,12 +110,12 @@ public class RESTUtil {
 	 * Spring REST template object to invoke all API calls.
 	 */
 	private RestTemplate restTemplate;
-	
+
 	/**
 	 * Spring rest template response http header
 	 */
 	private HttpHeaders responseHttpHeaders;
-	
+
 	/**
 	 * Constructor to initialize objects.
 	 */
@@ -125,8 +126,10 @@ public class RESTUtil {
 	/**
 	 * Reads file content for a given file resource using URL object.
 	 *
-	 * @param strRequestFile the str request file
-	 * @param mapHeader the map header
+	 * @param strRequestFile
+	 *            the str request file
+	 * @param mapHeader
+	 *            the map header
 	 */
 	public void setUpRequest(final String strRequestFile, final Map<String, String> mapHeader) {
 		try {
@@ -149,7 +152,8 @@ public class RESTUtil {
 	/**
 	 * Assigns given header object into local header map.
 	 *
-	 * @param mapHeader the map header
+	 * @param mapHeader
+	 *            the map header
 	 */
 	public void setUpRequest(final Map<String, String> mapHeader) {
 		requestHeaders.setAll(mapHeader);
@@ -168,7 +172,8 @@ public class RESTUtil {
 	 * Invokes REST end point for a GET method using REST Template API and
 	 * return response JSON object.
 	 *
-	 * @param serviceURL the service URL
+	 * @param serviceURL
+	 *            the service URL
 	 * @return the response
 	 */
 	public String getResponse(final String serviceURL) {
@@ -181,7 +186,8 @@ public class RESTUtil {
 	 * Invokes REST end point for a POST method using REST Template API and
 	 * return response JSON object.
 	 *
-	 * @param serviceURL the service URL
+	 * @param serviceURL
+	 *            the service URL
 	 * @return the string
 	 */
 
@@ -195,7 +201,8 @@ public class RESTUtil {
 	 * Invokes REST end point for a PUT method using REST Template API and
 	 * return response JSON object.
 	 *
-	 * @param serviceURL the service URL
+	 * @param serviceURL
+	 *            the service URL
 	 * @return the string
 	 */
 
@@ -209,7 +216,8 @@ public class RESTUtil {
 	 * Invokes REST end point for a DELETE method using REST Template API and
 	 * return response JSON object.
 	 *
-	 * @param serviceURL the service URL
+	 * @param serviceURL
+	 *            the service URL
 	 * @return the string
 	 */
 
@@ -224,9 +232,12 @@ public class RESTUtil {
 	 * RESTTemplate generic exchange method for various HTTP methods such as
 	 * GET,POST,PUT,DELETE
 	 *
-	 * @param serviceURL the service URL
-	 * @param request the request
-	 * @param httpMethod the http method
+	 * @param serviceURL
+	 *            the service URL
+	 * @param request
+	 *            the request
+	 * @param httpMethod
+	 *            the http method
 	 * @return the string
 	 */
 	private String executeAPI(final String serviceURL, final HttpEntity<?> request, final HttpMethod httpMethod) {
@@ -247,9 +258,12 @@ public class RESTUtil {
 	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
 	 *
-	 * @param serviceURL the service URL
-	 * @param fileName the file name
-	 * @param submitPayloadPath the submit payload path
+	 * @param serviceURL
+	 *            the service URL
+	 * @param fileName
+	 *            the file name
+	 * @param submitPayloadPath
+	 *            the submit payload path
 	 * @return the string
 	 */
 
@@ -276,9 +290,12 @@ public class RESTUtil {
 	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
 	 *
-	 * @param serviceURL the service URL
-	 * @param fileName the file name
-	 * @param submitPayload the submit payload
+	 * @param serviceURL
+	 *            the service URL
+	 * @param fileName
+	 *            the file name
+	 * @param submitPayload
+	 *            the submit payload
 	 * @return the string
 	 */
 
@@ -427,7 +444,7 @@ public class RESTUtil {
 	/**
 	 * Http components client http request factory.
 	 *
-	 * @return the http components client http request factory
+	 * @return the HTTP components client request factory
 	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
@@ -442,7 +459,7 @@ public class RESTUtil {
 	/**
 	 * Creates PoolingHttpClientConnectionManager with various settings.
 	 *
-	 * @return
+	 * @return the pooling HTTP client connection manager
 	 */
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
 		int maxTotalPool = 15;
@@ -461,9 +478,9 @@ public class RESTUtil {
 
 	/**
 	 * Creates HttpClientBuilder and sets PoolingHttpClientConnectionManager,
-	 * ConnectionConfig
+	 * ConnectionConfig.
 	 *
-	 * @return
+	 * @return the HTTP client builder
 	 */
 	private HttpClientBuilder getHttpClientBuilder() {
 		int connectionBufferSize = 4128;
@@ -493,7 +510,8 @@ public class RESTUtil {
 	/**
 	 * Loads the expected results from source folder and returns as string.
 	 *
-	 * @param filename the filename
+	 * @param filename
+	 *            the filename
 	 * @return the string
 	 */
 	public String readExpectedResponse(final String filename) {
@@ -517,9 +535,11 @@ public class RESTUtil {
 	/**
 	 * Utility method to read file. The parameter holds absolute path.
 	 *
-	 * @param filename the filename
+	 * @param filename
+	 *            the filename
 	 * @return the string
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	protected String readFile(final File filename) throws IOException {
 		String content = null;
@@ -539,7 +559,7 @@ public class RESTUtil {
 	/**
 	 * Asserts the response status code with the given status code.
 	 *
-	 * @param intStatusCode
+	 * @param intStatusCode the int status code
 	 */
 	public void validateStatusCode(final int intStatusCode) {
 		assertThat(httpResponseCode, equalTo(intStatusCode));
@@ -547,12 +567,12 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Returns response HTTP headers
-	 * @return
+	 * Returns response HTTP headers.
+	 *
+	 * @return the response HTTP headers
 	 */
 	public HttpHeaders getResponseHttpHeaders() {
 		return responseHttpHeaders;
 	}
-
 
 }
