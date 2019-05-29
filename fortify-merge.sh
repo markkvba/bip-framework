@@ -8,7 +8,6 @@ newFpr="target/fortify/bip-framework-reactor-$artifactVersion.fpr"
 mainFpr="./bip-framework.fpr"
 
 echo "+>> Merging $mainFpr into $newFpr"
-
 FPRUtility -merge -project $newFpr -source $mainFpr -f $newFpr
 
 echo "+>> Backing up $mainFpr into $mainFpr".backup

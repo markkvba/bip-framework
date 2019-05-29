@@ -43,8 +43,9 @@
     </execution>  
   </object>  
   <note id="21">    
-    <position height="99" width="133" x="487" y="150"/>    
-    <text><![CDATA[There are several logging options available. This diagram shows one example.]]>
+    <position height="99" width="133" x="482" y="145"/>    
+    <text><![CDATA[There are several logging options available. This diagram shows one example.
+    ]]>
     </text>  
   </note>  
   <message id="3" 

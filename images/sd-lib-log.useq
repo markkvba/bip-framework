@@ -32,8 +32,9 @@
     </execution>  
   </object>  
   <note id="16">    
-    <position height="79" width="222" x="355" y="78"/>    
-    <text><![CDATA[There are many static log methods available with different parameters. This diagram shows one example.]]>
+    <position height="79" width="222" x="297" y="78"/>    
+    <text><![CDATA[There are many static log methods available with different parameters. This diagram shows one example.
+    ]]>
     </text>  
   </note>  
   <message id="3" operation="getLogger(org.slf4j.Logger):gov.va.bip.framework.log.BipLogger" asynchronous="false">    
@@ -66,12 +67,12 @@
     <end type="TARGET" refId="15"/>  
   </message>  
   <text-link id="17">    
+    <link-end type="SOURCE" refId="16"/>    
+    <link-end type="TARGET" refId="16"/>  
+  </text-link>  
+  <text-link id="18">    
     <bendpoint x="212" y="164"/>    
     <link-end type="SOURCE" refId="16"/>    
     <link-end type="TARGET" refId="4"/>  
-  </text-link>  
-  <text-link id="18">    
-    <link-end type="SOURCE" refId="16"/>    
-    <link-end type="TARGET" refId="16"/>  
   </text-link>
 </sequence-diagram>

@@ -4,6 +4,7 @@ target/
 ### Fortify ###
 *.fpr.backup
 
+
 ### MAC ###
 *.DS_Store
 
