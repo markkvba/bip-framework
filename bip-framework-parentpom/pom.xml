@@ -241,7 +241,6 @@
 				<version>${mockito-core.version}</version>
 				<scope>test</scope>
 			</dependency>
-
 			<!-- Micormeter core dependecy -->
 			<dependency>
 				<groupId>io.micrometer</groupId>
@@ -254,6 +253,17 @@
 				<artifactId>micrometer-registry-prometheus</artifactId>
 				<version>${micrometer.version}</version>
 				<scope>runtime</scope>
+			</dependency>
+			<!-- OpenAPI Tools -->
+			<dependency>
+			    <groupId>org.openapitools</groupId>
+			    <artifactId>openapi-generator-cli</artifactId>
+			    <version>${openapi.codegen.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.openapitools</groupId>
+			    <artifactId>openapi-generator</artifactId>
+			    <version>${openapi.codegen.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -827,7 +837,7 @@
 			<id>org-openapitools-codegen-parent</id>
 			<activation>
 				<file><!-- Existence of API YML file to activate the profile -->
-					<exists>${basedir}/src/main/resources/openapi/api.yml</exists>
+					<exists>${basedir}/src/main/resources/openapi/openapi.yml</exists>
 				</file>
 			</activation>
 			<build>
@@ -868,7 +878,7 @@
 									<goal>generate</goal>
 								</goals>
 								<configuration>
-									<inputSpec>${basedir}/src/main/resources/openapi/api.yml</inputSpec>
+									<inputSpec>${basedir}/src/main/resources/openapi/openapi.yml</inputSpec>
 									<validateSpec>true</validateSpec>
 									<generatorName>openapi</generatorName>
 									<output>${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui</output>

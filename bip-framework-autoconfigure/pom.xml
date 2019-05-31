@@ -43,21 +43,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
-		<dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-swagger2</artifactId>
-	      <version>${springfox.version}</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-bean-validators</artifactId>
-	      <version>${springfox.version}</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-swagger-ui</artifactId>
-	      <version>${springfox.version}</version>
-	    </dependency>
  		<!-- Netflix commons util -->
  		<dependency>
 			<groupId>com.netflix.netflix-commons</groupId>
