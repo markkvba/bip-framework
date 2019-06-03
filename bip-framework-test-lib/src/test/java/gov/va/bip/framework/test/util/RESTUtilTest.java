@@ -149,6 +149,9 @@ public class RESTUtilTest {
 			instanceOfRESTConfigService.setAccessible(true);
 			instanceOfRESTConfigService.set(null, config);
 			ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
+			// reset the field instance and prop fields
+			instanceOfRESTConfigService.set(null,null);
+			ReflectionTestUtils.setField(config, "prop", null);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchFieldException | BipTestLibRuntimeException e) {
 			e.printStackTrace();
@@ -156,26 +159,6 @@ public class RESTUtilTest {
 		}
 	}
 
-	@Test
-	public void _testGetRestTemplateSuccess() {
-		String pathToKeyStore = null;
-		try {
-			pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		} catch (BipTestLibRuntimeException e) {
-			e.printStackTrace();
-			fail("Exception not expected!");
-		}
-		File strFilePath;
-		strFilePath = new File(pathToKeyStore);
-		strFilePath.setReadable(false);
-		try {
-			ReflectionTestUtils.invokeMethod(new RESTUtil(), "getRestTemplate");
-		} catch (BipTestLibRuntimeException e) {
-			e.printStackTrace();
-			fail("Exception not expected!");
-		}
-		strFilePath.setReadable(true);
-	}
 	@Test
 	public void test_getResponse_WithRetry() {
 		String response = restUtil.getResponse("http://localhost:9999/urldoesnotexits");
@@ -198,6 +181,7 @@ public class RESTUtilTest {
 	public void test_getResponse_Success() {
 		String response = restUtil.getResponse(LOCALHOST_URL_PERSON);
 		assertThat(true, equalTo(!response.isEmpty()));
+		assertThat(true, equalTo(restUtil.getResponseHttpHeaders() != null));
 	}
 
 	@Test

@@ -4,12 +4,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -23,11 +25,13 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +50,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import gov.va.bip.framework.shared.sanitize.Sanitizer;
 import gov.va.bip.framework.test.exception.BipTestLibRuntimeException;
 import gov.va.bip.framework.test.service.RESTConfigService;
 
@@ -72,6 +77,8 @@ public class RESTUtil {
 	 * Constant for submit folder name
 	 */
 	private static final String SUBMIT_PAYLOAD = "submitPayload";
+
+	/** The Constant COULD_NOT_FIND_PROPERTY_STRING. */
 	private static final String COULD_NOT_FIND_PROPERTY_STRING = "Could not find property : ";
 
 	/**
@@ -105,6 +112,11 @@ public class RESTUtil {
 	private RestTemplate restTemplate;
 
 	/**
+	 * Spring rest template response http header
+	 */
+	private HttpHeaders responseHttpHeaders;
+
+	/**
 	 * Constructor to initialize objects.
 	 */
 	public RESTUtil() {
@@ -115,8 +127,9 @@ public class RESTUtil {
 	 * Reads file content for a given file resource using URL object.
 	 *
 	 * @param strRequestFile
+	 *            the str request file
 	 * @param mapHeader
-	 * @throws Exception
+	 *            the map header
 	 */
 	public void setUpRequest(final String strRequestFile, final Map<String, String> mapHeader) {
 		try {
@@ -140,7 +153,7 @@ public class RESTUtil {
 	 * Assigns given header object into local header map.
 	 *
 	 * @param mapHeader
-	 * @throws Exception
+	 *            the map header
 	 */
 	public void setUpRequest(final Map<String, String> mapHeader) {
 		requestHeaders.setAll(mapHeader);
@@ -156,11 +169,12 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a GET method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a GET method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
-	 * @return
+	 *            the service URL
+	 * @return the response
 	 */
 	public String getResponse(final String serviceURL) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
@@ -169,11 +183,12 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a POST method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a POST method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
-	 * @return
+	 *            the service URL
+	 * @return the string
 	 */
 
 	public String postResponse(final String serviceURL) {
@@ -183,11 +198,12 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a PUT method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a PUT method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
-	 * @return
+	 *            the service URL
+	 * @return the string
 	 */
 
 	public String putResponse(final String serviceURL) {
@@ -197,11 +213,12 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Invokes REST end point for a DELETE method using REST Template API and return
-	 * response JSON object.
+	 * Invokes REST end point for a DELETE method using REST Template API and
+	 * return response JSON object.
 	 *
 	 * @param serviceURL
-	 * @return
+	 *            the service URL
+	 * @return the string
 	 */
 
 	public String deleteResponse(final String serviceURL) {
@@ -214,20 +231,25 @@ public class RESTUtil {
 	 * Private method that is invoked by different http methods. It uses
 	 * RESTTemplate generic exchange method for various HTTP methods such as
 	 * GET,POST,PUT,DELETE
-	 * 
+	 *
 	 * @param serviceURL
+	 *            the service URL
 	 * @param request
+	 *            the request
 	 * @param httpMethod
-	 * @return
+	 *            the http method
+	 * @return the string
 	 */
 	private String executeAPI(final String serviceURL, final HttpEntity<?> request, final HttpMethod httpMethod) {
 		try {
 			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
+			responseHttpHeaders = response.getHeaders();
 			return response.getBody();
 		} catch (HttpClientErrorException clientError) {
 			LOGGER.error("Http client exception is thrown", clientError);
 			httpResponseCode = clientError.getRawStatusCode();
+			responseHttpHeaders = clientError.getResponseHeaders();
 			return clientError.getResponseBodyAsString();
 		}
 	}
@@ -237,7 +259,12 @@ public class RESTUtil {
 	 * return response json object.
 	 *
 	 * @param serviceURL
-	 * @return
+	 *            the service URL
+	 * @param fileName
+	 *            the file name
+	 * @param submitPayloadPath
+	 *            the submit payload path
+	 * @return the string
 	 */
 
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
@@ -258,13 +285,18 @@ public class RESTUtil {
 			return null;
 		}
 	}
+
 	/**
 	 * Invokes REST end point for a multipart method using REST Template API and
 	 * return response json object.
+	 *
 	 * @param serviceURL
+	 *            the service URL
 	 * @param fileName
+	 *            the file name
 	 * @param submitPayload
-	 * @return
+	 *            the submit payload
+	 * @return the string
 	 */
 
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
@@ -282,12 +314,15 @@ public class RESTUtil {
 		}
 
 	}
+
 	/**
-	 * Private method that is invoked by multipart methods. It uses
-	 * RESTTemplate generic exchange method for multipart HTTP methods.
+	 * Execute multipart API.
+	 *
 	 * @param serviceURL
+	 *            the service URL
 	 * @param body
-	 * @return
+	 *            the body
+	 * @return the string
 	 */
 	private String executeMultipartAPI(final String serviceURL, final MultiValueMap<String, Object> body) {
 		HttpHeaders headers = new HttpHeaders(requestHeaders);
@@ -297,53 +332,119 @@ public class RESTUtil {
 	}
 
 	/**
-	 * Loads the KeyStore and password in to rest Template API so all the API's are
-	 * SSL enabled.
+	 * Loads the KeyStore and password in to rest Template API so all the API's
+	 * are SSL enabled.
+	 *
+	 * @return the rest template
 	 */
 
 	private RestTemplate getRestTemplate() {
-		// Create a new instance of the {@link RestTemplate} using default settings.
+		// Create a new instance of the {@link RestTemplate} using default
+		// settings.
 		RestTemplate apiTemplate = new RestTemplate();
-		
-		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
-		if (StringUtils.isNotBlank(pathToKeyStore)) {
-			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
-			if (StringUtils.isBlank(password)) {
-				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
-			}
-			try (FileInputStream instream = new FileInputStream(pathToKeyStore)) {
-				KeyStore keyStore = KeyStore.getInstance("jks");
-				keyStore.load(instream, password.toCharArray());
-				SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keyStore, password.toCharArray())
-						.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
 
-				SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
-						NoopHostnameVerifier.INSTANCE);
-				HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-				ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-				apiTemplate.setRequestFactory(requestFactory);
-			} catch (Exception e) {
-				LOGGER.error("Issue with the certificate or password", e);
-				throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
-			}			
+		String pathToKeyStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStore", true);
+		String pathToTrustStore = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStore", true);
+		SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+		try {
+			if (StringUtils.isBlank(pathToKeyStore) && StringUtils.isBlank(pathToTrustStore)) {
+				TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+				sslContextBuilder = sslContextBuilder.loadTrustMaterial(null, acceptingTrustStrategy);
+			} else {
+				sslContextBuilder = loadKeyMaterial(pathToKeyStore, sslContextBuilder);
+				sslContextBuilder = loadTrustMaterial(pathToTrustStore, sslContextBuilder);
+			}
+			SSLContext sslContext = sslContextBuilder.build();
+			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,
+					NoopHostnameVerifier.INSTANCE);
+			HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+			ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+			apiTemplate.setRequestFactory(requestFactory);
+		} catch (Exception e) {
+			LOGGER.error("Issue with the certificate or password", e);
+			throw new BipTestLibRuntimeException("Issue with the certificate or password", e);
 		}
 		apiTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
 		apiTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 		apiTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(httpComponentsClientHttpRequestFactory()));
 
 		for (HttpMessageConverter<?> converter : apiTemplate.getMessageConverters()) {
-		     if (converter instanceof StringHttpMessageConverter) {
-		         ((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
-		     }
+			if (converter instanceof StringHttpMessageConverter) {
+				((StringHttpMessageConverter) converter).setWriteAcceptCharset(false);
+			}
 		}
 		return apiTemplate;
 	}
 
 	/**
-	 * Creates HttpComponentsClientHttpRequestFactory with different settings such
-	 * as connectionTimeout, readTimeout
-	 * 
-	 * @return
+	 * Load key material.
+	 *
+	 * @param pathToKeyStore
+	 *            the path to key store
+	 * @param sslContextBuilder
+	 *            the ssl context builder
+	 * @return the SSL context builder
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws KeyStoreException
+	 *             the key store exception
+	 * @throws UnrecoverableKeyException
+	 *             the unrecoverable key exception
+	 * @throws CertificateException
+	 *             the certificate exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private SSLContextBuilder loadKeyMaterial(String pathToKeyStore, SSLContextBuilder sslContextBuilder)
+			throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException,
+			IOException {
+		if (StringUtils.isNotBlank(pathToKeyStore)) {
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.keyStorePassword", true);
+			if (StringUtils.isBlank(password)) {
+				throw new BipTestLibRuntimeException(COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.keyStorePassword");
+			}
+			return sslContextBuilder.loadKeyMaterial(new File(Sanitizer.safePath(pathToKeyStore)),
+					password.toCharArray(), password.toCharArray());
+		}
+		return sslContextBuilder;
+	}
+
+	/**
+	 * Load trust material.
+	 *
+	 * @param pathToTrustStore
+	 *            the path to trust store
+	 * @param sslContextBuilder
+	 *            the ssl context builder
+	 * @return the SSL context builder
+	 * @throws NoSuchAlgorithmException
+	 *             the no such algorithm exception
+	 * @throws KeyStoreException
+	 *             the key store exception
+	 * @throws CertificateException
+	 *             the certificate exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private SSLContextBuilder loadTrustMaterial(String pathToTrustStore, SSLContextBuilder sslContextBuilder)
+			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+		if (StringUtils.isNotBlank(pathToTrustStore)) {
+			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
+			if (StringUtils.isBlank(password)) {
+				throw new BipTestLibRuntimeException(
+						COULD_NOT_FIND_PROPERTY_STRING + "javax.net.ssl.trustStorePassword");
+			}
+			return sslContextBuilder.loadTrustMaterial(new File(Sanitizer.safePath(pathToTrustStore)),
+					password.toCharArray());
+		} else {
+			return sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+		}
+	}
+
+	/**
+	 * Http components client http request factory.
+	 *
+	 * @return the HTTP components client request factory
 	 */
 	public HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory() {
 		int connectionTimeout = 20000;
@@ -357,8 +458,8 @@ public class RESTUtil {
 
 	/**
 	 * Creates PoolingHttpClientConnectionManager with various settings.
-	 * 
-	 * @return
+	 *
+	 * @return the pooling HTTP client connection manager
 	 */
 	private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
 		int maxTotalPool = 15;
@@ -377,22 +478,22 @@ public class RESTUtil {
 
 	/**
 	 * Creates HttpClientBuilder and sets PoolingHttpClientConnectionManager,
-	 * ConnectionConfig
-	 * 
-	 * @return
+	 * ConnectionConfig.
+	 *
+	 * @return the HTTP client builder
 	 */
 	private HttpClientBuilder getHttpClientBuilder() {
 		int connectionBufferSize = 4128;
-		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-				.setBufferSize(connectionBufferSize).build();
+		ConnectionConfig connectionConfig = ConnectionConfig.custom().setBufferSize(connectionBufferSize).build();
 		HttpClientBuilder clientBuilder = HttpClients.custom();
 
 		clientBuilder.setConnectionManager(getPoolingHttpClientConnectionManager());
 		clientBuilder.setDefaultConnectionConfig(connectionConfig);
-		
+
 		clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, true, new ArrayList<>()) {
 			@Override
-			public boolean retryRequest(final IOException exception, final int executionCount, final HttpContext context) {
+			public boolean retryRequest(final IOException exception, final int executionCount,
+					final HttpContext context) {
 				LOGGER.info("Retry request, execution count: {}, exception: {}", executionCount, exception);
 				if (exception instanceof org.apache.http.NoHttpResponseException) {
 					LOGGER.warn("No response from server on " + executionCount + " call");
@@ -410,7 +511,8 @@ public class RESTUtil {
 	 * Loads the expected results from source folder and returns as string.
 	 *
 	 * @param filename
-	 * @return
+	 *            the filename
+	 * @return the string
 	 */
 	public String readExpectedResponse(final String filename) {
 		String strExpectedResponse = null;
@@ -432,10 +534,12 @@ public class RESTUtil {
 
 	/**
 	 * Utility method to read file. The parameter holds absolute path.
-	 * 
+	 *
 	 * @param filename
-	 * @return
+	 *            the filename
+	 * @return the string
 	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	protected String readFile(final File filename) throws IOException {
 		String content = null;
@@ -455,11 +559,20 @@ public class RESTUtil {
 	/**
 	 * Asserts the response status code with the given status code.
 	 *
-	 * @param intStatusCode
+	 * @param intStatusCode the int status code
 	 */
 	public void validateStatusCode(final int intStatusCode) {
 		assertThat(httpResponseCode, equalTo(intStatusCode));
 
+	}
+
+	/**
+	 * Returns response HTTP headers.
+	 *
+	 * @return the response HTTP headers
+	 */
+	public HttpHeaders getResponseHttpHeaders() {
+		return responseHttpHeaders;
 	}
 
 }

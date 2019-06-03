@@ -33,11 +33,17 @@ Add the dependency to the POM file in your `project-name-inttest` project.
 
 Test Library uses Maven and RestTemplate for core API validations. It provides support classes and methods that can be used to build Automated API tests for the RESTful services.
 
+#### gov.va.bip.framework.test.exception:
+
+`BipTestLibException`: Custom exception for BIP application that extends Exception. Application use this test library will throw this exception for any exception.
+
+`BipTestLibRuntimeException`: Custom runtime exception for BIP application that extends RuntimeException. Application use this test library will throw this exception for any runtime exception.
+
 #### gov.va.bip.framework.test.rest:
 
-`BaseStepDef`: Base class for all the step definitions.
+`BaseStepDef`: Base class that implements some of the common functionalities aka step definitions such as invoke different HTTP methods, set bearer token, compare expected and actual response.  
 
-`BaseStepDefHandler`: Handler object that extends BaseStepDef to handle rest based API calls. 
+`BaseStepDefHandler`: Handler object that extends BaseStepDef to handle rest based API calls. Step definition class reference this class to share state between various step definitions using a Singleton pattern.
 
 #### gov.va.bip.framework.test.service:
 
@@ -59,7 +65,7 @@ vetservices-inttest-<env>.properties**
 `RequestResponseLoggingInterceptor`: An interceptor for all rest API calls to trace requests and responses. This interceptor can also be used for troubleshooting to trace request headers, parameters, and the response body.
 
 ## Test library example
-An example of a functioning integration test can be seen in the [reference-inttest project](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/tree/master/bip-reference-inttest).
+An example of a functioning integration test can be seen in the [reference-inttest project](https://github.com/department-of-veterans-affairs/bip-reference-person/tree/master/bip-reference-inttest).
 
 ## Class Diagrams
 	gov.va.bip.framework.test 
