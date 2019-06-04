@@ -2,6 +2,7 @@ package gov.va.bip.framework.rest.exception;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -10,6 +11,8 @@ import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -58,6 +61,9 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 	/** The Constant LOGGER. */
 	private static final BipLogger logger = BipLoggerFactory.getLogger(BipRestGlobalExceptionHandler.class);
 
+	@Autowired
+	private MessageSource messageSource;
+
 	/**
 	 * Return value if no exception exists to provide a message.
 	 * To get default message text, use {@link #deriveMessage(Exception)}.
@@ -83,12 +89,12 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 		 */
 		String causeClassname = (ex.getCause() == null
 				? null
-				: ex.getCause().getClass().getName() + ":");
+						: ex.getCause().getClass().getName() + ":");
 
 		/* Scrub any occurrances of cause classname from exception message */
 		String msg = (causeClassname != null && StringUtils.isNotBlank(ex.getMessage())
 				? ex.getMessage().replaceAll(causeClassname, "")
-				: ex.getMessage());
+						: ex.getMessage());
 
 		/* Final check for empty */
 		if (StringUtils.isBlank(msg)) {
@@ -289,17 +295,25 @@ public class BipRestGlobalExceptionHandler extends BaseHttpProviderPointcuts {
 			MessageKey key = MessageKeys.BIP_GLOBAL_VALIDATOR_METHOD_ARGUMENT_NOT_VALID;
 			for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				String[] params = new String[] { "field", errorCodes, error.getDefaultMessage() };
+				String message = messageSource.getMessage(error, Locale.US);
+				if (StringUtils.isEmpty(message)) {
+					message = error.getDefaultMessage();
+				}
+				String[] params = new String[] { "field", errorCodes, message };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
-						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+						message, HttpStatus.BAD_REQUEST);
 			}
 			for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
 				String errorCodes = String.join(", ", error.getCodes());
-				String[] params = new String[] { "object", errorCodes, error.getDefaultMessage() };
+				String message = messageSource.getMessage(error, Locale.US);
+				if (StringUtils.isEmpty(message)) {
+					message = error.getDefaultMessage();
+				}
+				String[] params = new String[] { "object", errorCodes, message };
 				log(ex, key, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, params);
 				apiError.addMessage(MessageSeverity.ERROR, errorCodes,
-						error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+						message, HttpStatus.BAD_REQUEST);
 			}
 		}
 
