@@ -1,6 +1,11 @@
 ### Maven ###
 target/
 
+### Fortify ###
+*.fpr.backup
+fortify*.log
+
+
 ### MAC ###
 *.DS_Store
 

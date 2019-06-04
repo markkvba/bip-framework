@@ -2,7 +2,7 @@
 
 To run spring boot and spring cloud enabled services on the BIP Platform, it must adhere to various service patterns. This repository contains a suite of framework libraries, auto configurations, test libraries and parent POM that must be included as dependencies to enable the patterns.
 
-For general information regarding recommended development patterns for developing service applications, and the purpose and usage of capabilities that are provided by the BIP Framework, see the [bip-reference-spring-boot README.md](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot).
+For general information regarding recommended development patterns for developing service applications, and the purpose and usage of capabilities that are provided by the BIP Framework, see the [bip-reference-spring-boot README.md](https://github.com/department-of-veterans-affairs/bip-reference-person).
 
 ## Project Breakdown & Links
 
@@ -11,6 +11,8 @@ For general information regarding recommended development patterns for developin
 1. [bip-framework-libraries](bip-framework-libraries/README.md): Shared libraries for the services to provide common framework and security interfaces. 
 
 1. [bip-framework-parentpom](bip-framework-parentpom/README.md): Parent POM for spring boot and cloud enabled services. It provides common Maven configuration and dependencies for the suite of projects.
+
+1. [bip-framework-shared](bip-framework-shared/README.md): This project contains utilities and functional helpers that can be shared freely with any java project. Presently used by `bip-framework-libraries` and `bip-framework-test-lib` for shared utility
 
 1. [bip-framework-test-lib](bip-framework-test-lib/README.md): Test library framework to support functional testing for service applications.
 
@@ -30,6 +32,11 @@ For general information regarding recommended development patterns for developin
        <dependency>
          <groupId>gov.va.bip.framework</groupId>
          <artifactId>bip-framework-parentpom</artifactId>
+         <version><!-- add the appropriate version --></version>
+       </dependency>
+       <dependency>
+         <groupId>gov.va.bip.framework</groupId>
+         <artifactId>bip-framework-shared</artifactId>
          <version><!-- add the appropriate version --></version>
        </dependency>
        <dependency>
@@ -80,7 +87,7 @@ It requires changes in the reactor POM, and in your local maven settings file, a
 
 1. **POM file**
 
-Add the section shown below to the reactor (root) `pom.xml` of your service project. An example of this configuration can be seen in the [bip-reference reactor POM](https://github.com/department-of-veterans-affairs/ocp-reference-spring-boot/blob/master/pom.xml).
+Add the section shown below to the reactor (root) `pom.xml` of your service project. An example of this configuration can be seen in the [bip-reference reactor POM](https://github.com/department-of-veterans-affairs/bip-reference-person/blob/master/pom.xml).
  
 ```xml
 	<repositories>
@@ -134,7 +141,7 @@ source : http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-
 
 1. Modify `~/.m2/settings.xml`, same format as mentioned in the previous section 
 
-2. Update your application's parent pom with a `local-deploy` profile that configures your GitHub repo. For an example, look in [bip-framework-parentpom/pom.xml](https://github.com/department-of-veterans-affairs/ocp-framework/blob/master/bip-framework-parentpom/pom.xml) for the section framed by:
+2. Update your application's parent pom with a `local-deploy` profile that configures your GitHub repo. For an example, look in [bip-framework-parentpom/pom.xml](https://github.com/department-of-veterans-affairs/bip-framework/blob/master/bip-framework-parentpom/pom.xml) for the section framed by:
 
 ```xml
 	<profile>
@@ -145,7 +152,7 @@ source : http://stackoverflow.com/questions/14013644/hosting-a-maven-repository-
 
 3. Run maven with the appropriate parameters to deploy and upload artifacts to the repository
 
-```	mvn clean deploy -Plocal-deploy -DrepositoryName=bip-ocp-framework -DrepositoryOwner=EPMO ```
+```	mvn clean deploy -Plocal-deploy -DrepositoryName=bip-framework -DrepositoryOwner=EPMO ```
 
 -- OR --
 

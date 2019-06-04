@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>gov.va.bip.framework</groupId>
 		<artifactId>bip-framework-parentpom</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 		<relativePath>../bip-framework-parentpom</relativePath>
 	</parent>
 
@@ -14,6 +14,11 @@
 	<description>Shared libraries for BIP Application Framework - Spring Boot and Cloud Enabled</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>gov.va.bip.framework</groupId>
+			<artifactId>bip-framework-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- security dependencies -->
 	    <dependency>
@@ -141,6 +146,12 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+	      <groupId>io.springfox</groupId>
+	      <artifactId>springfox-swagger2</artifactId>
+	      <version>${springfox.version}</version>
+	    </dependency>
 
 		<!-- -YamlDependency -->
 		<dependency>
