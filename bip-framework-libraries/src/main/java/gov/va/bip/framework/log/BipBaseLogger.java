@@ -175,10 +175,7 @@ public class BipBaseLogger {
 			String originalWord = word;
 			if ((toLength.length() + word.length() + 1) > maxLength) {
 				while ((word.length() + 1) > maxLength) {
-					if (!"".equals(toLength)) {
-						addToThisList.add(toLength);
-						toLength = "";
-					}
+					toLength = avoidEmptyAdditions(addToThisList, toLength);
 					addToThisList.add(word.substring(0, maxLength - 1));
 					word = word.substring(maxLength - 1);
 				}
@@ -197,6 +194,15 @@ public class BipBaseLogger {
 		if (!alreadyAdded) {
 			addToThisList.add(toLength);
 		}
+	}
+
+	private String avoidEmptyAdditions(final List<String> addToThisList, final String toLength) {
+		String stringTobeAdded = toLength;
+		if (!"".equals(stringTobeAdded)) {
+			addToThisList.add(stringTobeAdded);
+			stringTobeAdded = "";
+		}
+		return stringTobeAdded;
 	}
 
 	private void throwExceptionsForInvalidConditions(final List<String> addToThisList, final int maxLength) {
