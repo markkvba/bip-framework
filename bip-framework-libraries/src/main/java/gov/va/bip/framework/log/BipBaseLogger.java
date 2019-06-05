@@ -301,18 +301,18 @@ public class BipBaseLogger {
 	 */
 	private void sendLogAtLevel(final Level level, final Marker marker, final String part, final Throwable t) {
 		if (level == null) {
-			sendLogDebug(marker, Sanitizer.stripXss(part), t);
+			sendLogDebug(marker, part, t);
 		} else {
 			if (org.slf4j.event.Level.ERROR.equals(level)) {
-				sendLogError(marker, Sanitizer.stripXss(part), t);
+				sendLogError(marker, part, t);
 			} else if (org.slf4j.event.Level.WARN.equals(level)) {
-				sendLogWarn(marker, Sanitizer.stripXss(part), t);
+				sendLogWarn(marker, part, t);
 			} else if (org.slf4j.event.Level.INFO.equals(level)) {
-				sendLogInfo(marker, Sanitizer.stripXss(part), t);
+				sendLogInfo(marker, part, t);
 			} else if (org.slf4j.event.Level.TRACE.equals(level)) {
-				sendLogTrace(marker, Sanitizer.stripXss(part), t);
+				sendLogTrace(marker, part, t);
 			} else {
-				sendLogDebug(marker, Sanitizer.stripXss(part), t);
+				sendLogDebug(marker, part, t);
 			}
 		}
 	}
