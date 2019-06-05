@@ -5,20 +5,20 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 
 /**
- * The Class BipMaskRules.
+ * A set of logback rules to mask sensitive data.
  */
 public class BipMaskRules {
 
-	/** The Constant NO_OP. */
+	/** A NO-OP function for non-parallel stream reduction (See {@link #apply(String)} */
 	private static final BinaryOperator<String> NO_OP = (in, out) -> {
 		throw new UnsupportedOperationException("Only needed for parallel streams!");
 	};
 
-	/** The rule. */
+	/** The list of rules */
 	private final Set<BipMaskRule> rules = new LinkedHashSet<>();
 
 	/**
-	 * Adds the rule.
+	 * Adds the rule definition to the set of rules.
 	 *
 	 * @param definition
 	 *            the definition
@@ -28,13 +28,16 @@ public class BipMaskRules {
 	}
 
 	/**
-	 * Apply.
+	 * Apply rules to a string value.
+	 * <p>
+	 * Used by
+	 * {@link BipMaskingMessageProvider#writeTo(com.fasterxml.jackson.core.JsonGenerator, ch.qos.logback.classic.spi.ILoggingEvent)}
 	 *
 	 * @param input
 	 *            the input
 	 * @return the string
 	 */
-	public String apply(String input) {
-		return rules.stream().reduce(input, (out, rule) -> rule.apply(out), NO_OP);
+	public String apply(String input, String fieldName) {
+		return rules.stream().reduce(input, (out, rule) -> rule.apply(out, fieldName), NO_OP);
 	}
 }

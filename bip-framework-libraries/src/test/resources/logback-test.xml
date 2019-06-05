@@ -3,10 +3,10 @@
 <configuration scan="false" debug="false">
 	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-	
+
 	<appender name="TestAppender" class="gov.va.bip.framework.TestAppender">
 	</appender>
-	
+
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n</pattern>
@@ -20,7 +20,7 @@
 	<root level="ERROR">
 		<appender-ref ref="STDOUT" />
 	</root>
-	
+
 	<appender name="JSON_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
@@ -42,17 +42,26 @@
 				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
 				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
 					<rules>
-			            <rule>
-			              <name>credit card</name>
-			              <pattern>\d{13,18}</pattern>
-			              <unmasked>4</unmasked>
-			            </rule>
-			             <rule>
-			              <name>SSN</name>
-			              <pattern>\d{3}-?\d{2}-?\d{4}</pattern>
-			             </rule>
-			          </rules>
-			    </provider>
+						<rule>
+							<name>credit card</name>
+							<prefix></prefix>
+							<pattern>\d{13,18}</pattern>
+							<suffix></suffix>
+							<unmasked>4</unmasked>
+							<exclusiveFields></exclusiveFields>
+							<excludeFields></excludeFields>
+						</rule>
+						<rule>
+							<name>SSN</name>
+							<prefix></prefix>
+							<pattern>\d{3}-?\d{2}-?\d{4}</pattern>
+							<suffix></suffix>
+							<unmasked></unmasked>
+							<exclusiveFields></exclusiveFields>
+							<excludeFields></excludeFields>
+						</rule>
+					</rules>
+				</provider>
 				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
 				<arguments /> <!--or through StructuredArguments -->
 				<stackTrace>
@@ -63,11 +72,11 @@
 						<shortenedClassNameLength>40</shortenedClassNameLength>
 						<rootCauseFirst>true</rootCauseFirst>
 					</throwableConverter>
-				</stackTrace>			
+				</stackTrace>
 			</providers>
 		</encoder>
 	</appender>
-	
+
 	<logger name="gov.va.bip.framework.log.logback" level="DEBUG" additivity="false">
 		<appender-ref ref="JSON_ENCODER" />
 	</logger>

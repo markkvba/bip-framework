@@ -29,18 +29,28 @@
 				<threadName />
 				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
 				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
+					<!--
+					  - Base rules for masking data, apps. Can add more rules via BipMaskRules.addRule(..).
+					  - By default, all fields are subject to each defined <rule>.
+					-->
 					<rules>
-			            <rule>
-			              <name>credit card</name>
-			              <pattern>\d{13,18}</pattern>
-			              <unmasked>4</unmasked>
-			            </rule>
-			             <rule>
-			              <name>SSN</name>
-			              <pattern>\d{3}-?\d{2}-?\d{4}</pattern>
-			             </rule>
-			          </rules>
-			    </provider>
+						<!-- A rule is embodied in BipMaskRule -->
+						<rule>
+							<name>credit card</name>
+							<prefix></prefix>
+							<pattern>\d{13,18}</pattern>
+							<suffix></suffix>
+							<unmasked>4</unmasked>
+						</rule>
+						<rule>
+							<name>SSN</name>
+							<prefix></prefix>
+							<pattern>\d{3}-?\d{2}-?\d{4}</pattern>
+							<suffix></suffix>
+							<unmasked></unmasked>
+						</rule>
+					</rules>
+				</provider>
 				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
 				<arguments /> <!--or through StructuredArguments -->
 				<stackTrace>
@@ -51,18 +61,19 @@
 						<shortenedClassNameLength>40</shortenedClassNameLength>
 						<rootCauseFirst>true</rootCauseFirst>
 					</throwableConverter>
-				</stackTrace>			</providers>
+				</stackTrace>
+			</providers>
 
 		</encoder>
 	</appender>
-	
+
 	<!--
-	  Async appenders can drastically speed up logging as well as your application's response time but with some potential drawbacks. 
-	  Read more at. 
-	  https://logback.qos.ch/manual/appenders.html#AsyncAppender
-	  http://blog.takipi.com/how-to-instantly-improve-your-java-logging-with-7-logback-tweaks/
-	  
-	  Always be sure to test different configurations for yourself. Every application has different requirements.
+		Async appenders can drastically speed up logging as well as your application's response time but with some potential drawbacks.
+		Read more at.
+		https://logback.qos.ch/manual/appenders.html#AsyncAppender
+		http://blog.takipi.com/how-to-instantly-improve-your-java-logging-with-7-logback-tweaks/
+
+		Always be sure to test different configurations for yourself. Every application has different requirements.
 	-->
 	<appender name="BIP_FRAMEWORK_ASYNC_CONSOLE_APPENDER" class="ch.qos.logback.classic.AsyncAppender">
 		<queueSize>262144</queueSize> <!--default is 256 -->
