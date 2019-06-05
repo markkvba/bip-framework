@@ -199,6 +199,12 @@ public class BipBaseLogger {
 		}
 	}
 
+	/**
+	 * Throw exceptions for invalid conditions.
+	 *
+	 * @param addToThisList the add to this list
+	 * @param maxLength the max length
+	 */
 	private void throwExceptionsForInvalidConditions(final List<String> addToThisList, final int maxLength) {
 		if (addToThisList == null) {
 			throw new IllegalArgumentException("List argument 'addToThisList' for makeToLength(..) must not be null.");
