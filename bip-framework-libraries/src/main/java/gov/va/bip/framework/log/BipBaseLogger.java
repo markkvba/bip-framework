@@ -196,6 +196,13 @@ public class BipBaseLogger {
 		}
 	}
 
+	/**
+	 * Avoid empty additions
+	 * 
+	 * @param addToThisList list of log messages that the original large message is split into
+	 * @param toLength current log message being accumulated so as to not exceed max length
+	 * @return
+	 */
 	private String avoidEmptyAdditions(final List<String> addToThisList, final String toLength) {
 		String stringTobeAdded = toLength;
 		if (!"".equals(stringTobeAdded)) {
@@ -208,8 +215,8 @@ public class BipBaseLogger {
 	/**
 	 * Throw exceptions for invalid conditions.
 	 *
-	 * @param addToThisList the add to this list
-	 * @param maxLength the max length
+	 * @param addToThisList list of log messages that the original large message is split into
+	 * @param maxLength the max length allowed for each split log message
 	 */
 	private void throwExceptionsForInvalidConditions(final List<String> addToThisList, final int maxLength) {
 		if (addToThisList == null) {
