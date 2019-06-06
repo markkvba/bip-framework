@@ -9,7 +9,7 @@
 	<springProperty scope="context" name="app_profile" source="spring.profiles.active" />
 	<springProperty scope="context" name="app_version" source="info.build.version" />
 
-	<appender name="BIP_FRAMEWORK_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="BIP_BASE_CONSOLE_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
 				<timestamp>
@@ -28,6 +28,25 @@
 				</pattern>
 				<threadName />
 				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
+				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
+				<arguments /> <!--or through StructuredArguments -->
+				<stackTrace>
+					<!-- limit the size of stack traces, show root cause first -->
+					<throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+						<maxDepthPerThrowable>30</maxDepthPerThrowable>
+						<maxLength>2048</maxLength>
+						<shortenedClassNameLength>40</shortenedClassNameLength>
+						<rootCauseFirst>true</rootCauseFirst>
+					</throwableConverter>
+				</stackTrace>
+			</providers>
+		</encoder>
+	</appender>
+
+	<appender name="BIP_FRAMEWORK_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
+		<appender-ref ref="BIP_BASE_CONSOLE_ENCODER" />
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
 				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
 					<!--
 					  - Base rules for masking data, apps. Can add more rules via BipMaskRules.addRule(..).
@@ -51,19 +70,7 @@
 						</rule>
 					</rules>
 				</provider>
-				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
-				<arguments /> <!--or through StructuredArguments -->
-				<stackTrace>
-					<!-- limit the size of stack traces, show root cause first -->
-					<throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-						<maxDepthPerThrowable>30</maxDepthPerThrowable>
-						<maxLength>2048</maxLength>
-						<shortenedClassNameLength>40</shortenedClassNameLength>
-						<rootCauseFirst>true</rootCauseFirst>
-					</throwableConverter>
-				</stackTrace>
 			</providers>
-
 		</encoder>
 	</appender>
 

@@ -48,8 +48,6 @@
 							<pattern>\d{13,18}</pattern>
 							<suffix></suffix>
 							<unmasked>4</unmasked>
-							<exclusiveFields></exclusiveFields>
-							<excludeFields></excludeFields>
 						</rule>
 						<rule>
 							<name>SSN</name>
@@ -57,8 +55,6 @@
 							<pattern>\d{3}-?\d{2}-?\d{4}</pattern>
 							<suffix></suffix>
 							<unmasked></unmasked>
-							<exclusiveFields></exclusiveFields>
-							<excludeFields></excludeFields>
 						</rule>
 					</rules>
 				</provider>
