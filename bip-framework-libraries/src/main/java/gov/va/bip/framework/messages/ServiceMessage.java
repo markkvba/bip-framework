@@ -33,7 +33,7 @@ public class ServiceMessage extends AbstractMessage {
 	/** The key */
 	@XmlElement(required = true)
 	@NotNull
-	private String key;
+	private String key = MessageKeys.NO_KEY.getKey();
 
 	/** The message, with values already replaced for any replaceable parameters */
 	private String text;
