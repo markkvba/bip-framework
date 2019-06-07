@@ -45,6 +45,10 @@ Test Library uses Maven and RestTemplate for core API validations. It provides s
 
 `BaseStepDefHandler`: Handler object that extends BaseStepDef to handle rest based API calls. Step definition class reference this class to share state between various step definitions using a Singleton pattern.
 
+#### gov.va.bip.framework.test.selenium:
+
+`BrowserDI`: It's a wrapper for selenium browser that gets injected to all Step definitions. It configures selenium webdriver, setting up all the capabilities and SSL configurations for HTML unit driver.
+
 #### gov.va.bip.framework.test.service:
 
 `RestConfigService`: Loads the configuration file that has all the properties related to reference services.
