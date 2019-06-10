@@ -252,7 +252,9 @@ public class BipBaseLogger {
 				int sequence = 1;
 				for (String toLog : stringsToLog) {
 					MDC.put(SPLIT_MDC_NAME, Integer.toString(sequence) + " of " + maxSequence);
+					sequence++;
 					this.sendLogAtLevel(levelToLogAt, marker, toLog, null);
+					MDC.clear();
 				}
 	}
 
