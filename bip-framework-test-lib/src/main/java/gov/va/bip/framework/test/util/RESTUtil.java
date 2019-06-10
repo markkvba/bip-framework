@@ -94,7 +94,7 @@ public class RESTUtil {
 	/**
 	 * Holds json that represents header info
 	 */
-	protected String jsonText = new String();
+	protected String jsonText = StringUtils.EMPTY;
 
 	/**
 	 * Holds API response object.
@@ -270,9 +270,10 @@ public class RESTUtil {
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
 			final String submitPayloadPath) {
 		try {
-			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
+			final URL urlFilePath = RESTUtil.class.getClassLoader()
+					.getResource(DOCUMENTS_FOLDER_NAME + File.separator + fileName);
 			final URL urlSubmitPayload = RESTUtil.class.getClassLoader()
-					.getResource(PAYLOAD_FOLDER_NAME + "/" + submitPayloadPath);
+					.getResource(PAYLOAD_FOLDER_NAME + File.separator + submitPayloadPath);
 			final File filePath = new File(urlFilePath.toURI());
 			final File filePathSubmitPayload = new File(urlSubmitPayload.toURI());
 			String submitPayload = FileUtils.readFileToString(filePathSubmitPayload, "UTF-8");
@@ -302,7 +303,8 @@ public class RESTUtil {
 	public String postResponseWithMultipart(final String serviceURL, final String fileName,
 			final byte[] submitPayload) {
 		try {
-			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource(DOCUMENTS_FOLDER_NAME + "/" + fileName);
+			final URL urlFilePath = RESTUtil.class.getClassLoader()
+					.getResource(DOCUMENTS_FOLDER_NAME + File.separator + fileName);
 			final File filePath = new File(urlFilePath.toURI());
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 			body.add("file", filePath);
@@ -426,7 +428,8 @@ public class RESTUtil {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private SSLContextBuilder loadTrustMaterial(final String pathToTrustStore, final SSLContextBuilder sslContextBuilder)
+	private SSLContextBuilder loadTrustMaterial(final String pathToTrustStore,
+			final SSLContextBuilder sslContextBuilder)
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		if (StringUtils.isNotBlank(pathToTrustStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
@@ -559,7 +562,8 @@ public class RESTUtil {
 	/**
 	 * Asserts the response status code with the given status code.
 	 *
-	 * @param intStatusCode the int status code
+	 * @param intStatusCode
+	 *            the int status code
 	 */
 	public void validateStatusCode(final int intStatusCode) {
 		assertThat(httpResponseCode, equalTo(intStatusCode));
