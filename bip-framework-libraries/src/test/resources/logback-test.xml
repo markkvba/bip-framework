@@ -22,6 +22,22 @@
 	</root>
 
 	<appender name="JSON_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- Log Masking Filters -->
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="gov.va.bip.framework.log.logback.BipMaskingFilter">
+				<name>credit card</name>
+				<pattern>\d{13,18}</pattern>
+				<unmasked>4</unmasked>
+			</evaluator>
+		</filter>
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="gov.va.bip.framework.log.logback.BipMaskingFilter">
+				<name>SSN</name>
+				<pattern>\d{3}-\d{2}-\d{4}</pattern>
+				<unmasked>4</unmasked>
+			</evaluator>
+		</filter>
+		<!-- JSON encoder -->
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
 				<timestamp>
@@ -34,30 +50,12 @@
 						"logType": "%mdc{logType:-applogs}",
 						"severity": "%level",
 						"class": "%logger{40}",
-						"pid": "${PID:-}"
+						"message": "%msg"
 						}
 					</pattern>
 				</pattern>
 				<threadName />
 				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
-				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
-					<rules>
-						<rule>
-							<name>credit card</name>
-							<prefix></prefix>
-							<pattern>\d{13,18}</pattern>
-							<suffix></suffix>
-							<unmasked>4</unmasked>
-						</rule>
-						<rule>
-							<name>SSN</name>
-							<prefix></prefix>
-							<pattern>\d{3}-?\d{2}-?\d{4}</pattern>
-							<suffix></suffix>
-							<unmasked></unmasked>
-						</rule>
-					</rules>
-				</provider>
 				<logstashMarkers /> <!-- Useful so we can add extra information for specific log lines as Markers -->
 				<arguments /> <!--or through StructuredArguments -->
 				<stackTrace>
