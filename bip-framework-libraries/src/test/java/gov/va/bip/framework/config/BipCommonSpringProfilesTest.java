@@ -90,77 +90,77 @@ public class BipCommonSpringProfilesTest {
 
 	@Test
 	public void profileDefaultTest() throws Exception {
-		assertEquals(TEST_PROFILE_DEFAULT, BipCommonSpringProfiles.PROFILE_DEFAULT);
+		assertEquals(BipCommonSpringProfiles.PROFILE_DEFAULT, TEST_PROFILE_DEFAULT);
 	}
 
 	@Test
 	public void profileLocalIntTest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_LOCAL_INT, BipCommonSpringProfiles.PROFILE_ENV_LOCAL_INT);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_LOCAL_INT, TEST_PROFILE_ENV_LOCAL_INT);
 	}
 
 	@Test
 	public void profileDockerDemoTest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_DOCKER_DEMO, BipCommonSpringProfiles.PROFILE_ENV_DOCKER_DEMO);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_DOCKER_DEMO, TEST_PROFILE_ENV_DOCKER_DEMO);
 	}
 
 	@Test
 	public void profileAwsCITest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_CI, BipCommonSpringProfiles.PROFILE_ENV_CI);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_CI, TEST_PROFILE_ENV_CI);
 	}
 
 	@Test
 	public void profileAwsDevTest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_DEV, BipCommonSpringProfiles.PROFILE_ENV_DEV);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_DEV, TEST_PROFILE_ENV_DEV);
 	}
 
 	@Test
 	public void profileAwsStageTest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_STAGE, BipCommonSpringProfiles.PROFILE_ENV_STAGE);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_STAGE, TEST_PROFILE_ENV_STAGE);
 	}
 
 	@Test
 	public void profileAwsProdTest() throws Exception {
-		assertEquals(TEST_PROFILE_ENV_PROD, BipCommonSpringProfiles.PROFILE_ENV_PROD);
+		assertEquals(BipCommonSpringProfiles.PROFILE_ENV_PROD, TEST_PROFILE_ENV_PROD);
 	}
 
 	@Test
 	public void profileRemoteClientSimulatorsTest() throws Exception {
-		assertEquals(TEST_PROFILE_REMOTE_CLIENT_SIMULATORS, BipCommonSpringProfiles.PROFILE_REMOTE_CLIENT_SIMULATORS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_REMOTE_CLIENT_SIMULATORS, TEST_PROFILE_REMOTE_CLIENT_SIMULATORS);
 	}
 
 	@Test
 	public void profileRemoteClientImplsTest() throws Exception {
-		assertEquals(TEST_PROFILE_REMOTE_CLIENT_IMPLS, BipCommonSpringProfiles.PROFILE_REMOTE_CLIENT_IMPLS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_REMOTE_CLIENT_IMPLS, TEST_PROFILE_REMOTE_CLIENT_IMPLS);
 	}
 
 	@Test
 	public void profileRemoteAuditSimulatorsTest() throws Exception {
-		assertEquals(TEST_PROFILE_REMOTE_AUDIT_SIMULATORS, BipCommonSpringProfiles.PROFILE_REMOTE_AUDIT_SIMULATORS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_REMOTE_AUDIT_SIMULATORS, TEST_PROFILE_REMOTE_AUDIT_SIMULATORS);
 	}
 
 	@Test
 	public void profileRemoteAuditImplsTest() throws Exception {
-		assertEquals(TEST_PROFILE_REMOTE_AUDIT_IMPLS, BipCommonSpringProfiles.PROFILE_REMOTE_AUDIT_IMPLS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_REMOTE_AUDIT_IMPLS, TEST_PROFILE_REMOTE_AUDIT_IMPLS);
 	}
 
 	@Test
 	public void profileUnitTestingTest() throws Exception {
-		assertEquals(TEST_PROFILE_UNIT_TEST, BipCommonSpringProfiles.PROFILE_UNIT_TEST);
+		assertEquals(BipCommonSpringProfiles.PROFILE_UNIT_TEST, TEST_PROFILE_UNIT_TEST);
 	}
 
 	@Test
 	public void profileEmbeddedRedisTest() throws Exception {
-		assertEquals(TEST_PROFILE_EMBEDDED_REDIS, BipCommonSpringProfiles.PROFILE_EMBEDDED_REDIS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_EMBEDDED_REDIS, TEST_PROFILE_EMBEDDED_REDIS);
 	}
 
 	@Test
 	public void profileEmbeddedAwsTest() throws Exception {
-		assertEquals(TEST_PROFILE_EMBEDDED_AWS, BipCommonSpringProfiles.PROFILE_EMBEDDED_AWS);
+		assertEquals(BipCommonSpringProfiles.PROFILE_EMBEDDED_AWS, TEST_PROFILE_EMBEDDED_AWS);
 	}
 
 	@Test
 	public void notProfileEmbeddedAwsTest() throws Exception {
-		assertEquals(TES_NOT_PROFILE_EMBEDDED_AWS, BipCommonSpringProfiles.NOT_PROFILE_EMBEDDED_AWS);
+		assertEquals(BipCommonSpringProfiles.NOT_PROFILE_EMBEDDED_AWS, TES_NOT_PROFILE_EMBEDDED_AWS);
 	}
 
 	@Test

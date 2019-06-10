@@ -137,7 +137,8 @@ public class RESTUtil {
 			LOGGER.info("Request File {}", strRequestFile);
 			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("request/" + strRequestFile);
 			if (urlFilePath == null) {
-				LOGGER.error("Requested File Doesn't Exist: {}", "request/" + strRequestFile);
+				LOGGER.error("Requested File Doesn't Exist: {}{}", "request/", strRequestFile);
+
 				throw new BipTestLibRuntimeException("Requested File Doesn't Exist: request/" + strRequestFile);
 			} else {
 				// Note - Enhance the code so if Header.Accept is xml, then it
@@ -395,7 +396,7 @@ public class RESTUtil {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private SSLContextBuilder loadKeyMaterial(String pathToKeyStore, SSLContextBuilder sslContextBuilder)
+	private SSLContextBuilder loadKeyMaterial(final String pathToKeyStore, final SSLContextBuilder sslContextBuilder)
 			throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException,
 			IOException {
 		if (StringUtils.isNotBlank(pathToKeyStore)) {
@@ -426,7 +427,7 @@ public class RESTUtil {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private SSLContextBuilder loadTrustMaterial(String pathToTrustStore, SSLContextBuilder sslContextBuilder)
+	private SSLContextBuilder loadTrustMaterial(final String pathToTrustStore, final SSLContextBuilder sslContextBuilder)
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		if (StringUtils.isNotBlank(pathToTrustStore)) {
 			String password = RESTConfigService.getInstance().getProperty("javax.net.ssl.trustStorePassword", true);
@@ -520,7 +521,7 @@ public class RESTUtil {
 			LOGGER.info("Response File: {}", filename);
 			final URL urlFilePath = RESTUtil.class.getClassLoader().getResource("response/" + filename);
 			if (urlFilePath == null) {
-				LOGGER.error("Requested File Doesn't Exist: {}", "response/" + filename);
+				LOGGER.error("Requested File Doesn't Exist: {}{}", "response/", filename);
 			} else {
 				final File strFilePath = new File(urlFilePath.toURI());
 				strExpectedResponse = FileUtils.readFileToString(strFilePath, "ASCII");

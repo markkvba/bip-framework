@@ -24,7 +24,7 @@ public class BipConstantsTest {
 
 	@Test
 	public void annotationConstantsTest() throws Exception {
-		assertEquals(UNCHECKED, BipConstants.UNCHECKED);
+		assertEquals(BipConstants.UNCHECKED, UNCHECKED);
 	}
 
 	@Test
