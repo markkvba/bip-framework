@@ -1,4 +1,4 @@
-This page documents the purpose and capabilities of **BIP Framework Libraries** for the services.
+This page documents the purpose and capabilities of _BIP Framework Libraries_ for the services.
 
 # What is this library project for?
 
@@ -42,11 +42,17 @@ For more information about developing applications on the BIP Framework, see [De
 
 # Log Masking
 
-Logback is configured in bip-framework-logback-starter.xml. As the app starts up, logback's `ContextInitializer.configureByResource(..)` method reads the configured `BipMaskingMessageProvider` encoder provider. Logback invokes this custom provider by convention: the tag names and values within the `<provider>` xml declaration are used to infer java class names and properties used by the provider.
+Logback is configured in [`bip-framework-logback-starter.xml`](https://github.com/department-of-veterans-affairs/bip-framework/blob/master/bip-framework-autoconfigure/src/main/resources/gov/va/bip/framework/starter/logger/bip-framework-logback-starter.xml). As the app starts up, logback's `ContextInitializer.configureByResource(..)` method reads the configured `BipMaskingMessageProvider` encoder provider. Logback invokes this custom provider by convention: the tag names and values within the `<provider>` xml declaration are used to infer java class names and properties used by the provider.
+
+The framework uses masking rules to provide default masking for the `BIP_FRAMEWORK_ASYNC_CONSOLE_APPENDER`. See the [_Logger_](#logger) sequence diagram below.
+
+For additional log masking definitions within services, framework provides the `BipMaskingFilter` class. This class can be referenced to declare masking s a logback filter.
+
+See [Log and Audit Management](https://github.com/department-of-veterans-affairs/bip-reference-person/blob/master/docs/log-audit-management.md) for more information.
 
 # Sequence Diagrams
 
-## **Audit**
+## _Audit_
 
 ### _@Auditable_
 
@@ -64,17 +70,17 @@ Logback is configured in bip-framework-logback-starter.xml. As the app starts up
 
 ![](/images/sd-lib-audit-logserializer.png)
 
-## **Logger**
+## _Logger_
 
 ![](/images/sd-lib-log.png)
 
-## **JWT Token Generator**
+## _JWT Token Generator_
 
 ![](/images/sd-lib-security-jwt-generator.png)
 
 # Class Diagrams
 
-## **Aspects, Join Points and Pointcuts**
+## _Aspects, Join Points and Pointcuts_
 
 ```
 gov.va.bip.framework.aspect
@@ -84,7 +90,7 @@ gov.va.bip.framework.service.aspect
 
 ![](/images/cd-lib-aspect.png)
 
-## **Audit**
+## _Audit_
 
 ```
 gov.va.bip.framework.audit
@@ -95,7 +101,7 @@ gov.va.bip.framework.audit.model
 
 ![](/images/cd-lib-audit.png)
 
-## **Cache**
+## _Cache_
 
 ```
 gov.va.bip.framework.cache
@@ -104,7 +110,7 @@ gov.va.bip.framework.cache.interceptor
 
 ![](/images/cd-lib-cache.png)
 
-## **Client**
+## _Client_
 
 ### _REST Client_
 
@@ -125,7 +131,7 @@ gov.va.bip.framework.client.ws.remote
 
 ![](/images/cd-lib-client-ws.png)
 
-## **Config**
+## _Config_
 
 ```
 gov.va.bip.framework.config
@@ -133,7 +139,7 @@ gov.va.bip.framework.config
 
 ![](/images/cd-lib-config.png)
 
-## **Exception**
+## _Exception_
 
 ```
 gov.va.bip.framework.exception
@@ -145,7 +151,7 @@ gov.va.bip.framework.service
 
 ![](/images/cd-lib-exception.png)
 
-## **Logging**
+## _Logging_
 
 ```
 gov.va.bip.framework.log
@@ -153,7 +159,7 @@ gov.va.bip.framework.log
 
 ![](/images/cd-lib-log.png)
 
-## **Messages**
+## _Messages_
 
 ```
 gov.va.bip.framework.messages
@@ -161,7 +167,7 @@ gov.va.bip.framework.messages
 
 ![](/images/cd-lib-messages.png)
 
-## **Rest**
+## _Rest_
 
 ```
 gov.va.bip.framework.rest.exception
@@ -171,7 +177,7 @@ gov.va.bip.framework.rest.aspect
 
 ![](/images/cd-lib-rest.png)
 
-## **Security**
+## _Security_
 
 ```
 gov.va.bip.framework.security
@@ -181,7 +187,7 @@ gov.va.bip.framework.security.util
 
 ![](/images/cd-lib-security.png)
 
-## **Security JWT**
+## _Security JWT_
 
 ```
 gov.va.bip.framework.security.jwt
@@ -190,7 +196,7 @@ gov.va.bip.framework.security.jwt.correlation
 
 ![](/images/cd-lib-security-jwt.png)
 
-## **Service**
+## _Service_
 
 ```
 gov.va.bip.framework.service
@@ -199,7 +205,7 @@ gov.va.bip.framework.service.spect
 
 ![](/images/cd-lib-service.png)
 
-## **Swagger**
+## _Swagger_
 
 ```
 gov.va.bip.framework.swagger
@@ -207,7 +213,7 @@ gov.va.bip.framework.swagger
 
 ![](/images/cd-lib-swagger.png)
 
-## **Transfer**
+## _Transfer_
 
 ```
 gov.va.bip.framework.transfer
@@ -217,7 +223,7 @@ gov.va.bip.framework.transfer.transform
 
 ![](/images/cd-lib-transfer.png)
 
-## **Validation**
+## _Validation_
 
 ```
 gov.va.bip.framework.validation
