@@ -10,25 +10,9 @@
 	<springProperty scope="context" name="app_version" source="info.build.version" />
 
 	<appender name="BIP_FRAMEWORK_CONSOLE_LOG_ENCODER" class="ch.qos.logback.core.ConsoleAppender">
-		<!-- Log Masking Filters -->
-		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-			<evaluator class="gov.va.bip.framework.log.logback.BipMaskingFilter">
-				<name>credit card</name>
-				<pattern>\d{13,18}</pattern>
-				<unmasked>4</unmasked>
-			</evaluator>
-		</filter>
-		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-			<evaluator class="gov.va.bip.framework.log.logback.BipMaskingFilter">
-				<name>SSN</name>
-				<pattern>\d{3}-\d{2}-\d{4}</pattern>
-				<unmasked>4</unmasked>
-			</evaluator>
-		</filter>
 		<!-- JSON encoder -->
 		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
-
 				<timestamp>
 					<timeZone>UTC</timeZone>
 				</timestamp>
