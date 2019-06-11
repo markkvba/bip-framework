@@ -26,29 +26,49 @@ public class SwaggerResponseMessagesTest {
 			+ "Response will contain \"messages\" element with additional information on the error. Please retry. "
 			+ "If problem persists, please contact support with a copy of the Response.";
 
+	public static String getResponse200Message() {
+		return RESPONSE_200_MESSAGE;
+	}
+
+	public static String getResponse400Message() {
+		return RESPONSE_400_MESSAGE;
+	}
+
+	public static String getResponse401Message() {
+		return RESPONSE_401_MESSAGE;
+	}
+
+	public static String getResponse403Message() {
+		return RESPONSE_403_MESSAGE;
+	}
+
+	public static String getResponse500Message() {
+		return RESPONSE_500_MESSAGE;
+	}
+
 	@Test
 	public void response200MessageTextTest() throws Exception {
-		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_200, RESPONSE_200_MESSAGE);
+		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_200, getResponse200Message());
 	}
 
 	@Test
 	public void response401MessageTextTest() throws Exception {
-		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_401, RESPONSE_401_MESSAGE);
+		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_401, getResponse401Message());
 	}
 
 	@Test
 	public void response403MessageTextTest() throws Exception {
-		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_403, RESPONSE_403_MESSAGE);
+		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_403, getResponse403Message());
 	}
 
 	@Test
 	public void response400MessageTextTest() throws Exception {
-		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_400, RESPONSE_400_MESSAGE);
+		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_400, getResponse400Message());
 	}
 
 	@Test
 	public void response500MessageTextTest() throws Exception {
-		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_500, RESPONSE_500_MESSAGE);
+		Assert.assertEquals(SwaggerResponseMessages.MESSAGE_500, getResponse500Message());
 	}
 
 }

@@ -54,7 +54,7 @@ public class RequestResponseLoggingInterceptor implements ClientHttpRequestInter
 		LOGGER.debug("URI         : {}", request.getURI());
 		LOGGER.debug("Method      : {}", request.getMethod());
 		LOGGER.debug("Headers     : {}", request.getHeaders());
-		if (body != null) {
+		if ((body != null) && LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Request body: {}", new String(body, Charset.defaultCharset()));
 		}
 		LOGGER.debug("==========================request end================================================");
@@ -72,7 +72,7 @@ public class RequestResponseLoggingInterceptor implements ClientHttpRequestInter
 		LOGGER.debug("Status code  : {}", response.getStatusCode());
 		LOGGER.debug("Status text  : {}", response.getStatusText());
 		LOGGER.debug("Headers      : {}", response.getHeaders());
-		if (response.getBody() != null) {
+		if ((response.getBody() != null) && LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Response body: {}", StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
 		}
 		LOGGER.debug("=======================response end=================================================");

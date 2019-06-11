@@ -97,11 +97,6 @@ public class RESTUtil {
 	protected String jsonText = StringUtils.EMPTY;
 
 	/**
-	 * Holds API response object.
-	 */
-	private ResponseEntity<String> response = null;
-
-	/**
 	 * API response status code
 	 */
 	private int httpResponseCode;
@@ -242,7 +237,7 @@ public class RESTUtil {
 	 */
 	private String executeAPI(final String serviceURL, final HttpEntity<?> request, final HttpMethod httpMethod) {
 		try {
-			response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
+			ResponseEntity<String> response = restTemplate.exchange(serviceURL, httpMethod, request, String.class);
 			httpResponseCode = response.getStatusCodeValue();
 			responseHttpHeaders = response.getHeaders();
 			return response.getBody();
