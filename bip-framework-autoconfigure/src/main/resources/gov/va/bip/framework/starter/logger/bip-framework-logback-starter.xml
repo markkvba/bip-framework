@@ -41,10 +41,34 @@
 						<rootCauseFirst>true</rootCauseFirst>
 					</throwableConverter>
 				</stackTrace>
+
+				<provider class="gov.va.bip.framework.log.logback.BipMaskingMessageProvider">
+					<!--
+					  - Base rules for masking data, apps. Can add more rules via BipMaskRules.addRule(..).
+					  - By default, all fields are subject to each defined <rule>.
+					-->
+					<rules>
+						<!-- A rule is embodied in BipMaskRule -->
+						<rule>
+							<name>credit card</name>
+							<prefix></prefix>
+							<pattern>\d{13,18}</pattern>
+							<suffix></suffix>
+							<unmasked>4</unmasked>
+						</rule>
+						<rule>
+							<name>SSN</name>
+							<prefix></prefix>
+							<pattern>\d{3}-?\d{2}-?\d{4}</pattern>
+							<suffix></suffix>
+							<unmasked>4</unmasked>
+						</rule>
+					</rules>
+				</provider>
 			</providers>
 		</encoder>
 	</appender>
-	
+
 	<!--
 	  Async appenders can drastically speed up logging as well as your application's response time but with some potential drawbacks. 
 	  Read more at. 
