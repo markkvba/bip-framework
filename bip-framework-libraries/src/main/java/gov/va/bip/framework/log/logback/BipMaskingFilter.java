@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.springframework.http.HttpStatus;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -72,6 +73,10 @@ public class BipMaskingFilter extends EventEvaluatorBase<ILoggingEvent> {
 	/**
 	 * Construct a logback filter that masks the log message and any message arguments based on regular expression matches.
 	 * <p>
+	 * <b>Do not instantiate filters that already exist in the logback config xml file(s).</b>
+	 * Filters must have unique names, and the {@link EventEvaluatorBase#setName(String)} method can only be called one time.
+	 * When attempting to set the name again, logback will fail the filter and ignore it.
+	 * <p>
 	 * As a side note, logging cannot be used in filter constructors because
 	 * logback has not completed initializing the logging ecosystem.
 	 *
@@ -82,7 +87,14 @@ public class BipMaskingFilter extends EventEvaluatorBase<ILoggingEvent> {
 	 * @param unmasked - the masked value will leave these characters at the end of the value unmasked
 	 */
 	public BipMaskingFilter(String name, String prefix, String suffix, String pattern, int unmasked) {
-		super.setName(name);
+		/*
+		 * logback allows name to only be set one time,
+		 * so if this is called from the default constructor during logback initialization
+		 * we must let logback give it the name from its filter config later in the init phase.
+		 */
+		if (StringUtils.isNotBlank(name)) {
+			super.setName(name);
+		}
 		this.prefix = prefix;
 		this.suffix = suffix;
 		this.pattern = pattern;
@@ -312,45 +324,10 @@ public class BipMaskingFilter extends EventEvaluatorBase<ILoggingEvent> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof BipMaskingFilter)) {
-			return false;
-		}
-		BipMaskingFilter other = (BipMaskingFilter) obj;
-		if (super.getName() == null) {
-			if (other.getName() != null) {
-				return false;
-			}
-		} else if (!super.getName().equals(other.getName())) {
-			return false;
-		}
-		if (pattern == null) {
-			if (other.getPattern() != null) {
-				return false;
-			}
-		} else if (!pattern.equals(other.getPattern())) {
-			return false;
-		}
-		if (prefix == null) {
-			if (other.getPrefix() != null) {
-				return false;
-			}
-		} else if (!prefix.equals(other.getPrefix())) {
-			return false;
-		}
-		if (suffix == null) {
-			if (other.getSuffix() != null) {
-				return false;
-			}
-		} else if (!suffix.equals(other.getSuffix())) {
-			return false;
-		}
-		return (unmasked == other.getUnmasked());
+		// superclass must be included to include "name" field, so must also exclude super's "started" field
+		// reflectUpToClass arg is not inclusive, so must be set to the super.superclass
+		return EqualsBuilder.reflectionEquals(this, obj, false, super.getClass().getSuperclass(),
+				"started", "EMPTY", "LOGGER", "bracesPattern", "maskPattern");
 	}
 
 	/*

@@ -8,44 +8,56 @@ import java.lang.reflect.Field;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.boolex.EvaluationException;
 
+@RunWith(SpringRunner.class)
 public class BipMaskingFilterTest {
+
+	Logger logger = LoggerFactory.getLogger(BipMaskingFilterTest.class);
 
 	@Rule
 	public OutputCapture capture = new OutputCapture();
 
 	@Test
-	public final void testEvaluate() {
-		capture.reset();
-
+	public final void testEvaluate_NoMasking() {
 		String msg = "TEST simple message";
-		Logger logger = LoggerFactory.getLogger(BipMaskingFilter.class);
 		logger.error(msg);
 		String log = capture.toString();
 		assertTrue(log.contains(msg));
+	}
 
-		capture.reset();
-
-		msg = "Test SSN 123-45-6789 value";
+	@Test
+	public final void testEvaluate_MaskNumber() {
+		String msg = "Test credit card 12345678901234 value";
 		logger.error(msg);
-		log = capture.toString();
-		assertTrue(log.contains("Test SSN *******6789 value"));
-
-		capture.reset();
-
-		msg = "Test credit card 12345678901234 value";
-		logger.error(msg);
-		log = capture.toString();
+		String log = capture.toString();
 		assertTrue(log.contains("Test credit card **********1234 value"));
+	}
+
+	@Test
+	public final void testEvaluate_SsnAndFileNumber() {
+		String msg = "Test SSN 123-45-6789 value";
+		logger.error(msg);
+		String log = capture.toString();
+		assertTrue(log.contains("Test SSN *******6789 value"));
+	}
+
+	@Test
+	public final void testEvaluate_FilterPattern() {
+		String msg = "Test sample filter 123-456 value";
+		logger.error(msg);
+		String log = capture.toString();
+		assertTrue(log.contains("Test sample filter ****456 value"));
 	}
 
 	@Test
@@ -127,6 +139,13 @@ public class BipMaskingFilterTest {
 
 		name.set(testFilter, "TEST");
 		assertTrue(testFilter.hashCode() != 0);
+		System.out.println("superclass: testFilter=" + testFilter.getClass().getSuperclass().getName() + "; otherFilter="
+				+ otherFilter.getClass().getSuperclass().getName());
+		System.out.println(
+				"super.superclass: testFilter=" + testFilter.getClass().getSuperclass().getSuperclass().getName() + "; otherFilter="
+						+ otherFilter.getClass().getSuperclass().getSuperclass().getName());
+		System.out.println("name fields :: testFilter=" + testFilter.getName() + "; otherFilter=" + otherFilter.getName());
+		System.out.println("Does testFilter name = otherFilter name: " + testFilter.equals(otherFilter));
 		assertFalse(testFilter.equals(otherFilter));
 		name.set(otherFilter, "TEST");
 		assertTrue(testFilter.hashCode() != 0);

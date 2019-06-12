@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.logstash.logback.encoder.org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  * A Logback rule with definition, to mask sensitive information in logs.
  * <p>
@@ -294,45 +296,9 @@ public class BipMaskRule {
 		 */
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof Definition)) {
-				return false;
-			}
-			Definition other = (Definition) obj;
-			if (name == null) {
-				if (other.name != null) {
-					return false;
-				}
-			} else if (!name.equals(other.name)) {
-				return false;
-			}
-			if (pattern == null) {
-				if (other.pattern != null) {
-					return false;
-				}
-			} else if (!pattern.equals(other.pattern)) {
-				return false;
-			}
-			if (prefix == null) {
-				if (other.prefix != null) {
-					return false;
-				}
-			} else if (!prefix.equals(other.prefix)) {
-				return false;
-			}
-			if (suffix == null) {
-				if (other.suffix != null) {
-					return false;
-				}
-			} else if (!suffix.equals(other.suffix)) {
-				return false;
-			}
-			return (unmasked == other.getUnmasked());
+			// reflectUpToClass arg is not inclusive, so must be set to the superclass
+			return EqualsBuilder.reflectionEquals(this, obj, false, super.getClass(),
+					new String[] { "definition", "bracesPattern", "maskPattern" });
 		}
 	}
 }
