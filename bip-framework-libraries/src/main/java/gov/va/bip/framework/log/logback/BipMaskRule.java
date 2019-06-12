@@ -332,10 +332,7 @@ public class BipMaskRule {
 			} else if (!suffix.equals(other.suffix)) {
 				return false;
 			}
-			if (unmasked != other.unmasked) {
-				return false;
-			}
-			return true;
+			return (unmasked == other.getUnmasked());
 		}
 	}
 }

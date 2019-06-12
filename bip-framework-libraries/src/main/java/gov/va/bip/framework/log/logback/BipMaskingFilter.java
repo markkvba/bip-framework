@@ -51,7 +51,7 @@ public class BipMaskingFilter extends EventEvaluatorBase<ILoggingEvent> {
 	Pattern maskPattern;
 
 	/** Compiled pattern used to remove braces from a string */
-	transient Pattern bracesPattern = Pattern.compile("[{}]+");
+	Pattern bracesPattern = Pattern.compile("[{}]+");
 
 	/* ***************************** CONSTRUCTORS ***************************** */
 
@@ -350,10 +350,7 @@ public class BipMaskingFilter extends EventEvaluatorBase<ILoggingEvent> {
 		} else if (!suffix.equals(other.getSuffix())) {
 			return false;
 		}
-		if (unmasked != other.getUnmasked()) {
-			return false;
-		}
-		return true;
+		return (unmasked == other.getUnmasked());
 	}
 
 	/*
