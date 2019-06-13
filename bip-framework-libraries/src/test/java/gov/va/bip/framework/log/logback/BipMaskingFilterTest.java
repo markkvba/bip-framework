@@ -96,31 +96,6 @@ public class BipMaskingFilterTest {
 		}
 	}
 
-//	@Test
-//	public final void testUpdateMessage() {
-//		BipMaskingFilter testFilter = new BipMaskingFilter();
-//		LoggingEvent event = new LoggingEvent();
-//
-//		// throw bogus exception
-////		BipMaskingFilter spiedFilter = Mockito.spy(testFilter);
-//		Object spiedObj = Mockito.spy(testFilter);
-////		Mockito.doThrow(new RuntimeException("Intentionally thrown")).when(spiedFilter).getClass();
-//		when((spiedObj).getClass()).thenThrow(new RuntimeException("Intentionally thrown"));
-//
-//		try {
-//			((BipMaskingFilter) spiedObj).updateMessage(event, "TEST");
-//			fail("Should have thrown exception");
-//		} catch (Exception e) {
-//			assertTrue(BipRuntimeException.class.equals(e.getClass()));
-//			assertTrue("Intentionally thrown".equals(e.getCause().getMessage()));
-//		}
-//	}
-
-//	@Test
-//	public final void testUpdateArgs() {
-//
-//	}
-
 	@Test
 	public final void testHashCodeAndEqualsAndEtters()
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -139,13 +114,7 @@ public class BipMaskingFilterTest {
 
 		name.set(testFilter, "TEST");
 		assertTrue(testFilter.hashCode() != 0);
-		System.out.println("superclass: testFilter=" + testFilter.getClass().getSuperclass().getName() + "; otherFilter="
-				+ otherFilter.getClass().getSuperclass().getName());
-		System.out.println(
-				"super.superclass: testFilter=" + testFilter.getClass().getSuperclass().getSuperclass().getName() + "; otherFilter="
-						+ otherFilter.getClass().getSuperclass().getSuperclass().getName());
-		System.out.println("name fields :: testFilter=" + testFilter.getName() + "; otherFilter=" + otherFilter.getName());
-		System.out.println("Does testFilter name = otherFilter name: " + testFilter.equals(otherFilter));
+
 		assertFalse(testFilter.equals(otherFilter));
 		name.set(otherFilter, "TEST");
 		assertTrue(testFilter.hashCode() != 0);

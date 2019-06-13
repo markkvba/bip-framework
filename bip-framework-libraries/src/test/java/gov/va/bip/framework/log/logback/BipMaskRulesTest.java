@@ -25,14 +25,6 @@ public class BipMaskRulesTest {
 		BipMaskRule.Definition testDef = new BipMaskRule.Definition();
 		BipMaskRule.Definition otherDef = new BipMaskRule.Definition();
 
-		System.out.println((testDef.getClass().equals(otherDef.getClass()) ? " " : "X")
-				+ " :: testDef.getClass(): " + testDef.getClass().getName() + "; otherDef.getClass()" + otherDef.getClass().getName());
-		System.out.println((testDef.hashCode() == otherDef.hashCode() ? " " : "X") + " :: testDef.hashCode()=" + testDef.hashCode()
-				+ "; otherDef.hashCode()=" + otherDef.hashCode());
-		System.out.println((testDef.toString().equals(otherDef.toString()) ? " " : "X") + " :: testDef.toString()="
-				+ testDef.toString() + "; otherDef.toString()=" + otherDef.toString());
-		System.out.println((testDef.equals(otherDef) ? " " : "X") + " :: testDef.equals(otherDef)");
-
 		assertTrue(testDef.hashCode() != 0);
 		assertTrue(testDef.equals(testDef));
 		assertFalse(testDef.equals(null));
