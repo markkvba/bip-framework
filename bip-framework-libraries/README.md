@@ -46,7 +46,9 @@ Logback is configured in [`bip-framework-logback-starter.xml`](https://github.co
 
 The framework uses masking rules to provide default masking for the `BIP_FRAMEWORK_ASYNC_CONSOLE_APPENDER`. See the [_Logger_](#logger) sequence diagram below.
 
-For additional log masking definitions within services, framework provides the `BipMaskingFilter` class. This class can be referenced to declare masking s a logback filter.
+Additional log masking definitions can be declared within services with the `BipMaskingFilter` class. This class can be referenced to declare masking in a logback filter.
+
+If declarative masking in logback config is not sufficient for specific data, developers can manually mask data with methods from `MaskUtils`.
 
 See [Log and Audit Management](https://github.com/department-of-veterans-affairs/bip-reference-person/blob/master/docs/log-audit-management.md) for more information.
 
