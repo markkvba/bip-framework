@@ -30,13 +30,13 @@ public class BipExceptionTest {
 		BipException bipException =
 				new BipException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST,
 						new Exception("wrapped message"), params);
-		assertTrue(bipException.getKey().equals(TEST_KEY.getKey()));
+		assertTrue(bipException.getExceptionInfo().getKey().equals(TEST_KEY.getKey()));
 		assertTrue(bipException.getMessage().equals(TEST_KEY.getKey()));
-		assertTrue(bipException.getSeverity().equals(MessageSeverity.ERROR));
-		assertTrue(bipException.getParams().equals(params));
-		assertTrue(bipException.getStatus().equals(HttpStatus.BAD_REQUEST));
+		assertTrue(bipException.getExceptionInfo().getSeverity().equals(MessageSeverity.ERROR));
+		assertTrue(bipException.getExceptionInfo().getParams().equals(params));
+		assertTrue(bipException.getExceptionInfo().getStatus().equals(HttpStatus.BAD_REQUEST));
 		System.setProperty("server.name", TEST_VALUE);
-		assertTrue(bipException.getServerName().equals(System.getProperty("server.name")));
+		assertTrue(bipException.getExceptionInfo().getServerName().equals(System.getProperty("server.name")));
 	}
 
 }
