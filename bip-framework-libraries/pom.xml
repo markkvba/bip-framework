@@ -147,12 +147,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<dependency>
-	      <groupId>io.springfox</groupId>
-	      <artifactId>springfox-swagger2</artifactId>
-	      <version>${springfox.version}</version>
-	    </dependency>
-
 		<!-- -YamlDependency -->
 		<dependency>
 			<groupId>org.yaml</groupId>

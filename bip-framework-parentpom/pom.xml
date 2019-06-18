@@ -96,7 +96,6 @@
 		<swagger-ui.version>3.22.1</swagger-ui.version>
 		<openapi.codegen.version>3.3.4</openapi.codegen.version>
 		<google.codereplacer.version>1.5.3</google.codereplacer.version>
-		<springfox.version>2.9.2</springfox.version>
 		<fest-assert.version>2.0M10</fest-assert.version>
 		<commons-io.version>2.6</commons-io.version>
 		<commons-lang3.version>3.8.1</commons-lang3.version>
@@ -838,14 +837,19 @@
 		<profile>
 			<id>org-openapitools-codegen-parent</id>
 			<activation>
-				<file><!-- Existence of API YML file to activate the profile -->
+				<!-- Profile is activated if openapi.yml exists  -->
+				<file>
+					<!--
+						This path is also used in the framework parentpom.
+						If this path changes, framework must also be updated.
+					-->
 					<exists>${basedir}/src/main/resources/openapi/openapi.yml</exists>
 				</file>
 			</activation>
 			<build>
 				<plugins>
+					<!-- Download and unpack swagger-ui web jar -->
 					<plugin>
-						<!-- Download Swagger UI webjar. -->
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
@@ -869,6 +873,7 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!-- Generate the swagger ui from application yaml spec -->
 					<plugin>
 						<groupId>org.openapitools</groupId>
 						<artifactId>openapi-generator-maven-plugin</artifactId>
@@ -915,6 +920,7 @@
 							</replacements>
 						</configuration>
 					</plugin>
+					<!-- Move generated artifacts to their final location -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
@@ -940,6 +946,7 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!-- Add generated source directory for eclipse -->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>build-helper-maven-plugin</artifactId>
