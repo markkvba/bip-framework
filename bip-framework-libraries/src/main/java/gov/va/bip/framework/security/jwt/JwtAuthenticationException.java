@@ -54,6 +54,12 @@ public class JwtAuthenticationException extends AuthenticationException implemen
 		exceptionData = new BipExceptionData(key, severity, status, params);
 	}
 
+	/**
+	 * Returns the BIP Exception Data.
+	 *
+	 * @return the exception data
+	 * @see BipExceptionData
+	 */
 	@Override
 	public BipExceptionData getExceptionData() {
 		return exceptionData;

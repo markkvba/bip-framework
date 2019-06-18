@@ -8,7 +8,7 @@ import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageSeverity;
 
 /**
- * A Class to hold relevant information about an exception in the Bip framework.
+ * A Class to hold relevant information about an exception in the BIP framework.
  * 
  * Implied private properties are:
  * 
