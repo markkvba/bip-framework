@@ -21,7 +21,7 @@ import gov.va.bip.framework.messages.MessageSeverity;
  * <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>
  * </ul>
  */
-public class BipExceptionInfo implements Serializable {
+public class BipExceptionData implements Serializable {
 
 	/**
 	 * SerialVersionUID
@@ -37,7 +37,7 @@ public class BipExceptionInfo implements Serializable {
 	/** The best-fit HTTP Status, see <a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a> */
 	private final HttpStatus status;
 
-	public BipExceptionInfo(final MessageKey key, final MessageSeverity severity, final HttpStatus status, final String... params) {
+	public BipExceptionData(final MessageKey key, final MessageSeverity severity, final HttpStatus status, final String... params) {
 		this.key = key;
 		this.params = params;
 		this.severity = severity;

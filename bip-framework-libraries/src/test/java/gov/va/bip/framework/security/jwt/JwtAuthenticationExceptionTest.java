@@ -45,14 +45,14 @@ public class JwtAuthenticationExceptionTest {
 		JwtAuthenticationException exception =
 				new JwtAuthenticationException(TEST_KEY, MessageSeverity.ERROR, HttpStatus.BAD_REQUEST, new Throwable(), PARAMS);
 
-		assertTrue(exception.getExceptionInfo().getKey().equals(TEST_KEY.getKey()));
-		assertTrue(exception.getExceptionInfo().getMessageKey().equals(TEST_KEY));
-		assertTrue(exception.getExceptionInfo().getStatus().equals(HttpStatus.BAD_REQUEST));
-		assertTrue(exception.getExceptionInfo().getSeverity().equals(MessageSeverity.ERROR));
+		assertTrue(exception.getExceptionData().getKey().equals(TEST_KEY.getKey()));
+		assertTrue(exception.getExceptionData().getMessageKey().equals(TEST_KEY));
+		assertTrue(exception.getExceptionData().getStatus().equals(HttpStatus.BAD_REQUEST));
+		assertTrue(exception.getExceptionData().getSeverity().equals(MessageSeverity.ERROR));
 
-		assertEquals(2, exception.getExceptionInfo().getParams().length);
-		assertTrue(exception.getExceptionInfo().getParams()[0].equals(PARAMS[0]));
-		assertTrue(exception.getExceptionInfo().getParams()[1].equals(PARAMS[1]));
+		assertEquals(2, exception.getExceptionData().getParams().length);
+		assertTrue(exception.getExceptionData().getParams()[0].equals(PARAMS[0]));
+		assertTrue(exception.getExceptionData().getParams()[1].equals(PARAMS[1]));
 
 
 	}

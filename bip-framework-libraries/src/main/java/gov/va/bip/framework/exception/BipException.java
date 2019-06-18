@@ -20,8 +20,8 @@ import gov.va.bip.framework.messages.MessageSeverity;
 public class BipException extends Exception implements BipExceptionExtender {
 	private static final long serialVersionUID = 4717771104509731434L;
 
-	/** The {@link BipExceptionInfo} object*/
-	private final BipExceptionInfo exceptionInfo;
+	/** The {@link BipExceptionData} object*/
+	private final BipExceptionData exceptionData;
 
 	/**
 	 * Constructs a new <b>checked</b> Exception with the specified detail key, message, severity, and status.
@@ -57,11 +57,11 @@ public class BipException extends Exception implements BipExceptionExtender {
 	public BipException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, final String... params) {
 		super((key == null ? MessageKeys.NO_KEY.toString() : key.getMessage(params)), cause);
-		this.exceptionInfo = new BipExceptionInfo(key, severity, status, params);
+		this.exceptionData = new BipExceptionData(key, severity, status, params);
 	}
 
 	@Override
-	public BipExceptionInfo getExceptionInfo() {
-		return exceptionInfo;
+	public BipExceptionData getExceptionData() {
+		return exceptionData;
 	}
 }

@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 
 import gov.va.bip.framework.exception.BipExceptionExtender;
-import gov.va.bip.framework.exception.BipExceptionInfo;
+import gov.va.bip.framework.exception.BipExceptionData;
 import gov.va.bip.framework.messages.MessageKey;
 import gov.va.bip.framework.messages.MessageKeys;
 import gov.va.bip.framework.messages.MessageSeverity;
@@ -15,8 +15,8 @@ import gov.va.bip.framework.messages.MessageSeverity;
 public class JwtAuthenticationException extends AuthenticationException implements BipExceptionExtender {
 	private static final long serialVersionUID = 7005295148966720986L;
 
-	/** The {@link BipExceptionInfo} object*/
-	private final BipExceptionInfo exceptionInfo;
+	/** The {@link BipExceptionData} object*/
+	private final BipExceptionData exceptionData;
 
 	/**
 	 * Constructs a new RuntimeException with the specified detail key, message, severity, and status.
@@ -51,12 +51,12 @@ public class JwtAuthenticationException extends AuthenticationException implemen
 	public JwtAuthenticationException(final MessageKey key, final MessageSeverity severity, final HttpStatus status,
 			final Throwable cause, final String... params) {
 		super((key == null ? MessageKeys.NO_KEY.toString() : key.getMessage(params)), cause);
-		exceptionInfo = new BipExceptionInfo(key, severity, status, params);
+		exceptionData = new BipExceptionData(key, severity, status, params);
 	}
 
 	@Override
-	public BipExceptionInfo getExceptionInfo() {
-		return exceptionInfo;
+	public BipExceptionData getExceptionData() {
+		return exceptionData;
 	}
 
 }

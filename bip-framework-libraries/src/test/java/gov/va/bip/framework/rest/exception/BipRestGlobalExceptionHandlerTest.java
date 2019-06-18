@@ -62,7 +62,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import gov.va.bip.framework.AbstractBaseLogTester;
-import gov.va.bip.framework.exception.BipExceptionInfo;
+import gov.va.bip.framework.exception.BipExceptionData;
 import gov.va.bip.framework.exception.BipPartnerException;
 import gov.va.bip.framework.exception.BipPartnerRuntimeException;
 import gov.va.bip.framework.exception.BipRuntimeException;
@@ -479,8 +479,8 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 		BipRuntimeException ex = new BipRuntimeException(MessageKeys.NO_KEY, MessageSeverity.DEBUG, HttpStatus.BAD_REQUEST);
 		Field exceptionInfo = ex.getClass().getDeclaredField("exceptionInfo");
 		exceptionInfo.setAccessible(true);
-		exceptionInfo.set(ex, new BipExceptionInfo((MessageKey) null, ((BipExceptionInfo) exceptionInfo.get(ex)).getSeverity(),
-				((BipExceptionInfo) exceptionInfo.get(ex)).getStatus(), ((BipExceptionInfo) exceptionInfo.get(ex)).getParams()));
+		exceptionInfo.set(ex, new BipExceptionData((MessageKey) null, ((BipExceptionData) exceptionInfo.get(ex)).getSeverity(),
+				((BipExceptionData) exceptionInfo.get(ex)).getStatus(), ((BipExceptionData) exceptionInfo.get(ex)).getParams()));
 
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "standardHandler", ex, HttpStatus.BAD_REQUEST);

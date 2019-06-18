@@ -28,10 +28,10 @@ package gov.va.bip.framework.exception;
 public interface BipExceptionExtender {
 
 	/**
-	 * Getter for {@link BipExceptionInfo} object
+	 * Getter for {@link BipExceptionData} object
 	 * 
-	 * @return the {@link BipExceptionInfo} object
+	 * @return the {@link BipExceptionData} object
 	 */
-	public BipExceptionInfo getExceptionInfo();
+	public BipExceptionData getExceptionData();
 
 }
