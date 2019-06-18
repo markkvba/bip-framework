@@ -149,7 +149,7 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void logInfoTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
+	InvocationTargetException {
 		Method logMethod = bipRestGlobalExceptionHandler.getClass().getDeclaredMethod("log", Exception.class, MessageKey.class,
 				MessageSeverity.class, HttpStatus.class, String[].class);
 		logMethod.setAccessible(true);
@@ -165,7 +165,7 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void logDebugTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
+	InvocationTargetException {
 		Method logMethod = bipRestGlobalExceptionHandler.getClass().getDeclaredMethod("log", Exception.class, MessageKey.class,
 				MessageSeverity.class, HttpStatus.class, String[].class);
 		logMethod.setAccessible(true);
@@ -181,7 +181,7 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void logWarnTest() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
+	InvocationTargetException {
 		Method logMethod = bipRestGlobalExceptionHandler.getClass().getDeclaredMethod("log", Exception.class, MessageKey.class,
 				MessageSeverity.class, HttpStatus.class, String[].class);
 		logMethod.setAccessible(true);
@@ -477,10 +477,10 @@ public class BipRestGlobalExceptionHandlerTest extends AbstractBaseLogTester {
 	public void standardHandlerWithNullMessagekeyTest()
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		BipRuntimeException ex = new BipRuntimeException(MessageKeys.NO_KEY, MessageSeverity.DEBUG, HttpStatus.BAD_REQUEST);
-		Field exceptionInfo = ex.getClass().getDeclaredField("exceptionInfo");
-		exceptionInfo.setAccessible(true);
-		exceptionInfo.set(ex, new BipExceptionData((MessageKey) null, ((BipExceptionData) exceptionInfo.get(ex)).getSeverity(),
-				((BipExceptionData) exceptionInfo.get(ex)).getStatus(), ((BipExceptionData) exceptionInfo.get(ex)).getParams()));
+		Field exceptionData = ex.getClass().getDeclaredField("exceptionData");
+		exceptionData.setAccessible(true);
+		exceptionData.set(ex, new BipExceptionData((MessageKey) null, ((BipExceptionData) exceptionData.get(ex)).getSeverity(),
+				((BipExceptionData) exceptionData.get(ex)).getStatus(), ((BipExceptionData) exceptionData.get(ex)).getParams()));
 
 		ResponseEntity<Object> response =
 				ReflectionTestUtils.invokeMethod(bipRestGlobalExceptionHandler, "standardHandler", ex, HttpStatus.BAD_REQUEST);
