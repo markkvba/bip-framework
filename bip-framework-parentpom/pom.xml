@@ -507,7 +507,7 @@
 			<!-- Antrun plugin that runs fortify scans via ant. The fortify scans 
 				are run using the sourceanalyzer and FPRUtility commandline applications 
 				for now, so Fortify SCA will need to be installed before running -->
-<!-- 			<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
@@ -569,16 +569,7 @@
 						</goals>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>gov.va.vetservices.fortify-build-utils</groupId>
-						<artifactId>fortify-build-utils</artifactId>
-						<version>${fortify-build-utils.version}</version>
-						<type>jar</type>
-						<optional>true</optional>
-					</dependency>
-				</dependencies>
-			</plugin> -->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
