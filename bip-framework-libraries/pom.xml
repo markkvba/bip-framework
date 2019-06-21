@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>gov.va.bip.framework</groupId>
 		<artifactId>bip-framework-parentpom</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.0.3-SNAPSHOT</version>
 		<relativePath>../bip-framework-parentpom</relativePath>
 	</parent>
 
@@ -105,6 +105,11 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<!-- logstash-logback-encoder -->
+		<dependency>
+		    <groupId>net.logstash.logback</groupId>
+		    <artifactId>logstash-logback-encoder</artifactId>
 		</dependency>
 		<!-- for ascii art enhanced logging -->
 		<dependency>

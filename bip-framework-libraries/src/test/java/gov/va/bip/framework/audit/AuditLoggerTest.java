@@ -10,7 +10,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -204,7 +203,6 @@ public class AuditLoggerTest {
 		verify(mockAppender).doAppend(captorLoggingEvent.capture());
 		// Having a genricised captor means we don't need to cast
 		final ch.qos.logback.classic.spi.LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-		System.out.println(ReflectionToStringBuilder.toString(loggingEvent.getMDCPropertyMap().values()));
 		// Check log level is correct
 		assertThat(loggingEvent.getLevel(), is(ch.qos.logback.classic.Level.WARN));
 		// Check the message being logged is correct
