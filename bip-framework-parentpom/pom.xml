@@ -12,12 +12,12 @@
 	<groupId>gov.va.bip.framework</groupId>
 	<artifactId>bip-framework-parentpom</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>${project.artifactId}</name>
 	<description>Parent POM for BIP Application Framework - Spring Boot and Cloud Enabled</description>
 
 	<properties>
-		<!-- configuration properties -->
+		<!-- Configuration properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
@@ -28,7 +28,7 @@
 		<repo.release>${repo.baseurl}/maven-releases</repo.release>
 		<repo.snapshot>${repo.baseurl}/maven-snapshots</repo.snapshot>
 
-		<!-- test coverage configuration properties -->
+		<!-- Test coverage configuration properties -->
 		<jacoco.outputRootDir>${project.basedir}/target/jacoco</jacoco.outputRootDir>
 		<jacoco.dataFile>${jacoco.outputRootDir}/jacoco.exec</jacoco.dataFile>
 		<jacoco.reportDir>${jacoco.outputRootDir}/jacoco</jacoco.reportDir>
@@ -41,7 +41,7 @@
 		<sonar.test.exclusions>**/test/*</sonar.test.exclusions>
 		<include.int.tests.pattern>**/*IT.java,**/*Runner.java</include.int.tests.pattern>
 
-		<!-- code version control configuration -->
+		<!-- Code version control configuration -->
 		<jgitflow.keepBranch>false</jgitflow.keepBranch>
 
 		<!-- fortify properties for easy override -->
@@ -109,7 +109,7 @@
 		<httpclient.version>4.5.7</httpclient.version>
 
 		<!-- GitHub server corresponds to entry in ~/.m2/settings.xml -->
-		<!-- TEMPORARY: TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE VIA SOCKS -->
+		<!-- TEMPORARY TO BE REMOVED ONCE NEXUS REPO IS AVAILABLE -->
 		<github.global.server>github</github.global.server>
 
 	</properties>
@@ -366,7 +366,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${maven-surefire-plugin.version}</version><!--$NO-MVN-MAN-VER$ -->
+				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<skipTests>${skipTests}</skipTests>
 				</configuration>
@@ -503,72 +503,6 @@
 					<maxHeap>${fortify.maxHeap}</maxHeap>
 					<maxPermGen>${fortify.maxPermGen}</maxPermGen>
 				</configuration>
-			</plugin>
-			<!-- Antrun plugin that runs fortify scans via ant. The fortify scans 
-				are run using the sourceanalyzer and FPRUtility commandline applications 
-				for now, so Fortify SCA will need to be installed before running -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>fortify-scan</id>
-						<configuration>
-							<target>
-								<property name="dir.scripts" value="target/antscripts" />
-								<property name="fortify.util.version" value="${fortify-build-utils.version}" />
-								<property name="fortify.util.jar.path"
-									value="${gov.va.vetservices.fortify-build-utils:fortify-build-utils:jar}" />
-								<property name="settings.file.location" value="${settings.file.location}" />
-
-								<basename property="fortify.util.jar.filename" file="${fortify.util.jar.path}" />
-
-								<echo
-									message="Using the fortify-build-utils file path: ${fortify.util.jar.path}" />
-								<echo message="Version: ${fortify.util.version}" />
-								<echo message="File name: ${fortify.util.jar.filename}" />
-								<echo message="Clean ${dir.scripts}" />
-								<delete dir="${dir.scripts}" />
-								<mkdir dir="${dir.scripts}" />
-								<copy todir="${dir.scripts}" flatten="true" overwrite="true"
-									file="${fortify.util.jar.path}" />
-
-								<unzip src="${dir.scripts}/${fortify.util.jar.filename}"
-									dest="${dir.scripts}" failOnEmptyArchive="true">
-									<mapper type="flatten" />
-									<patternset>
-										<include name="**/**/*.xml" />
-									</patternset>
-								</unzip>
-
-								<property name="local.ant.lib" value="target/antlib" />
-								<mkdir dir="${local.ant.lib}" />
-								<get
-									src="http://search.maven.org/remotecontent?filepath=org/eclipse/aether/aether-ant-tasks/1.0.0.v20140518/aether-ant-tasks-1.0.0.v20140518-uber.jar"
-									dest="${local.ant.lib}/aether-ant-tasks-uber.jar" verbose="true"
-									skipexisting="true" />
-								<fail
-									message="Checksum mismatch for 'target/antlib/aether-ant-tasks-uber.jar'. Please delete it and rerun ant to redownload.">
-									<condition>
-										<not>
-											<checksum file="${local.ant.lib}/aether-ant-tasks-uber.jar"
-												algorithm="SHA" property="95dadd03392a75564904da45108cf048abe6e5bb"
-												verifyproperty="checksum.matches" />
-										</not>
-									</condition>
-								</fail>
-
-								<echo message="Running antfile ${dir.scripts}/fortify.xml" />
-								<ant antfile="${dir.scripts}/fortify.xml">
-									<property name="mvn.project.settings" value="${settings.file.location}" />
-								</ant>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -828,197 +762,81 @@
 				</plugins>
 			</build>
 		</profile>
-		<!-- OpenAPI Specification (OAS) Code generation profile -->
+		<!-- A profile to prevent inclusion of unresolvable dependency for non-GFE/JumpBox users -->
 		<profile>
-			<id>org-openapitools-codegen-parent</id>
-			<activation>
-				<!-- Profile is activated if openapi.yml exists  -->
-				<file>
-					<!--
-						This path is also used in the framework parentpom.
-						If this path changes, framework must also be updated.
-					-->
-					<exists>${basedir}/src/main/resources/openapi/openapi.yml</exists>
-				</file>
-			</activation>
+			<id>fortify</id>
+			<!-- Antrun plugin that runs fortify scans via ant. The fortify scans
+				are run using the sourceanalyzer and FPRUtility commandline applications
+				for now, so Fortify SCA will need to be installed before running -->
 			<build>
 				<plugins>
-					<!-- Download and unpack swagger-ui web jar -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>download-swagger-ui-webjar</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.webjars</groupId>
-											<artifactId>swagger-ui</artifactId>
-											<version>${swagger-ui.version}</version>
-											<overWrite>false</overWrite>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}/classes</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Generate the swagger ui from application yaml spec -->
-					<plugin>
-						<groupId>org.openapitools</groupId>
-						<artifactId>openapi-generator-maven-plugin</artifactId>
-						<version>${openapi.codegen.version}</version>
-						<executions>
-							<execution>
-								<id>generate-openapi-spec</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<configuration>
-									<inputSpec>${basedir}/src/main/resources/openapi/openapi.yml</inputSpec>
-									<validateSpec>true</validateSpec>
-									<generatorName>openapi</generatorName>
-									<output>${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui</output>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- replace name of the specification file to show -->
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>replacer</artifactId>
-						<version>${google.codereplacer.version}</version>
-						<executions>
-							<execution>
-								<id>replace-tokens-swaggerui</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<filesToInclude>
-								${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui/index.html,
-								${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui/${swagger-ui.version}/index.html
-							</filesToInclude>
-							<replacements>
-								<replacement>
-									<token>"https://petstore.swagger.io/v2/swagger.json"</token>
-									<value>"/openapi.json"</value>
-								</replacement>
-							</replacements>
-						</configuration>
-					</plugin>
-					<!-- Move generated artifacts to their final location -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-delete-swaggerui</id>
-								<phase>compile</phase>
+								<id>fortify-scan</id>
+								<configuration>
+									<target>
+										<property name="dir.scripts" value="target/antscripts" />
+										<property name="fortify.util.version" value="${fortify-build-utils.version}" />
+										<property name="fortify.util.jar.path"
+												  value="${gov.va.vetservices.fortify-build-utils:fortify-build-utils:jar}" />
+										<property name="settings.file.location" value="${settings.file.location}" />
+
+										<basename property="fortify.util.jar.filename" file="${fortify.util.jar.path}" />
+
+										<echo message="Using the fortify-build-utils file path: ${fortify.util.jar.path}" />
+										<echo message="Version: ${fortify.util.version}" />
+										<echo message="File name: ${fortify.util.jar.filename}" />
+										<echo message="Clean ${dir.scripts}" />
+										<delete dir="${dir.scripts}" />
+										<mkdir dir="${dir.scripts}" />
+										<copy todir="${dir.scripts}" flatten="true" overwrite="true" file="${fortify.util.jar.path}" />
+
+										<unzip src="${dir.scripts}/${fortify.util.jar.filename}" dest="${dir.scripts}" failOnEmptyArchive="true">
+											<mapper type="flatten" />
+											<patternset>
+												<include name="**/**/*.xml" />
+											</patternset>
+										</unzip>
+
+										<property name="local.ant.lib" value="target/antlib" />
+										<mkdir dir="${local.ant.lib}" />
+										<get
+												src="http://search.maven.org/remotecontent?filepath=org/eclipse/aether/aether-ant-tasks/1.0.0.v20140518/aether-ant-tasks-1.0.0.v20140518-uber.jar"
+												dest="${local.ant.lib}/aether-ant-tasks-uber.jar" verbose="true" skipexisting="true" />
+										<fail
+												message="Checksum mismatch for 'target/antlib/aether-ant-tasks-uber.jar'. Please delete it and rerun ant to redownload."
+										>
+											<condition>
+												<not>
+													<checksum file="${local.ant.lib}/aether-ant-tasks-uber.jar" algorithm="SHA"
+															  property="95dadd03392a75564904da45108cf048abe6e5bb" verifyproperty="checksum.matches" />
+												</not>
+											</condition>
+										</fail>
+
+										<echo message="Running antfile ${dir.scripts}/fortify.xml" />
+										<ant antfile="${dir.scripts}/fortify.xml">
+											<property name="mvn.project.settings" value="${settings.file.location}" />
+										</ant>
+									</target>
+								</configuration>
 								<goals>
 									<goal>run</goal>
 								</goals>
-								<configuration>
-									<target>
-										<copy
-											todir="${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui"
-											flatten="true" overwrite="true">
-											<fileset
-												dir="${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui/${swagger-ui.version}" />
-										</copy>
-										<delete
-											dir="${project.build.directory}/classes/META-INF/resources/webjars/swagger-ui/${swagger-ui.version}" />
-									</target>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Add generated source directory for eclipse -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<executions>
-							<!-- TODO for eclipse/m2e users: install the m2e connector 'buildhelper' 
-								by selecting 'Discover new m2e connectors' while hovering over the following 
-								execution tag -->
-							<execution>
-								<id>add-generated-source</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>${project.build.directory}/generated-sources/openapi</source>
-									</sources>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 				</plugins>
-				<!-- the following is only necessary if you are using eclipse and m2e -->
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.eclipse.m2e</groupId>
-							<artifactId>lifecycle-mapping</artifactId>
-							<configuration>
-								<lifecycleMappingMetadata>
-									<pluginExecutions>
-										<pluginExecution>
-											<pluginExecutionFilter>
-												<groupId>org.openapitools</groupId>
-												<artifactId>openapi-generator-maven-plugin</artifactId>
-												<versionRange>[${openapi.codegen.version},)</versionRange>
-												<goals>
-													<goal>generate</goal>
-												</goals>
-											</pluginExecutionFilter>
-											<action>
-												<execute />
-											</action>
-										</pluginExecution>
-										<pluginExecution>
-											<pluginExecutionFilter>
-												<groupId>com.google.code.maven-replacer-plugin</groupId>
-												<artifactId>replacer</artifactId>
-												<versionRange>[${google.codereplacer.version},)</versionRange>
-												<goals>
-													<goal>replace</goal>
-												</goals>
-											</pluginExecutionFilter>
-											<action>
-												<execute />
-											</action>
-										</pluginExecution>
-										<pluginExecution>
-											<pluginExecutionFilter>
-												<groupId>org.apache.maven.plugins</groupId>
-												<artifactId>maven-antrun-plugin</artifactId>
-												<versionRange>[${maven-antrun-plugin.version},)</versionRange>
-												<goals>
-													<goal>run</goal>
-												</goals>
-											</pluginExecutionFilter>
-											<action>
-												<execute />
-											</action>
-										</pluginExecution>
-									</pluginExecutions>
-								</lifecycleMappingMetadata>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
 			</build>
+			<dependencies>
+				<dependency>
+					<groupId>gov.va.vetservices.fortify-build-utils</groupId>
+					<artifactId>fortify-build-utils</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 </project>
